@@ -1,5 +1,6 @@
 package com.toyota.productservice.service;
 
+import com.toyota.productservice.Mapper.ProductMapper;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
@@ -26,33 +27,45 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        Product product = mapToEntity(productDto);
+        Product product = ProductMapper.mapToEntity(productDto);
         Product savedProduct = productRepository.save(product);
         logger.info("Product {} is created", product.getName());
 
-        return mapToDto(savedProduct);
+        return ProductMapper.mapToDto(savedProduct);
     }
     @Override
     public List<ProductDto> getAllProducts() {
-        List<Product> products = productRepository.findAll();
-        return products.stream().map(this::mapToDto).collect(Collectors.toList());
+        List<Product> products = productRepository.findActiveProducts();
+        return products.stream().map(ProductMapper::mapToDto).collect(Collectors.toList());
     }
 
     @Override
     public ProductDto getProductById(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
-        return optionalProduct.map(this::mapToDto).orElse(null);
+        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
+        if (optionalProduct.isPresent()) {
+            return ProductMapper.mapToDto(optionalProduct.get());
+        } else {
+            throw new EntityNotFoundException("Product not found with id: " + id);
+        }
     }
+
+
 
     @Override
     public ProductDto updateProduct(Long id, ProductDto productDto) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();
-            Product updatedProduct = mapToEntity(productDto);
-            updatedProduct.setId(existingProduct.getId());
-        //    updatedProduct.setActive(existingProduct.isActive());
-            return mapToDto(productRepository.save(updatedProduct));
+            if (productDto.isActive()) {
+                Product updatedProduct = ProductMapper.mapToEntity(productDto);
+                updatedProduct.setId(existingProduct.getId());
+                updatedProduct.setActive(true);
+                logger.info("Product with id {} is updated", id);
+                return ProductMapper.mapToDto(productRepository.save(updatedProduct));
+            } else {
+                logger.warn("Attempted to update product with inactive status");
+                throw new IllegalArgumentException("Cannot update product with inactive status");
+            }
         } else {
             throw new EntityNotFoundException("Product not found with id: " + id);
         }
@@ -60,36 +73,19 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void softDeleteProduct(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
-           // product.setActive(false); // Soft delete işareti
+            product.setActive(false); // Soft delete
             productRepository.save(product);
-           // logger.info("Product with id {} soft deleted", id);
+            logger.info("Product with id {} soft deleted", id);
         } else {
-         //   logger.warn("Attempted to soft delete product with id {} but not found", id);
+            logger.warn("Attempted to soft delete product with id {} but not found", id);
             throw new EntityNotFoundException("Product not found with id: " + id);
         }
     }
 
 
 
-    private ProductDto mapToDto(Product product) {
-        ProductDto productDto = new ProductDto();
-        productDto.setId(product.getId());
-        productDto.setName(product.getName());
-        productDto.setDescription(product.getDescription());
-        productDto.setPrice(product.getPrice());
-        productDto.setInventory(product.getInventory());
-        return productDto;
-    }
 
-    private Product mapToEntity(ProductDto productDto) {
-        Product product = new Product();
-        product.setName(productDto.getName());
-        product.setDescription(productDto.getDescription());
-        product.setPrice(productDto.getPrice());
-        product.setInventory(productDto.getInventory());
-        return product;
-    }
 }

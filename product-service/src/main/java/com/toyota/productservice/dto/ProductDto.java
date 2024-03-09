@@ -12,4 +12,5 @@ public class ProductDto {
     private double price;
    // private String sku;
     private int inventory;
+    private boolean active = Boolean.TRUE;
 }

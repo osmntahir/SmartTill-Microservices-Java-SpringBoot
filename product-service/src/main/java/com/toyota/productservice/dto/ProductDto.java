@@ -10,7 +10,6 @@ public class ProductDto {
     private String name;
     private String description;
     private double price;
-   // private String sku;
     private int inventory;
     private boolean active = Boolean.TRUE;
 }

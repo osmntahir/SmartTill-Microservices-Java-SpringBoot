@@ -8,8 +8,13 @@ import jakarta.persistence.EntityNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -35,13 +40,26 @@ public class ProductServiceImpl implements ProductService {
     }
     @Override
     public List<ProductDto> getAllProducts() {
-        List<Product> products = productRepository.findActiveProducts();
+        List<Product> products = productRepository.findAll();
         return products.stream().map(ProductMapper::mapToDto).collect(Collectors.toList());
     }
+    public Page<Product> getAllProductsByFiltering(String firstNameFilter, int page, int size, List<String> sortList, String sortOrder) {
+        Sort sort = createSortOrder(sortList, sortOrder);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return productRepository.findProductsByName(firstNameFilter, pageable);
+    }
+
+    private Sort createSortOrder(List<String> sortList, String sortOrder) {
+        List<Sort.Order> orders = sortList.stream()
+                .map(field -> sortOrder.equalsIgnoreCase("DESC") ? Sort.Order.desc(field) : Sort.Order.asc(field))
+                .collect(Collectors.toList());
+        return Sort.by(orders);
+    }
+
 
     @Override
     public ProductDto getProductById(Long id) {
-        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             return ProductMapper.mapToDto(optionalProduct.get());
         } else {
@@ -53,7 +71,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto updateProduct(Long id, ProductDto productDto) {
-        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();
             if (productDto.isActive()) {
@@ -73,7 +91,7 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public void softDeleteProduct(Long id) {
-        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
+        Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
             product.setActive(false); // Soft delete

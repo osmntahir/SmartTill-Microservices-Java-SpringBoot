@@ -13,6 +13,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 @Data // Generates getters, setters, etc.
+@Where(clause = "active = true") // Hibernate specific annotation
 public class Product {
 
     @jakarta.persistence.Id

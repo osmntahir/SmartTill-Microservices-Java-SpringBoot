@@ -1,19 +1,19 @@
 package com.toyota.productservice.dao;
 
 import com.toyota.productservice.domain.Product;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    @Query("SELECT p FROM Product p WHERE p.active = true")
-    List<Product> findActiveProducts();
+    static final String FILTER_PRODUCTS_ON_NAME = "SELECT p FROM Product p WHERE p.name = :name";
 
-    @Query("SELECT p FROM Product p WHERE p.id = :id AND p.active = true")
-    Optional<Product> findActiveProductById(Long id);
-
+    @Query(FILTER_PRODUCTS_ON_NAME)
+    Page<Product> findProductsByName(String name, Pageable pageable);
 
 }

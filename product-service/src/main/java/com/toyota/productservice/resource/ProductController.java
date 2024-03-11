@@ -1,8 +1,11 @@
 package com.toyota.productservice.resource;
 
+import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
 import com.toyota.productservice.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +26,16 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductDto> products = productService.getAllProducts();
+        return ResponseEntity.ok(products);
+    }
+
+    @GetMapping("/page")
+    public ResponseEntity<Page<Product>> fetchCustomersWithPageInterfaceAndSorted(@RequestParam(defaultValue = "muz") String nameFilter,
+                                                                                  @RequestParam(defaultValue = "0") int page,
+                                                                                  @RequestParam(defaultValue = "30") int size,
+                                                                                  @RequestParam(defaultValue = "") List<String> sortList,
+                                                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortOrder) {
+        Page<Product> products = productService.getAllProductsByFiltering(nameFilter, page, size, sortList, sortOrder.name());
         return ResponseEntity.ok(products);
     }
 

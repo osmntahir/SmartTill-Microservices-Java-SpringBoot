@@ -51,10 +51,20 @@ public class ProductServiceImpl implements ProductService {
 
     private Sort createSortOrder(List<String> sortList, String sortOrder) {
         List<Sort.Order> orders = sortList.stream()
-                .map(field -> sortOrder.equalsIgnoreCase("DESC") ? Sort.Order.desc(field) : Sort.Order.asc(field))
+                .map(field -> {
+                    // Sıralama yapılacak alanı kontrol edelim
+                    if (field.equalsIgnoreCase("price")) {
+                        // Eğer sıralama yapılacak alan price ise, price alanına göre sıralama yapalım
+                        return sortOrder.equalsIgnoreCase("DESC") ? Sort.Order.desc("price") : Sort.Order.asc("price");
+                    } else {
+                        // Diğer alanlar için mevcut mantığı kullanalım
+                        return sortOrder.equalsIgnoreCase("DESC") ? Sort.Order.desc(field) : Sort.Order.asc(field);
+                    }
+                })
                 .collect(Collectors.toList());
         return Sort.by(orders);
     }
+
 
 
     @Override

@@ -30,14 +30,20 @@ public class ProductController {
     }
 
     @GetMapping("/page")
-    public ResponseEntity<Page<Product>> fetchCustomersWithPageInterfaceAndSorted(@RequestParam(defaultValue = "muz") String nameFilter,
+    public ResponseEntity<Page<Product>> fetchCustomersWithPageInterfaceAndSorted(@RequestParam(defaultValue = "") String nameFilter,
                                                                                   @RequestParam(defaultValue = "0") int page,
                                                                                   @RequestParam(defaultValue = "30") int size,
                                                                                   @RequestParam(defaultValue = "") List<String> sortList,
-                                                                                  @RequestParam(defaultValue = "DESC") Sort.Direction sortOrder) {
+                                                                                  @RequestParam(defaultValue = "ASC") Sort.Direction sortOrder) {
+        // Ek olarak price alanına göre sıralama ekleyelim
+        if (!sortList.contains("price")) {
+            sortList.add("price");
+        }
+
         Page<Product> products = productService.getAllProductsByFiltering(nameFilter, page, size, sortList, sortOrder.name());
         return ResponseEntity.ok(products);
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {

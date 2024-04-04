@@ -25,4 +25,16 @@ public class Product {
     private double price;
     private int inventory;
     private boolean active = true; // Default value is true
+
+
+    public Product(String s, double price) {
+        this.name = s;
+        this.price = price;
+    }
+    public Product(Long id, String name, double price, int inventory) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.inventory = inventory;
+    }
 }

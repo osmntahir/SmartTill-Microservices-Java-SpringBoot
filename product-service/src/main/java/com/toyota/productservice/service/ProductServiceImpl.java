@@ -32,12 +32,18 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public ProductDto createProduct(ProductDto productDto) {
-        Product product = ProductMapper.mapToEntity(productDto);
-        Product savedProduct = productRepository.save(product);
-        logger.info("Product {} is created", product.getName());
+        // Name ve price null değilse devam et
+        if (productDto.getName() != null && productDto.getPrice() != 0.0) {
+            Product product = ProductMapper.mapToEntity(productDto);
+            Product savedProduct = productRepository.save(product);
+            logger.info("Product {} is created", product.getName());
 
-        return ProductMapper.mapToDto(savedProduct);
+            return ProductMapper.mapToDto(savedProduct);
+        } else {
+            throw new IllegalArgumentException("Name and price cannot be null");
+        }
     }
+
     @Override
     public List<ProductDto> getAllProducts() {
         List<Product> products = productRepository.findAll();
@@ -51,19 +57,12 @@ public class ProductServiceImpl implements ProductService {
 
     private Sort createSortOrder(List<String> sortList, String sortOrder) {
         List<Sort.Order> orders = sortList.stream()
-                .map(field -> {
-                    // Sıralama yapılacak alanı kontrol edelim
-                    if (field.equalsIgnoreCase("price")) {
-                        // Eğer sıralama yapılacak alan price ise, price alanına göre sıralama yapalım
-                        return sortOrder.equalsIgnoreCase("DESC") ? Sort.Order.desc("price") : Sort.Order.asc("price");
-                    } else {
-                        // Diğer alanlar için mevcut mantığı kullanalım
-                        return sortOrder.equalsIgnoreCase("DESC") ? Sort.Order.desc(field) : Sort.Order.asc(field);
-                    }
-                })
+                .map(field -> Sort.Order.by(field).with(Sort.Direction.fromString(sortOrder)))
                 .collect(Collectors.toList());
         return Sort.by(orders);
     }
+
+
 
 
 

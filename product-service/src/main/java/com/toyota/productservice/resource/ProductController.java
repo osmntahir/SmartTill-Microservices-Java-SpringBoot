@@ -18,24 +18,39 @@ public class ProductController {
 
     private final ProductService productService;
 
+    /**
+     * Constructor based injection
+     * @param productService
+     */
     @Autowired
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
-
+    /**
+     * Method to get all products
+     * @return List of ProductDto
+     */
     @GetMapping
     public ResponseEntity<List<ProductDto>> getAllProducts() {
         List<ProductDto> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
-
+/**
+     * Method to get all products with pagination and sorting
+     * @param nameFilter
+     * @param page
+     * @param size
+     * @param sortList
+     * @param sortOrder
+     * @return Page of Product
+     */
     @GetMapping("/page")
     public ResponseEntity<Page<Product>> fetchCustomersWithPageInterfaceAndSorted(@RequestParam(defaultValue = "") String nameFilter,
                                                                                   @RequestParam(defaultValue = "0") int page,
                                                                                   @RequestParam(defaultValue = "30") int size,
                                                                                   @RequestParam(defaultValue = "") List<String> sortList,
                                                                                   @RequestParam(defaultValue = "ASC") Sort.Direction sortOrder) {
-        // Ek olarak price alanına göre sıralama ekleyelim
+        // in addition to the default sorting by name, we also want to sort by price
         if (!sortList.contains("price")) {
             sortList.add("price");
         }
@@ -43,26 +58,42 @@ public class ProductController {
         Page<Product> products = productService.getAllProductsByFiltering(nameFilter, page, size, sortList, sortOrder.name());
         return ResponseEntity.ok(products);
     }
-
+/**
+     * Method to get product by id
+     * @param id
+     * @return ProductDto
+     */
 
     @GetMapping("/{id}")
     public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
         ProductDto product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
-
+/**
+     * Method to create product
+     * @param productDto
+     * @return ProductDto
+     */
     @PostMapping
     public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
         ProductDto createdProduct = productService.createProduct(productDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
-
+/**
+     * Method to update product
+     * @param id
+     * @param productDto
+     * @return ProductDto
+     */
     @PutMapping("/{id}")
     public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
         ProductDto updatedProduct = productService.updateProduct(id, productDto);
         return ResponseEntity.ok(updatedProduct);
     }
-
+/**         * Method to delete product
+     * @param id
+     * @return ResponseEntity<Void>
+     */
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.softDeleteProduct(id);

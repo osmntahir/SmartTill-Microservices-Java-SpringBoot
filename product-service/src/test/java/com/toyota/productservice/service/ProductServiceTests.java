@@ -1,5 +1,6 @@
 package com.toyota.productservice.service;
 
+import com.toyota.productservice.Mapper.ProductMapper;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
@@ -11,14 +12,10 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -60,20 +57,17 @@ class ProductServiceTests {
         assertEquals(savedProduct.getName(), createdProduct.getName());
         assertEquals(savedProduct.getPrice(), createdProduct.getPrice());
         assertEquals(savedProduct.getDescription(), createdProduct.getDescription());
-        assertEquals(savedProduct.getInventory(), createdProduct.getInventory());
+        assertEquals(savedProduct.getInventory() , createdProduct.getInventory());
     }
 
     /**
-     * Test for createProduct method with null name and price
+     * Test for createProduct method with null name
      */
     @Test
-    public void TestCreateProduct_NullName_ThrowsIllegalArgumentException() {
+    public void testCreateProductNullNameThrowsIllegalArgumentException() {
         // Arrange
         ProductDto productDto = new ProductDto();
-        // productDto has no name. then it should throw IllegalArgumentException
-
         productDto.setPrice(10.0);
-        productDto.setDescription("Test Description");
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
@@ -84,20 +78,18 @@ class ProductServiceTests {
     /**
      * Test for createProduct method with null price
      */
-
     @Test
-    void TestCreateProduct_NullPrice_ThrowsIllegalArgumentException() {
+    public void testCreateProductNullPriceThrowsIllegalArgumentException() {
         // Arrange
         ProductDto productDto = new ProductDto();
         productDto.setName("Test Product");
-        // productDto has no price. then it should throw IllegalArgumentException
-        productDto.setDescription("Test Description");
 
         // Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(productDto);
         });
     }
+
 
     /**
      * Test for createProduct method with null name and price
@@ -113,6 +105,23 @@ class ProductServiceTests {
         assertThrows(IllegalArgumentException.class, () -> {
             productService.createProduct(productDto);
         });
+    }
+    /**
+     * Test for createProduct method with zero price
+     */
+
+    @Test
+    public void testCreateProduct_ZeroPrice_ThrowsIllegalArgumentException() {
+        // Arrange
+        ProductDto productDto = new ProductDto();
+        productDto.setName("Test Product");
+        productDto.setPrice(0.0);
+
+        // Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+            productService.createProduct(productDto);
+        });
+
     }
 
     /**
@@ -274,6 +283,62 @@ class ProductServiceTests {
             verify(productRepository, never()).save(any(Product.class));
         }
     }
+
+    @Test
+    void getProducts_ASC() {
+        //given
+        int page=0;
+        int size=5;
+        String name= "";
+        Double minPrice= (double) 0;
+        Double maxPrice = Double.MAX_VALUE;
+        boolean isActive=true;
+        String sortBy="name";
+        String sortDirection="ASC";
+        List<Product> content=List.of(new Product());
+        Sort.Order sort=new Sort.Order(Sort.Direction.ASC,sortBy);
+        Pageable pageable= PageRequest.of(page,size,Sort.by(sort));
+        Page<Product> pageMock=new PageImpl<>(content,pageable,1);
+
+        //when
+        when(productRepository.getProductsFiltered(anyString(),anyDouble(),anyDouble(),anyBoolean(),any()))
+                .thenReturn(pageMock);
+        Page<ProductDto> result=productService.getProducts(page,size,name,minPrice,maxPrice,isActive,sortBy
+                ,sortDirection);
+
+        //then
+        assertEquals(page,result.getPageable().getPageNumber());
+        assertEquals(size,result.getPageable().getPageSize());
+        assertEquals(ProductDto.class,result.getContent().get(0).getClass());
+    }
+    @Test
+    void getProducts_DESC() {
+        //given
+        int page=0;
+        int size=5;
+        String name="";
+        Double minPrice = (double) 0;
+        Double maxPrice = Double.MAX_VALUE;
+        boolean isActive=true;
+        String sortBy="name";
+        String sortDirection="DESC";
+        List<Product> content=List.of(new Product());
+        Sort.Order sort=new Sort.Order(Sort.Direction.DESC,sortBy);
+        Pageable pageable= PageRequest.of(page,size,Sort.by(sort));
+        Page<Product> pageMock=new PageImpl<>(content,pageable,1);
+
+        //when
+        when(productRepository.getProductsFiltered(anyString(),anyDouble(), anyDouble(),anyBoolean(),any()))
+                .thenReturn(pageMock);
+        Page<ProductDto> result=productService.getProducts(page,size,name,minPrice,maxPrice,isActive,sortBy
+                ,sortDirection);
+
+        //then
+        assertEquals(page,result.getPageable().getPageNumber());
+        assertEquals(size,result.getPageable().getPageSize());
+        assertEquals(ProductDto.class,result.getContent().get(0).getClass());
+    }
+
 }
 
 

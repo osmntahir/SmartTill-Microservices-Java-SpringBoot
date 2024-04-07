@@ -39,13 +39,13 @@ public class ProductServiceImpl implements ProductService {
     @Override
     public ProductDto createProduct(ProductDto productDto) {
 
-        if (productDto.getName() != null || productDto.getPrice() != 0.0) {
+        if (productDto.getName() != null && productDto.getPrice() != 0.0) {
             Product product = ProductMapper.mapToEntity(productDto);
             Product savedProduct = productRepository.save(product);
             logger.info("Product {} is created", product.getName());
             return ProductMapper.mapToDto(savedProduct);
         } else {
-            throw new IllegalArgumentException("Name and price cannot be null");
+            throw new IllegalArgumentException("Name or price cannot be null");
         }
     }
 

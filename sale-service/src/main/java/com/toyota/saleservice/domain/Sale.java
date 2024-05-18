@@ -19,17 +19,11 @@ public class Sale {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
     private double totalPrice;
-
-
     private LocalDateTime date;
-
-
     @Enumerated(EnumType.STRING)
     private PaymentType paymentType;
-
+    private boolean deleted;
 
 
     // Getter ve setter metotları

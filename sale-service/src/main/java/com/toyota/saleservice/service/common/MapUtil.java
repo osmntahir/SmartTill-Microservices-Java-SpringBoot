@@ -12,32 +12,34 @@ public class MapUtil {
     private final ModelMapper modelMapper;
 
     public MapUtil(ModelMapper modelMapper) {
+
         this.modelMapper = modelMapper;
     }
 
-    public SaleDto convertToDTO(Sale sale) {
-        return modelMapper.map(sale, SaleDto.class);
-    }
-
-    public Sale convertToEntity(SaleDto saleDto) {
-        return modelMapper.map(saleDto, Sale.class);
-    }
-
-    public CampaignDto convertToDTO(Campaign campaign) {
-        return modelMapper.map(campaign, CampaignDto.class);
-    }
-
-    public Campaign convertToEntity(CampaignDto campaignDto) {
+   public Campaign convertCampaignDtoToCampaign(CampaignDto campaignDto) {
         return modelMapper.map(campaignDto, Campaign.class);
     }
 
-    public SoldProduct convertToEntity(SoldProductDto soldProductdto) {
-        return modelMapper.map(soldProductdto, SoldProduct.class);
+    public CampaignDto convertCampaignToCampaignDto(Campaign campaign) {
+        return modelMapper.map(campaign, CampaignDto.class);
     }
 
-    public SoldProductDto convertToDTO(SoldProduct soldProduct) {
+    public Sale convertSaleDtoToSale(SaleDto saleDto) {
+        return modelMapper.map(saleDto, Sale.class);
+    }
+
+    public SaleDto convertSaleToSaleDto(Sale sale) {
+        return modelMapper.map(sale, SaleDto.class);
+    }
+
+    public SoldProduct convertSoldProductDtoToSoldProduct(SoldProductDto soldProductDto) {
+        return modelMapper.map(soldProductDto, SoldProduct.class);
+    }
+
+    public SoldProductDto convertSoldProductToSoldProductDto(SoldProduct soldProduct) {
         return modelMapper.map(soldProduct, SoldProductDto.class);
     }
+
 
 
 

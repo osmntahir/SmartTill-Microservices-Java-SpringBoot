@@ -2,8 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/product-service/product-service.iml" filepath="$PROJECT_DIR$/product-service/product-service.iml" />
-      <module fileurl="file://$PROJECT_DIR$/sale-service/sale-service.iml" filepath="$PROJECT_DIR$/sale-service/sale-service.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Java-Toyota-32Bit-Backend.iml" filepath="$PROJECT_DIR$/Java-Toyota-32Bit-Backend.iml" />
     </modules>
   </component>
 </project>

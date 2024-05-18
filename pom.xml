@@ -6,15 +6,15 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.4</version>
+        <version>3.1.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <modules>
         <module>product-service</module>
         <module>sale-service</module>
-
     </modules>
+
     <packaging>pom</packaging>
     <groupId>com.toyota</groupId>
     <artifactId>toyota-project</artifactId>
@@ -39,26 +39,6 @@
                 <version>${spring-cloud.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.modelmapper</groupId>
-                <artifactId>modelmapper</artifactId>
-                <version>${modelmapper.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.springframework</groupId>
-                <artifactId>spring-webflux</artifactId>
-                <version>${webflux.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-api</artifactId>
-                <version>${log4j-api.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.apache.logging.log4j</groupId>
-                <artifactId>log4j-core</artifactId>
-                <version>${log4j-core.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

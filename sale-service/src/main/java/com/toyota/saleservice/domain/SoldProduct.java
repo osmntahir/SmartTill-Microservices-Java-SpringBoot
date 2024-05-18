@@ -1,8 +1,6 @@
 package com.toyota.saleservice.domain;
 
 
-
-
 import com.toyota.productservice.domain.Product;
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,11 +22,11 @@ public class SoldProduct {
     @JoinColumn(name = "sale_id")
     private Sale sale;
 
-    /**
+    private boolean deleted;
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-     */
+
 
     @Column(nullable = false)
     private double price;

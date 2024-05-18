@@ -18,14 +18,9 @@ public class Campaign {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-
     private String name;
-
-
-    private double discount;
-
-    @Column
+    private long discount;
     private String description;
+    private boolean deleted;
 
 }

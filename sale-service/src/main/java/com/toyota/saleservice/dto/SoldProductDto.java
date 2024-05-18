@@ -1,5 +1,5 @@
 package com.toyota.saleservice.dto;
-import com.toyota.productservice.dto.ProductDto;
+import com.toyota.productservice.dto.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

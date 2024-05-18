@@ -4,6 +4,7 @@ import com.toyota.saleservice.dao.CampaignRepository;
 import com.toyota.saleservice.domain.Campaign;
 import com.toyota.saleservice.dto.CampaignDto;
 import com.toyota.saleservice.dto.PaginationResponse;
+import com.toyota.saleservice.exception.CampaignAlreadyExistsException;
 import com.toyota.saleservice.service.abstracts.CampaignService;
 import com.toyota.saleservice.service.common.MapUtil;
 import com.toyota.saleservice.service.common.SortUtil;
@@ -47,5 +48,20 @@ public class CampaignServiceImpl implements CampaignService {
 
 
 
+    }
+
+    @Override
+    public CampaignDto addCampaign(CampaignDto campaignDto) {
+        logger.info("Adding campaign with name: {}",campaignDto.getName());
+        if(campaignRepository.existsByName(campaignDto.getName())){
+            logger.warn("Vehicle create failed due to VIN conflict: Vehicle with this VIN already exists!" +
+                    " VIN: {}",campaignDto.getName());
+            throw new CampaignAlreadyExistsException("Campaign with this name already exists! " + campaignDto.getName());
+        }
+        Campaign campaign = mapUtil.convertCampaignDtoToCampaign(campaignDto);
+        Campaign saved = campaignRepository.save(campaign);
+        logger.info("Campaign with name {} added successfully.",campaignDto.getName());
+
+        return mapUtil.convertCampaignToCampaignDto(saved);
     }
 }

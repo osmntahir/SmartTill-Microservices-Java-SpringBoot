@@ -13,4 +13,5 @@ public interface CampaignService {
             List<String> sortBy, String sortDirection);
 
 
+    CampaignDto addCampaign(CampaignDto campaignDto);
 }

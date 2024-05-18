@@ -15,4 +15,6 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
     Page<Campaign> getCampaignsFiltered(String name,
                                         Double minDiscount, Double maxDiscount,
                                         boolean deleted, Pageable pageable);
+
+    boolean existsByName(String name);
 }

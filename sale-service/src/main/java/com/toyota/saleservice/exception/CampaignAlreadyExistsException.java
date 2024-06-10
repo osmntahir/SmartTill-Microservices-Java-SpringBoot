@@ -3,7 +3,7 @@ package com.toyota.saleservice.exception;
 
 
 /**
- * VehicleAlreadyExistsException thrown when vehicle already exists
+ * CampaignAlreadyExistsException thrown when campaign already exists
  */
 public class CampaignAlreadyExistsException extends RuntimeException{
     public CampaignAlreadyExistsException(String message) {

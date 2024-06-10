@@ -12,8 +12,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+
 
 public class CampaignDto {
     private Long id;
@@ -24,4 +23,5 @@ public class CampaignDto {
     @Min(value = 0, message = "Discount must be greater than 0")
     @Max(value = 100,  message = "Discount must be less than 101")
     private long discount;
+    private boolean deleted = Boolean.FALSE;
 }

@@ -27,7 +27,6 @@ public class SoldProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
-
     @Column(nullable = false)
     private double price;
 

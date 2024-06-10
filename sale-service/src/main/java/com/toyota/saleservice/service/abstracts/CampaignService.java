@@ -14,4 +14,8 @@ public interface CampaignService {
 
 
     CampaignDto addCampaign(CampaignDto campaignDto);
+
+    CampaignDto updateCampaign(Long id ,CampaignDto campaignDto);
+
+    CampaignDto deleteCampaign(Long id);
 }

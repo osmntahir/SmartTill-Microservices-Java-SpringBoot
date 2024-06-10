@@ -48,6 +48,30 @@ public class CampaignController {
 
     }
 
+    @PutMapping("/update/{id}")
+    public ResponseEntity<CampaignDto> updateCampaign(@PathVariable Long id,@RequestBody CampaignDto campaignDto) {
+        CampaignDto response = campaignService.updateCampaign(id,campaignDto);
+
+        if(response == null)
+        {
+            return ResponseEntity.badRequest().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<CampaignDto> deleteCampaign(@PathVariable Long id) {
+        CampaignDto response = campaignService.deleteCampaign(id);
+
+        if(response == null)
+        {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 
 

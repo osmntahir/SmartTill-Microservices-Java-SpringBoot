@@ -3,10 +3,8 @@ package com.toyota.saleservice.domain;
 import com.toyota.productservice.domain.Product;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "campaign_products")
@@ -14,6 +12,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
+
+@Where(clause = "deleted = false")
 public class CampaignProduct {
 
     @Id
@@ -29,5 +29,6 @@ public class CampaignProduct {
     @JoinColumn(name = "product_id")
     private Product product;
 
+    boolean deleted = Boolean.FALSE;
     // Getter ve setter metotları
 }

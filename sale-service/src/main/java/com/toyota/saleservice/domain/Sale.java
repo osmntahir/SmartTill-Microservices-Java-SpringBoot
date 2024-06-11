@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -14,6 +15,8 @@ import java.util.List;
 @Table(name = "sale")
 @NoArgsConstructor
 @Data
+
+@Where(clause = "deleted = false") // Hibernate specific annotation
 public class Sale {
 
     @Id
@@ -21,9 +24,15 @@ public class Sale {
     private Long id;
     private double totalPrice;
     private LocalDateTime date;
+
     @Enumerated(EnumType.STRING)
+    @Column(name = "payment_type")
     private PaymentType paymentType;
-    private boolean deleted;
+    private boolean deleted = Boolean.FALSE;
+
+
+    @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
+    private List<SoldProduct> soldProducts;
 
 
     // Getter ve setter metotları

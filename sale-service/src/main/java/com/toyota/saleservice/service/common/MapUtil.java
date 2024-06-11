@@ -3,6 +3,7 @@ package com.toyota.saleservice.service.common;
 import com.toyota.saleservice.domain.Campaign;
 import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.dto.CampaignDto;
+import com.toyota.saleservice.dto.CampaignProductDto;
 import org.modelmapper.ModelMapper;
 
 public class MapUtil {
@@ -20,7 +21,6 @@ public class MapUtil {
     public CampaignDto convertCampaignToCampaignDto(Campaign campaign) {
         return modelMapper.map(campaign, CampaignDto.class);
     }
-/*
 
     public CampaignProductDto convertCampaignProductToCampaignProductDto(CampaignProduct campaignProduct) {
         return modelMapper.map(campaignProduct, CampaignProductDto.class);
@@ -30,7 +30,6 @@ public class MapUtil {
         return modelMapper.map(campaignProductDto, CampaignProduct.class);
     }
 
-*/
 
 
 

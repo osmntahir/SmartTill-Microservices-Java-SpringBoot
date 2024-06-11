@@ -7,7 +7,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 
 @SpringBootApplication
 @EntityScan(basePackages = {"com.toyota.saleservice.domain", "com.toyota.productservice.domain"})
-@EnableJpaRepositories(basePackages = {"com.toyota.saleservice.dao"})
+@EnableJpaRepositories(basePackages = {"com.toyota.saleservice.dao", "com.toyota.productservice.dao"})
 public class SaleServiceApplication {
 
     public static void main(String[] args) {

@@ -11,4 +11,5 @@ public class CampaignProductDto {
     private Long id;
     private Long campaignId;
     private Long productId;
+    boolean deleted = Boolean.FALSE;
 }

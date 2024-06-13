@@ -4,9 +4,9 @@ package com.toyota.saleservice.service.impl;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 
-import com.toyota.productservice.dto.ProductDto;
 import com.toyota.saleservice.dao.SoldProductRepository;
 import com.toyota.saleservice.domain.SoldProduct;
+import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.exception.ProductNotFoundException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
@@ -14,10 +14,16 @@ import com.toyota.saleservice.service.common.MapUtil;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +73,19 @@ public class SoldProductServiceImpl  implements SoldProductService {
         }
     }
 
+    @Override
+    public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean deleted, String sortBy, String sortDirection) {
+    logger.info("Getting sold products with filters");
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+    Page<SoldProduct> pageResponse = soldProductRepository.getSoldProductsFiltered(name, minPrice, maxPrice, deleted, pageable);
+    logger.debug("Retrieved {} sold products.", pageResponse.getContent().size());
+        List<SoldProductDto> soldProductDtos = pageResponse.stream().map(
+                mapUtil::convertSoldProductToSoldProductDto).toList();
+    logger.info("Retrieved and converted {} sold products to dto.", soldProductDtos.size());
+
+    return new PaginationResponse<>(soldProductDtos, pageResponse);
+
+    }
     // Yardımcı metodlar
     private SoldProduct createSoldProduct(Long productId, SoldProductDto soldProductDto) {
         Optional<Product> productOptional = productRepository.findById(productId);

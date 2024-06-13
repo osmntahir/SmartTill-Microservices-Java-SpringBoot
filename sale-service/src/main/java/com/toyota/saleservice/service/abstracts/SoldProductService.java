@@ -4,7 +4,7 @@ import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SoldProductDto;
 
 public interface SoldProductService {
-    SoldProductDto addSoldProduct(Long productId, SoldProductDto soldProductDto);
+    SoldProductDto addSoldProduct(Long productId,Long SaleId, SoldProductDto soldProductDto);
 
     SoldProductDto deleteSoldProduct(Long id);
 

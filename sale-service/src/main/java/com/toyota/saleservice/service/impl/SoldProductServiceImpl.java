@@ -4,7 +4,9 @@ package com.toyota.saleservice.service.impl;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 
+import com.toyota.saleservice.dao.SaleRepository;
 import com.toyota.saleservice.dao.SoldProductRepository;
+import com.toyota.saleservice.domain.Sale;
 import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SoldProductDto;
@@ -36,16 +38,17 @@ public class SoldProductServiceImpl  implements SoldProductService {
 
     private final ProductRepository productRepository;
     private final CampaignProductServiceImpl campaignProductService;
+    private final SaleRepository saleRepository;
 
 
     @Override
-    public SoldProductDto addSoldProduct(Long productId, SoldProductDto soldProductDto) {
+    public SoldProductDto addSoldProduct(Long productId,Long saleId, SoldProductDto soldProductDto) {
         logger.info("Adding sold product with productId: {}", productId);
 
         Optional<Product> productOptional = productRepository.findById(productId);
 
         if (productOptional.isPresent()) {
-            SoldProduct soldProduct = createSoldProduct(productId, soldProductDto);
+            SoldProduct soldProduct = createSoldProduct(productId,saleId, soldProductDto);
             SoldProduct saved = soldProductRepository.save(soldProduct);
             logger.info("Sold product added with id: {}", saved.getId());
             return mapUtil.convertSoldProductToSoldProductDto(saved);
@@ -87,7 +90,7 @@ public class SoldProductServiceImpl  implements SoldProductService {
 
     }
     // Yardımcı metodlar
-    private SoldProduct createSoldProduct(Long productId, SoldProductDto soldProductDto) {
+    private SoldProduct createSoldProduct(Long productId,Long saleId, SoldProductDto soldProductDto) {
         Optional<Product> productOptional = productRepository.findById(productId);
         if (productOptional.isPresent()) {
             Product product = productOptional.get();
@@ -107,6 +110,11 @@ public class SoldProductServiceImpl  implements SoldProductService {
                 soldProduct.setDiscount(0L);
             }
             soldProduct.setTotal(totalPrice);
+            Optional<Sale> sale = saleRepository.findById(saleId);
+            if (sale.isPresent()) {
+                sale.get().setTotalPrice(sale.get().getTotalPrice() + totalPrice);
+                soldProduct.setSale(sale.get());
+            }
             soldProduct.setName(product.getName());
             return soldProduct;
         } else {

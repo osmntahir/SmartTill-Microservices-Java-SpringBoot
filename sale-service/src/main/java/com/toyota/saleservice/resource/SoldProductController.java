@@ -31,13 +31,14 @@ public class SoldProductController {
         return soldProductService.getSoldProducts(page, size, name, minPrice, maxPrice, deleted, sortBy, sortDirection);
     }
 
-    @PostMapping("/add/{productId}")
+    @PostMapping("/add/{productId}/{saleId}")
     public ResponseEntity <SoldProductDto> addSoldProduct(
             @PathVariable("productId") Long productId ,
+            @PathVariable("saleId") Long saleId,
             @RequestBody @Valid SoldProductDto soldProductDto)
     {
         return ResponseEntity.status(HttpStatus.CREATED).
-                body(soldProductService.addSoldProduct(productId, soldProductDto));
+                body(soldProductService.addSoldProduct(productId,saleId, soldProductDto));
     }
     @PutMapping("/update/{id}")
     public ResponseEntity <SoldProductDto> updateSoldProduct(

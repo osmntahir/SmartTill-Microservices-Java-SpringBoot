@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
+import java.util.List;
+
 @Entity
 @Table(name = "campaign")
 @Getter
@@ -24,5 +26,8 @@ public class Campaign {
     private long discount;
     private String description;
     private boolean deleted;
+
+    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CampaignProduct> campaignProducts;
 
 }

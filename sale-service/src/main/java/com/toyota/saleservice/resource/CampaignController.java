@@ -37,15 +37,11 @@ public class CampaignController {
     @PostMapping("/add")
     public ResponseEntity<CampaignDto>addCampaign (@RequestBody  CampaignDto campaignDto){
         CampaignDto response = campaignService.addCampaign(campaignDto);
-
         if(response == null)
         {
             return ResponseEntity.badRequest().body(null);
         }
-
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-
-
     }
 
     @PutMapping("/update/{id}")

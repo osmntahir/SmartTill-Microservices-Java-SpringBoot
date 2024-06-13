@@ -114,7 +114,17 @@ public class CampaignProductServiceImpl implements CampaignProductService {
         return mapUtil.convertCampaignProductToCampaignProductDto(saved);
     }
 
+    @Override
+    public Optional<Long> getDiscountForProduct(Long productId) {
+        List<CampaignProduct> campaignProducts = campaignProductRepository.findByProductId(productId);
 
+        if (campaignProducts.isEmpty()) {
+            return Optional.of(0L);
+        }
+
+        // Örneğin, ilk kampanyanın indirimini alabilirsiniz:
+        return Optional.of(campaignProducts.get(0).getCampaign().getDiscount());
+    }
 
 
 

@@ -20,4 +20,6 @@ public class SoldProductDto {
 
     @Min(value = 1, message = "Quantity must be greater than or equal to 1")
     private int quantity;
+
+    boolean deleted;
 }

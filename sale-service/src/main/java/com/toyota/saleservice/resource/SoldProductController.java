@@ -24,4 +24,21 @@ public class SoldProductController {
         return ResponseEntity.status(HttpStatus.CREATED).
                 body(soldProductService.addSoldProduct(productId, soldProductDto));
     }
+    @PutMapping("/update/{id}")
+    public ResponseEntity <SoldProductDto> updateSoldProduct(
+            @PathVariable Long id,
+            @RequestBody @Valid SoldProductDto soldProductDto)
+    {
+        return ResponseEntity.ok(soldProductService.updateSoldProduct(id, soldProductDto));
+    }
+
+
+
+
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity <SoldProductDto> deleteSoldProduct(@PathVariable Long id)
+    {
+        return ResponseEntity.ok(soldProductService.deleteSoldProduct(id));
+    }
 }

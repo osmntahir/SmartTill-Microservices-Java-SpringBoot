@@ -23,8 +23,7 @@ public class CampaignProduct {
     @ManyToOne
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
-
-
+    
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;

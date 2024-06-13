@@ -13,4 +13,8 @@ public interface CampaignProductService {
     CampaignProductDto updateCampaignProduct(Long id, CampaignProductDto campaignProductDto);
 
     CampaignProductDto deleteCampaignProduct(Long id);
+
+    public List<CampaignProductDto> getCampaignProductsByCampaignId(Long campaignId);
+
+    public List<CampaignProductDto> getCampaignProductsByProductId(Long productId);
 }

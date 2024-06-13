@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -111,5 +112,25 @@ public class CampaignProductServiceImpl implements CampaignProductService {
         CampaignProduct saved = campaignProductRepository.save(campaignProduct);
         logger.info("Campaign product with id {} deleted successfully.", id);
         return mapUtil.convertCampaignProductToCampaignProductDto(saved);
+    }
+
+
+
+
+
+    @Override
+    public List<CampaignProductDto> getCampaignProductsByProductId(Long productId) {
+        List<CampaignProduct> campaignProducts = campaignProductRepository.findByProductIdAndDeletedFalse(productId);
+        return campaignProducts.stream()
+                .map(mapUtil::convertCampaignProductToCampaignProductDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<CampaignProductDto> getCampaignProductsByCampaignId(Long campaignId) {
+        List<CampaignProduct> campaignProducts = campaignProductRepository.findByCampaignIdAndDeletedFalse(campaignId);
+        return campaignProducts.stream()
+                .map(mapUtil::convertCampaignProductToCampaignProductDto)
+                .collect(Collectors.toList());
     }
 }

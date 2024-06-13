@@ -26,15 +26,13 @@ public class SoldProduct {
     private Sale sale;
 
     private boolean deleted = Boolean.FALSE;
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "product_id")
     private Product product;
-
-
+    private String name;
     private double price;
-
-
     private int quantity;
-
+    private double total;
+    private long discount;
 
 }

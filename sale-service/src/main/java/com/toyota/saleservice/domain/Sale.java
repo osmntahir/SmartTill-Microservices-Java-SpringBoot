@@ -35,5 +35,5 @@ public class Sale {
     private List<SoldProduct> soldProducts;
 
 
-    // Getter ve setter metotları
+
 }

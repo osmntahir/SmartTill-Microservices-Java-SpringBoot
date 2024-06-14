@@ -76,7 +76,6 @@ public class SoldProductServiceImpl  implements SoldProductService {
     return new PaginationResponse<>(soldProductDtos, pageResponse);
 
     }
-
     public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {
         logger.info("Adding sold product with productId: {}", productId);
 
@@ -112,7 +111,7 @@ public class SoldProductServiceImpl  implements SoldProductService {
 
     private Sale getSaleById(Long saleId) {
         return saleRepository.findById(saleId)
-                .orElseThrow(() -> new ProductNotFoundException("Sale not found with id: " + saleId));
+                .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + saleId));
     }
 
     private void updateExistingSoldProduct(SoldProduct existingSoldProduct, SoldProductDto soldProductDto,
@@ -150,7 +149,7 @@ public class SoldProductServiceImpl  implements SoldProductService {
         double totalPrice = product.getPrice() * soldProduct.getQuantity();
         applyDiscountIfNeeded(soldProduct, totalPrice, productId);
 
-        soldProduct.setTotal(totalPrice);
+
         soldProduct.setSale(sale);
         soldProduct.setName(product.getName());
 
@@ -162,7 +161,7 @@ public class SoldProductServiceImpl  implements SoldProductService {
     }
 
     private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
-        // Assume campaignProductService is properly implemented and provides discount
+        // Check if there is a discount available for the product
         Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
         if (discountOptional.isPresent() && discountOptional.get() > 0) {
             double discount = discountOptional.get();

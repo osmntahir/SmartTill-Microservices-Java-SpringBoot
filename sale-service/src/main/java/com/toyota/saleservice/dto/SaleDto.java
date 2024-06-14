@@ -20,7 +20,7 @@ public class SaleDto {
     //private Long userId;
     private Long id;
     @NotNull(message = "Creation date must be not null")
-    private LocalDateTime creationDate;
+    private LocalDateTime date;
     @NotNull(message = "Total price must be not null")
     private PaymentType paymentType;
     private double totalPrice = 0.0;

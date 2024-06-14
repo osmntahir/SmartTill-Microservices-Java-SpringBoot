@@ -78,10 +78,10 @@ public class SaleServiceImpl implements SaleService {
             throw new SaleAlreadyExistsException("Sale already exists with id: " + saleDto.getId());
         }
 
-        // Toplam satış tutarını hesaplamak için başlangıç değeri
+
         double totalPrice = 0.0;
 
-        // Her satılan ürünü dolaşarak toplam fiyatı hesapla
+
         for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
             if (soldProductDto.getProductDto() != null) {
                 double productPrice = soldProductDto.getProductDto().getPrice();
@@ -92,29 +92,15 @@ public class SaleServiceImpl implements SaleService {
             }
         }
 
-        // Toplam fiyatı saleDto'ya ayarla
+
         saleDto.setTotalPrice(totalPrice);
 
-        // Eğer creationDate null ise, şu anki tarihi ayarla
-        if (saleDto.getCreationDate() == null) {
-            saleDto.setCreationDate(LocalDateTime.now());
-        }
-
-        // DTO'yu Entity'e dönüştür
         Sale sale = mapUtil.convertSaleDtoToSale(saleDto);
         Sale saved = saleRepository.save(sale);
 
         logger.info("Sale added with id: {}", saved.getId());
 
-        // Kaydedilen entity'nin creationDate alanını kontrol edin ve DTO'ya dönüştürün
-        SaleDto resultDto = mapUtil.convertSaleToSaleDto(saved);
-
-        // Eğer resultDto'nun creationDate'i hala null ise manuel olarak ayarla
-        if (resultDto.getCreationDate() == null) {
-            resultDto.setCreationDate(saved.getDate());
-        }
-
-        return resultDto;
+        return mapUtil.convertSaleToSaleDto(saved);
     }
 
 

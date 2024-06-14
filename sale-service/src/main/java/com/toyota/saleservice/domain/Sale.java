@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
-import java.util.Date;
+
 import java.util.List;
 
 @Entity
@@ -33,6 +33,12 @@ public class Sale {
 
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SoldProduct> soldProducts;
+
+
+    @PrePersist
+    protected void onCreate() {
+        date = LocalDateTime.now(); // Set the date of creation
+    }
 
 
 

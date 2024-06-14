@@ -1,5 +1,7 @@
 package com.toyota.saleservice.service.common;
 
+import com.toyota.productservice.domain.Product;
+import com.toyota.productservice.dto.ProductDto;
 import com.toyota.saleservice.domain.Campaign;
 import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.domain.Sale;
@@ -48,5 +50,9 @@ public class MapUtil {
     }
     public Sale convertSaleDtoToSale(SaleDto saleDto) {
         return modelMapper.map(saleDto, Sale.class);
+    }
+
+    public ProductDto convertProductToProductDto(Product product) {
+        return modelMapper.map(product, ProductDto.class);
     }
 }

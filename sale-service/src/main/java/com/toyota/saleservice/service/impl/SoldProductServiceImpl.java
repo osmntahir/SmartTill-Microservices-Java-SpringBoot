@@ -11,6 +11,7 @@ import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.exception.ProductNotFoundException;
+import com.toyota.saleservice.exception.ProductQuantityShortageException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
 import lombok.RequiredArgsConstructor;
@@ -41,22 +42,6 @@ public class SoldProductServiceImpl  implements SoldProductService {
     private final SaleRepository saleRepository;
 
 
-    @Override
-    public SoldProductDto addSoldProduct(Long productId,Long saleId, SoldProductDto soldProductDto) {
-        logger.info("Adding sold product with productId: {}", productId);
-
-        Optional<Product> productOptional = productRepository.findById(productId);
-
-        if (productOptional.isPresent()) {
-            SoldProduct soldProduct = createSoldProduct(productId,saleId, soldProductDto);
-            SoldProduct saved = soldProductRepository.save(soldProduct);
-            logger.info("Sold product added with id: {}", saved.getId());
-            return mapUtil.convertSoldProductToSoldProductDto(saved);
-        } else {
-            logger.error("Product not found with id: {}", productId);
-            throw new ProductNotFoundException("Product not found with id: " + productId);
-        }
-    }
 
     @Override
     public SoldProductDto updateSoldProduct(Long id, SoldProductDto soldProductDto) {
@@ -89,36 +74,72 @@ public class SoldProductServiceImpl  implements SoldProductService {
     return new PaginationResponse<>(soldProductDtos, pageResponse);
 
     }
-    // Yardımcı metodlar
-    private SoldProduct createSoldProduct(Long productId,Long saleId, SoldProductDto soldProductDto) {
+
+    @Override
+    public SoldProductDto addSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto) {
+        logger.info("Adding sold product with productId: {}", productId);
+
         Optional<Product> productOptional = productRepository.findById(productId);
+
         if (productOptional.isPresent()) {
+            SoldProduct soldProduct = createSoldProduct(productId, saleId, soldProductDto);
+            SoldProduct saved = soldProductRepository.save(soldProduct);
+            logger.info("Sold product added with id: {}", saved.getId());
+            SoldProductDto a = mapUtil.convertSoldProductToSoldProductDto(saved);
+            a.setProductDto(mapUtil.convertProductToProductDto(productOptional.get()));
+            return a;
+        } else {
+            logger.error("Product not found with id: {}", productId);
+            throw new ProductNotFoundException("Product not found with id: " + productId);
+        }
+    }
+    // Yardımcı metodlar
+    private SoldProduct createSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto) {
+        Optional<Product> productOptional = productRepository.findById(productId);
+        Optional<Sale> saleOptional = saleRepository.findById(saleId);
+
+        if (productOptional.isPresent() && saleOptional.isPresent()) {
             Product product = productOptional.get();
+            Sale sale = saleOptional.get();
+
+            // Check if there is enough stock
+            if (product.getInventory() < soldProductDto.getQuantity()) {
+                throw new ProductQuantityShortageException("Not enough stock available for product: " + product.getName());
+            }
+
             SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
             soldProduct.setProduct(product);
             soldProduct.setQuantity(soldProductDto.getQuantity());
             soldProduct.setPrice(product.getPrice());
+
+            // Calculate total price
             double totalPrice = product.getPrice() * soldProduct.getQuantity();
+
+            // Check for discount
             Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
-            double discountAmount = 0.0;
-            if (discountOptional.isPresent() && discountOptional.get() > 0.0) {
+            if (discountOptional.isPresent() && discountOptional.get() > 0) {
                 double discount = discountOptional.get();
-                discountAmount = totalPrice * (discount / 100);
+                double discountAmount = totalPrice * (discount / 100);
                 totalPrice -= discountAmount;
                 soldProduct.setDiscount((long) discount);
             } else {
                 soldProduct.setDiscount(0L);
             }
+
             soldProduct.setTotal(totalPrice);
-            Optional<Sale> sale = saleRepository.findById(saleId);
-            if (sale.isPresent()) {
-                sale.get().setTotalPrice(sale.get().getTotalPrice() + totalPrice);
-                soldProduct.setSale(sale.get());
-            }
+            soldProduct.setSale(sale);
             soldProduct.setName(product.getName());
+
+            // Update sale's total price
+            sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
+
+            // Update product stock quantity
+            product.setInventory(product.getInventory() - soldProductDto.getQuantity());
+            productRepository.save(product); // Update product
+
             return soldProduct;
         } else {
-            throw new ProductNotFoundException("Product not found with id: " + productId);
+            throw new ProductNotFoundException("Product or Sale not found with id: " + productId + " or " + saleId);
         }
     }
 

@@ -16,10 +16,15 @@ public class SoldProductDto {
     private Long id;
 
     @Valid
-    private ProductDto productDto;
+    private ProductDto productDto; // ProductDto olarak tanımlıyoruz
+
+
+    private double discount;
+    private double total;
+
 
     @Min(value = 1, message = "Quantity must be greater than or equal to 1")
     private int quantity;
 
-    boolean deleted;
+    private boolean deleted;
 }

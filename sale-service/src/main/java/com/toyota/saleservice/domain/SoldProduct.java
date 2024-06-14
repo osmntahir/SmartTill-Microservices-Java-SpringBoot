@@ -1,11 +1,9 @@
 package com.toyota.saleservice.domain;
 
-
 import com.toyota.productservice.domain.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
-
 
 @Entity
 @Table(name = "sold_product")
@@ -13,7 +11,6 @@ import org.hibernate.annotations.Where;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-
 @Where(clause = "deleted = false")
 public class SoldProduct {
 
@@ -25,14 +22,15 @@ public class SoldProduct {
     @JoinColumn(name = "sale_id")
     private Sale sale;
 
-    private boolean deleted = Boolean.FALSE;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "product_id")
-    private Product product;
+    private Product product; // Product tipinde
+
     private String name;
     private double price;
     private int quantity;
     private double total;
     private long discount;
 
+    private boolean deleted = Boolean.FALSE;
 }

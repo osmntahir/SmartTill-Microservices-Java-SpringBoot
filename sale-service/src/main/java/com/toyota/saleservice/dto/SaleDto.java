@@ -23,6 +23,7 @@ public class SaleDto {
     private LocalDateTime creationDate;
     @NotNull(message = "Total price must be not null")
     private PaymentType paymentType;
+    private double totalPrice = 0.0;
     @Valid
     private List<SoldProductDto> soldProducts;
 }

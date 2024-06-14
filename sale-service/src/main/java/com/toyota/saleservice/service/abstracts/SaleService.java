@@ -8,7 +8,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface SaleService {
-    PaginationResponse<SaleDto> getSalesFiltered(int page, int size, List<String> sortBy, String sortOrder, double totalPrice, LocalDateTime date, String paymentType, boolean deleted);
+    PaginationResponse<SaleDto> getSalesFiltered(int page,
+                                                 int size,
+                                                 List<String> sortBy,
+                                                 String sortOrder,
+                                                 double minTotalPrice,
+                                                 double maxTotalPrice,
+                                                 LocalDateTime startDate,
+                                                 LocalDateTime endDate,
+                                                 String paymentType,
+                                                 boolean deleted);
 
     SaleDto addSale(SaleDto saleDto);
 

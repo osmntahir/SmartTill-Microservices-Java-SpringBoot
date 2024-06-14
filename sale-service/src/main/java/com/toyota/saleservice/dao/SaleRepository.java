@@ -1,5 +1,6 @@
 package com.toyota.saleservice.dao;
 
+import com.toyota.saleservice.domain.PaymentType;
 import com.toyota.saleservice.domain.Sale;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,14 +12,20 @@ import java.time.LocalDateTime;
 
 
 @Repository
-public interface SaleRepository extends JpaRepository<Sale, Long>{
+public interface SaleRepository extends JpaRepository<Sale, Long> {
 
-    @Query("SELECT s FROM Sale s WHERE " +
-            "(:totalPrice IS NULL OR s.totalPrice >= :totalPrice) AND " +
-            "(:date IS NULL OR s.date = :date) AND " +
-            "(:paymentType IS NULL OR s.paymentType = :paymentType) AND " +
-            "(:deleted IS NULL OR s.deleted = :deleted)")
-    Page<Sale> getSalesFiltered(double totalPrice, LocalDateTime date, String paymentType, boolean deleted, Pageable pageable);
+    @Query("SELECT s FROM Sale s WHERE s.totalPrice >= :minTotalPrice " +
+            "AND s.totalPrice <= :maxTotalPrice " +
+            "AND s.date BETWEEN :startDate AND :endDate " +
+            "AND (:paymentType IS NULL OR s.paymentType = :paymentType) " +
+            "AND s.deleted = :deleted")
+    Page<Sale> getSalesFiltered(double minTotalPrice,
+                                double maxTotalPrice,
+                                LocalDateTime startDate,
+                                LocalDateTime endDate,
+                                PaymentType paymentType,
+                                boolean deleted,
+                                Pageable pageable);
 
     boolean existsByIdAndDeletedIsFalse(Long id);
 }

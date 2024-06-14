@@ -4,10 +4,13 @@ import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SaleDto;
 import com.toyota.saleservice.service.abstracts.SaleService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,21 +18,25 @@ import java.util.List;
 @RequestMapping("/sale")
 @RequiredArgsConstructor
 public class SaleController {
+
+    @Autowired
     private final SaleService saleService;
 
+
     @GetMapping("/getAll")
-    public PaginationResponse<SaleDto> getAllSales(@RequestParam(defaultValue = "") int page,
-                                                   @RequestParam(defaultValue = "") int size,
-                                                   @RequestParam(defaultValue = "") double totalPrice,
-                                                   @RequestParam(defaultValue = "") LocalDateTime date,
+    public PaginationResponse<SaleDto> getAllSales(@RequestParam(defaultValue = "0") int page,
+                                                   @RequestParam(defaultValue = "5") int size,
+                                                   @RequestParam(defaultValue = "0.0") Double minTotalPrice,
+                                                   @RequestParam(defaultValue = "" + Double.MAX_VALUE) Double maxTotalPrice,
+                                                   @RequestParam(defaultValue = "2023-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+                                                   @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().toString()}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
                                                    @RequestParam(defaultValue = "") String paymentType,
                                                    @RequestParam(defaultValue = "false") boolean deleted,
                                                    @RequestParam(defaultValue = "") List<String> sortBy,
-                                                   @RequestParam(defaultValue = "ASC") String sortOrder)
-    {
-        return saleService.getSalesFiltered(page,size,sortBy, sortOrder, totalPrice,
-                date, paymentType, deleted);
+                                                   @RequestParam(defaultValue = "ASC") String sortOrder) {
+        return saleService.getSalesFiltered(page, size, sortBy, sortOrder, minTotalPrice, maxTotalPrice, startDate, endDate, paymentType, deleted);
     }
+
 
     @PostMapping("/add")
     public ResponseEntity <SaleDto> addSale(@RequestBody /*@Valid*/SaleDto saleDto){

@@ -12,8 +12,10 @@ import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.exception.ProductNotFoundException;
 import com.toyota.saleservice.exception.ProductQuantityShortageException;
+import com.toyota.saleservice.exception.SaleNotFoundException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -75,73 +77,113 @@ public class SoldProductServiceImpl  implements SoldProductService {
 
     }
 
-    @Override
-    public SoldProductDto addSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto) {
+    public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {
         logger.info("Adding sold product with productId: {}", productId);
 
-        Optional<Product> productOptional = productRepository.findById(productId);
+        Product product = getProductById(productId);
+        Sale sale = getSaleById(saleId);
 
-        if (productOptional.isPresent()) {
-            SoldProduct soldProduct = createSoldProduct(productId, saleId, soldProductDto);
-            SoldProduct saved = soldProductRepository.save(soldProduct);
-            logger.info("Sold product added with id: {}", saved.getId());
-            SoldProductDto a = mapUtil.convertSoldProductToSoldProductDto(saved);
-            a.setProductDto(mapUtil.convertProductToProductDto(productOptional.get()));
-            return a;
+        // Check if this product is already added to this sale
+        SoldProduct existingSoldProduct = soldProductRepository.findBySaleIdAndProductId(saleId, productId)
+                .orElse(null);
+
+        if (existingSoldProduct != null) {
+            // Product already exists in the sale, update quantity and total price
+            updateExistingSoldProduct(existingSoldProduct, soldProductDto, product, sale);
         } else {
-            logger.error("Product not found with id: {}", productId);
-            throw new ProductNotFoundException("Product not found with id: " + productId);
+            // Product doesn't exist in the sale, create a new entry
+            createNewSoldProduct(productId, saleId, soldProductDto, product, sale);
         }
+
+        // Fetch existing sold product again if updated or created
+        existingSoldProduct = soldProductRepository.findBySaleIdAndProductId(saleId, productId)
+                .orElseThrow(() -> new IllegalStateException("Failed to fetch saved sold product"));
+
+        // Convert to DTO and return
+        SoldProductDto resultDto = mapUtil.convertSoldProductToSoldProductDto(existingSoldProduct);
+        resultDto.setProductDto(mapUtil.convertProductToProductDto(product));
+        return resultDto;
     }
-    // Yardımcı metodlar
-    private SoldProduct createSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto) {
-        Optional<Product> productOptional = productRepository.findById(productId);
-        Optional<Sale> saleOptional = saleRepository.findById(saleId);
 
-        if (productOptional.isPresent() && saleOptional.isPresent()) {
-            Product product = productOptional.get();
-            Sale sale = saleOptional.get();
+    private Product getProductById(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
+    }
 
-            // Check if there is enough stock
-            if (product.getInventory() < soldProductDto.getQuantity()) {
-                throw new ProductQuantityShortageException("Not enough stock available for product: " + product.getName());
-            }
+    private Sale getSaleById(Long saleId) {
+        return saleRepository.findById(saleId)
+                .orElseThrow(() -> new ProductNotFoundException("Sale not found with id: " + saleId));
+    }
 
-            SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
-            soldProduct.setProduct(product);
-            soldProduct.setQuantity(soldProductDto.getQuantity());
-            soldProduct.setPrice(product.getPrice());
+    private void updateExistingSoldProduct(SoldProduct existingSoldProduct, SoldProductDto soldProductDto,
+                                           Product product, Sale sale) {
+        // Update quantity
+        existingSoldProduct.setQuantity(existingSoldProduct.getQuantity() + soldProductDto.getQuantity());
 
-            // Calculate total price
-            double totalPrice = product.getPrice() * soldProduct.getQuantity();
+        // Recalculate total price
+        double totalPrice = existingSoldProduct.getPrice() * existingSoldProduct.getQuantity();
+        applyDiscountIfNeeded(existingSoldProduct, totalPrice, product.getId());
 
-            // Check for discount
-            Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
-            if (discountOptional.isPresent() && discountOptional.get() > 0) {
-                double discount = discountOptional.get();
-                double discountAmount = totalPrice * (discount / 100);
-                totalPrice -= discountAmount;
-                soldProduct.setDiscount((long) discount);
-            } else {
-                soldProduct.setDiscount(0L);
-            }
+        existingSoldProduct.setTotal(totalPrice);
 
-            soldProduct.setTotal(totalPrice);
-            soldProduct.setSale(sale);
-            soldProduct.setName(product.getName());
+        // Update sale's total price
+        sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
 
-            // Update sale's total price
-            sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
+        // Update product stock quantity
+        checkAndUpdateInventory(product, soldProductDto.getQuantity());
 
-            // Update product stock quantity
-            product.setInventory(product.getInventory() - soldProductDto.getQuantity());
-            productRepository.save(product); // Update product
+        // Save existing sold product
+        soldProductRepository.save(existingSoldProduct);
+    }
 
-            return soldProduct;
+    private void createNewSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto,
+                                      Product product, Sale sale) {
+        // Check if there is enough stock
+        checkAndUpdateInventory(product, soldProductDto.getQuantity());
+
+        SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
+        soldProduct.setProduct(product);
+        soldProduct.setQuantity(soldProductDto.getQuantity());
+        soldProduct.setPrice(product.getPrice());
+
+        // Calculate total price
+        double totalPrice = product.getPrice() * soldProduct.getQuantity();
+        applyDiscountIfNeeded(soldProduct, totalPrice, productId);
+
+        soldProduct.setTotal(totalPrice);
+        soldProduct.setSale(sale);
+        soldProduct.setName(product.getName());
+
+        // Update sale's total price
+        sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
+
+        // Save new sold product
+        soldProductRepository.save(soldProduct);
+    }
+
+    private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
+        // Assume campaignProductService is properly implemented and provides discount
+        Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
+        if (discountOptional.isPresent() && discountOptional.get() > 0) {
+            double discount = discountOptional.get();
+            double discountAmount = totalPrice * (discount / 100);
+            totalPrice -= discountAmount;
+            soldProduct.setDiscount((long) discount);
         } else {
-            throw new ProductNotFoundException("Product or Sale not found with id: " + productId + " or " + saleId);
+            soldProduct.setDiscount(0L);
         }
+        soldProduct.setTotal(totalPrice);
     }
+
+    private void checkAndUpdateInventory(Product product, int quantity) {
+        if (product.getInventory() < quantity) {
+            throw new ProductQuantityShortageException("Not enough stock available for product: " + product.getName());
+        }
+        product.setInventory(product.getInventory() - quantity);
+        productRepository.save(product); // Update product inventory
+    }
+
+
 
     private void updateSoldProductDetails(SoldProduct existingSoldProduct, SoldProductDto soldProductDto) {
         existingSoldProduct.setQuantity(soldProductDto.getQuantity());

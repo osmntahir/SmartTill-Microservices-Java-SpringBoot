@@ -1,8 +1,10 @@
 package com.toyota.usermanagementservice.resource;
 
 import com.toyota.usermanagementservice.dto.UserDto;
+import com.toyota.usermanagementservice.dto.UserResponse;
 import com.toyota.usermanagementservice.service.abstracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,8 +38,21 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<UserDto>> getAllUsers() {
-        return ResponseEntity.ok(userService.getAllUsers());
+    @GetMapping("/users")
+    public Page<UserResponse> getAll(
+            @RequestParam(defaultValue = "")String firstName,
+            @RequestParam(defaultValue = "")String lastName,
+            @RequestParam(defaultValue = "")String username,
+            @RequestParam(defaultValue = "")String email,
+            @RequestParam(defaultValue = "0")int page,
+            @RequestParam(defaultValue = "5")int size,
+            @RequestParam(defaultValue = "") List<String> sortList,
+            @RequestParam(defaultValue = "ASC") String sortOrder
+
+    )
+    {
+        return userService.getAll(firstName, lastName, username
+                , email,page,size,sortList,sortOrder);
     }
+
 }

@@ -3,12 +3,18 @@ package com.toyota.usermanagementservice.service.impl;
 import com.toyota.usermanagementservice.dao.UserRepository;
 import com.toyota.usermanagementservice.domain.User;
 import com.toyota.usermanagementservice.dto.UserDto;
+import com.toyota.usermanagementservice.dto.UserResponse;
 import com.toyota.usermanagementservice.exception.UserNotFoundException;
 import com.toyota.usermanagementservice.service.abstracts.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final Logger logger = Logger.getLogger(UserServiceImpl.class.getName());
 
     public UserDto createUser(UserDto userDto) {
         User user = new User();
@@ -51,8 +59,42 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    public List<UserDto> getAllUsers() {
-        return userRepository.findAll().stream().map(this::mapToDTO).collect(Collectors.toList());
+    @Override
+    public Page<UserResponse> getAll(String firstname, String lastname,
+                                     String username, String email,
+                                     int page, int size, List<String> sortList,
+                                     String sortOrder) {
+        logger.info("Fetching users");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(createSortOrder(sortList, sortOrder)));
+        Page<User> entities = userRepository.getUsersFiltered(firstname, lastname, email, username, pageable);
+        logger.info("Fetched {} users");
+        return entities.map(this::convertToResponse);
+    }
+
+    private UserResponse convertToResponse(User user) {
+        UserResponse response = new UserResponse();
+
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setFirstname(user.getFirstName());
+        response.setLastname(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRoles());
+
+        return response;
+    }
+
+    private List<Sort.Order> createSortOrder(List<String> sortList, String sortOrder) {
+        List<Sort.Order> orders = sortList.stream()
+                .map(field -> {
+                    if ("ASC".equalsIgnoreCase(sortOrder)) {
+                        return Sort.Order.asc(field);
+                    } else {
+                        return Sort.Order.desc(field);
+                    }
+                })
+                .collect(Collectors.toList());
+        return orders;
     }
 
     private UserDto mapToDTO(User user) {

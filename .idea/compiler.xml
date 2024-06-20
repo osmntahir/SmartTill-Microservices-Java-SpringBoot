@@ -8,8 +8,9 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="product-service" />
-        <module name="sale-service" />
         <module name="report-service" />
+        <module name="sale-service" />
+        <module name="user-management-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -21,6 +22,7 @@
       <module name="product-service" options="-parameters" />
       <module name="report-service" options="-parameters" />
       <module name="sale-service" options="-parameters" />
+      <module name="user-management-service" options="-parameters" />
     </option>
   </component>
 </project>

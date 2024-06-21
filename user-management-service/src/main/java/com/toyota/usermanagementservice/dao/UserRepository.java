@@ -14,4 +14,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "(:email is null or u.email like %:email%) and " +
             "(:username is null or u.username like %:username%)")
     Page<User> getUsersFiltered(String firstname, String lastname, String email, String username, Pageable pageable);
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }

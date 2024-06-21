@@ -6,11 +6,8 @@ import com.toyota.usermanagementservice.domain.User;
 import com.toyota.usermanagementservice.dto.UserDto;
 import com.toyota.usermanagementservice.dto.UserResponse;
 
-import com.toyota.usermanagementservice.exception.RoleAlreadyExistsException;
-import com.toyota.usermanagementservice.exception.RoleNotFoundException;
-import com.toyota.usermanagementservice.exception.SingleRoleRemovalException;
+import com.toyota.usermanagementservice.exception.*;
 
-import com.toyota.usermanagementservice.exception.UserNotFoundException;
 import com.toyota.usermanagementservice.service.abstracts.UserService;
 
 import org.apache.logging.log4j.LogManager;
@@ -28,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 import java.util.Optional;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @Service
@@ -40,7 +38,20 @@ public class UserServiceImpl implements UserService {
 
     private final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
+    @Override
     public UserDto createUser(UserDto userDto) {
+        if (!isValidEmail(userDto.getEmail())) {
+            throw new InvalidEmailFormatException("Invalid email format: " + userDto.getEmail());
+        }
+
+        if (userRepository.existsByEmail(userDto.getEmail())) {
+            throw new EmailAlreadyExistsException("Email already exists: " + userDto.getEmail());
+        }
+
+        if (userRepository.existsByUsername(userDto.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username already exists: " + userDto.getUsername());
+        }
+
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setFirstName(userDto.getFirstName());
@@ -50,6 +61,12 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
         userDto.setId(user.getId());
         return userDto;
+    }
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
     }
 
     public UserDto getUser(Long id) {
@@ -135,18 +152,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private UserResponse convertToResponse(User user) {
-        UserResponse response = new UserResponse();
-
-        response.setId(user.getId());
-        response.setUsername(user.getUsername());
-        response.setFirstname(user.getFirstName());
-        response.setLastname(user.getLastName());
-        response.setEmail(user.getEmail());
-        response.setRole(user.getRoles());
-
-        return response;
-    }
 
     private List<Sort.Order> createSortOrder(List<String> sortList, String sortOrder) {
         return sortList.stream()
@@ -160,6 +165,18 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+    private UserResponse convertToResponse(User user) {
+        UserResponse response = new UserResponse();
+
+        response.setId(user.getId());
+        response.setUsername(user.getUsername());
+        response.setFirstname(user.getFirstName());
+        response.setLastname(user.getLastName());
+        response.setEmail(user.getEmail());
+        response.setRole(user.getRoles());
+
+        return response;
+    }
     private UserDto mapToDTO(User user) {
         UserDto UserDto = new UserDto();
         UserDto.setId(user.getId());

@@ -39,6 +39,12 @@ public class UserServiceImpl implements UserService {
     private final Logger logger = LogManager.getLogger(UserServiceImpl.class);
 
     @Override
+    public UserDto getUser(Long id) {
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        return mapToDTO(user);
+    }
+
+    @Override
     public UserDto createUser(UserDto userDto) {
         if (!isValidEmail(userDto.getEmail())) {
             throw new InvalidEmailFormatException("Invalid email format: " + userDto.getEmail());
@@ -52,41 +58,46 @@ public class UserServiceImpl implements UserService {
             throw new UsernameAlreadyExistsException("Username already exists: " + userDto.getUsername());
         }
 
-        User user = new User();
-        user.setUsername(userDto.getUsername());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setEmail(userDto.getEmail());
-        user.setRoles(userDto.getRoles());
+        User user = convertToEntity(userDto);
         userRepository.save(user);
         userDto.setId(user.getId());
         return userDto;
     }
 
-    private boolean isValidEmail(String email) {
-        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
-        Pattern pattern = Pattern.compile(emailRegex);
-        return pattern.matcher(email).matches();
-    }
-
-    public UserDto getUser(Long id) {
+    public UserDto updateUser(Long id, UserDto userDto) {
         User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        return mapToDTO(user);
-    }
 
-    public UserDto updateUser(Long id, UserDto UserDto) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
-        user.setUsername(UserDto.getUsername());
-        user.setFirstName(UserDto.getFirstName());
-        user.setLastName(UserDto.getLastName());
-        user.setEmail(UserDto.getEmail());
-        user.setRoles(UserDto.getRoles());
+
+        if (!user.getUsername().equals(userDto.getUsername()) && userRepository.existsByUsername(userDto.getUsername())) {
+            throw new UsernameAlreadyExistsException("Username is already taken: " + userDto.getUsername());
+        }
+
+
+        if (!user.getEmail().equals(userDto.getEmail()) && userRepository.existsByEmail(userDto.getEmail())) {
+            throw new EmailAlreadyExistsException("Email address is already registered: " + userDto.getEmail());
+        }
+
+
+        if (!isValidEmail(userDto.getEmail())) {
+            throw new InvalidEmailFormatException("Invalid email address format: " + userDto.getEmail());
+        }
+
+
+        user.setUsername(userDto.getUsername());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+
+
         userRepository.save(user);
+
+
         return mapToDTO(user);
     }
 
+    @Override
     public void deleteUser(Long id) {
-        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found"));
+        User user = userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User not found with ID: " + id));
         user.setDeleted(true);
         userRepository.save(user);
     }
@@ -165,6 +176,13 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
     }
 
+
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        Pattern pattern = Pattern.compile(emailRegex);
+        return pattern.matcher(email).matches();
+    }
+
     private UserResponse convertToResponse(User user) {
         UserResponse response = new UserResponse();
 
@@ -187,4 +205,15 @@ public class UserServiceImpl implements UserService {
         UserDto.setRoles(user.getRoles());
         return UserDto;
     }
+
+    private User convertToEntity(UserDto userDto) {
+        User user = new User();
+        user.setUsername(userDto.getUsername());
+        user.setFirstName(userDto.getFirstName());
+        user.setLastName(userDto.getLastName());
+        user.setEmail(userDto.getEmail());
+        user.setRoles(userDto.getRoles());
+        return user;
+    }
+
 }

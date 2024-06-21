@@ -41,7 +41,7 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/users")
+    @GetMapping("/getAll")
     public Page<UserResponse> getAll(
             @RequestParam(defaultValue = "")String firstName,
             @RequestParam(defaultValue = "")String lastName,

@@ -9,6 +9,7 @@
         <option value="$PROJECT_DIR$/pom.xml" />
         <option value="$PROJECT_DIR$/report-service/pom.xml" />
         <option value="$PROJECT_DIR$/user-management-service/pom.xml" />
+        <option value="$PROJECT_DIR$/keycloak-config-service/pom.xml" />
       </list>
     </option>
   </component>

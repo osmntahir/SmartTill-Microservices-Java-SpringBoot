@@ -38,6 +38,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.keycloak</groupId>
+            <artifactId>keycloak-admin-client</artifactId>
+            <version>15.0.2</version> <!-- En güncel sürümü kullanabilirsiniz -->
+        </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>

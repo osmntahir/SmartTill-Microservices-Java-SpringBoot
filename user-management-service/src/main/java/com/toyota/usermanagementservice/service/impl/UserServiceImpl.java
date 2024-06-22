@@ -206,7 +206,7 @@ public class UserServiceImpl implements UserService {
         return UserDto;
     }
 
-    private User convertToEntity(UserDto userDto) {
+    public User convertToEntity(UserDto userDto) {
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setFirstName(userDto.getFirstName());

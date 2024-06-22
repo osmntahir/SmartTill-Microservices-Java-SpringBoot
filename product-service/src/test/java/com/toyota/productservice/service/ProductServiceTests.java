@@ -32,6 +32,10 @@ class ProductServiceTests {
         MockitoAnnotations.initMocks(this);
     }
 
+    /**
+     * Test for createProduct method
+     */
+
     @Test
     void TestCreateProduct() {
         // Arrange

@@ -16,7 +16,7 @@ public class UserResponse {
     private String email;
     private Set<Role> role;
 
-    public UserResponse(Long id,String firstname, String lastname, String username, String email, Set<Role> role) {
+    public UserResponse(String firstname, String lastname, String username, String email, Set<Role> role) {
         this.firstname = firstname;
         this.lastname = lastname;
         this.username = username;

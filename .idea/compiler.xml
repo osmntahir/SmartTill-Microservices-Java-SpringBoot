@@ -10,12 +10,12 @@
         <module name="product-service" />
         <module name="keycloak-config-service (1)" />
         <module name="report-service" />
-        <module name="keycloak-config-service" />
         <module name="sale-service" />
         <module name="user-management-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
+      <module name="keycloak-config-service" target="1.5" />
       <module name="order-service" target="17" />
     </bytecodeTargetLevel>
   </component>

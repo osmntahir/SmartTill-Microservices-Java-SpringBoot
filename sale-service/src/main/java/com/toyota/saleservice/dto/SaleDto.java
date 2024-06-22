@@ -3,6 +3,8 @@ package com.toyota.saleservice.dto;
 import com.toyota.saleservice.domain.PaymentType;
 import jakarta.validation.Valid;
 
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,6 +25,7 @@ public class SaleDto {
     private LocalDateTime date;
     @NotNull(message = "Total price must be not null")
     private PaymentType paymentType;
+    @DecimalMin(value = "0.0", inclusive = false, message = "Total price must be greater than 0.0")
     private double totalPrice = 0.0;
     @Valid
     private List<SoldProductDto> soldProducts;

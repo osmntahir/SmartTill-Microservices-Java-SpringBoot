@@ -12,6 +12,10 @@ import lombok.Setter;
 
 import java.util.Set;
 
+/**
+ * DTO class representing a user in the system.
+ */
+
 @Getter
 @Setter
 @AllArgsConstructor

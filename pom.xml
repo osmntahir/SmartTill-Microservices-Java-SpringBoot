@@ -13,7 +13,6 @@
     <modules>
         <module>product-service</module>
         <module>sale-service</module>
-        <module>keycloak-config-service</module>
         <module>user-management-service</module>
         <module>report-service</module>
     </modules>

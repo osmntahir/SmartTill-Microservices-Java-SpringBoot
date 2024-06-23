@@ -9,6 +9,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="product-service" />
         <module name="report-service" />
+        <module name="auth-service" />
         <module name="sale-service" />
         <module name="user-management-service" />
       </profile>
@@ -21,6 +22,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="auth-service" options="-parameters" />
       <module name="keycloak-config-service" options="" />
       <module name="keycloak-config-service (1)" options="-parameters" />
       <module name="product-service" options="-parameters" />

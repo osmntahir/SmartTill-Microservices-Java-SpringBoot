@@ -129,7 +129,7 @@ class SoldProductControllerTest {
                                 "{\"id\":null,\"productDto\":null,\"discount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
     }
 
-   
+
     @Test
     void testGetAllSoldProducts() throws Exception {
         // Arrange

@@ -8,7 +8,6 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="product-service" />
-        <module name="keycloak-config-service (1)" />
         <module name="report-service" />
         <module name="sale-service" />
         <module name="user-management-service" />
@@ -16,6 +15,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="keycloak-config-service" target="1.5" />
+      <module name="keycloak-config-service (1)" target="17" />
       <module name="order-service" target="17" />
     </bytecodeTargetLevel>
   </component>

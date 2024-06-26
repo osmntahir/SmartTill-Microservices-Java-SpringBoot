@@ -11,6 +11,7 @@
         <option value="$PROJECT_DIR$/user-management-service/pom.xml" />
         <option value="$PROJECT_DIR$/keycloak-config-service/pom.xml" />
         <option value="$PROJECT_DIR$/keycloak-auth-service/pom.xml" />
+        <option value="$PROJECT_DIR$/discovery-server/pom.xml" />
       </list>
     </option>
     <option name="ignoredFiles">

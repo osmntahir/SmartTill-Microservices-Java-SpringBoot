@@ -1,32 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.0</version>
+        <version>3.2.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
-    <modules>
-        <module>product-service</module>
-        <module>sale-service</module>
-        <module>user-management-service</module>
-        <module>report-service</module>
-    </modules>
-
-    <packaging>pom</packaging>
     <groupId>com.toyota</groupId>
     <artifactId>toyota-project</artifactId>
     <version>1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
     <name>toyota-project</name>
-    <description>toyota-project</description>
+    <description>Toyota Project</description>
 
     <properties>
         <java.version>17</java.version>
-        <spring-cloud.version>2022.0.2</spring-cloud.version>
+        <spring-cloud.version>2023.0.0</spring-cloud.version>
         <modelmapper.version>3.1.1</modelmapper.version>
         <webflux.version>6.0.8</webflux.version>
         <log4j-api.version>2.20.0</log4j-api.version>
@@ -45,6 +39,28 @@
         </dependencies>
     </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>spring-releases</id>
+            <url>https://repo.spring.io/release</url>
+        </repository>
+        <repository>
+            <id>spring-snapshots</id>
+            <url>https://repo.spring.io/snapshot</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>product-service</module>
+        <module>sale-service</module>
+        <module>user-management-service</module>
+        <module>report-service</module>
+        <module>discovery-server</module>
+    </modules>
+
     <build>
         <plugins>
             <plugin>
@@ -53,5 +69,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

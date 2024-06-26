@@ -10,6 +10,7 @@
         <module name="keycloak-auth-service" />
         <module name="product-service" />
         <module name="report-service" />
+        <module name="discovery-server" />
         <module name="sale-service" />
         <module name="user-management-service" />
       </profile>
@@ -24,6 +25,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="auth-service" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
       <module name="keycloak-auth-service" options="-parameters" />
       <module name="keycloak-config-service" options="" />
       <module name="keycloak-config-service (1)" options="-parameters" />

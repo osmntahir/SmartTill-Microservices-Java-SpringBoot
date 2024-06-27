@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/campaigns")
+@RequestMapping("/campaign")
 @RequiredArgsConstructor
 public class CampaignController {
 

@@ -1,6 +1,7 @@
 package com.toyota.productservice.service;
 
 import com.toyota.productservice.Mapper.ProductMapper;
+import com.toyota.productservice.config.WebClientConfig;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,6 +26,9 @@ public class ProductServiceImpl implements ProductService {
 
     private final ProductRepository productRepository;
    private final Logger logger = LogManager.getLogger(Product.class);
+
+    @Autowired
+    private WebClient.Builder webClientBuilder;
 
     @Autowired
     public ProductServiceImpl(ProductRepository productRepository) {

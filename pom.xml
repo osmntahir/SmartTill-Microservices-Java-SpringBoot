@@ -59,6 +59,7 @@
         <module>user-management-service</module>
         <module>report-service</module>
         <module>discovery-server</module>
+        <module>api-gateway</module>
     </modules>
 
     <build>

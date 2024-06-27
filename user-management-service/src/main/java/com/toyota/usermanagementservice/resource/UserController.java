@@ -17,7 +17,7 @@ import java.util.List;
  * REST Controller for managing user operations.
  */
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 public class UserController {
 
     @Autowired

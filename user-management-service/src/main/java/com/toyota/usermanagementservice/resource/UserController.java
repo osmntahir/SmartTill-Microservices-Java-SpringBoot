@@ -23,6 +23,8 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+
+
     /**
      * Endpoint for creating a new user.
      *
@@ -31,6 +33,7 @@ public class UserController {
      */
     @PostMapping("/add")
     public ResponseEntity<UserDto> createUser(@RequestBody UserDto userDto) {
+
         return ResponseEntity.ok(userService.createUser(userDto));
     }
 

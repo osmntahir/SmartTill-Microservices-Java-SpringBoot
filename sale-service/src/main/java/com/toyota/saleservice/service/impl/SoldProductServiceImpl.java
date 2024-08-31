@@ -1,20 +1,19 @@
 package com.toyota.saleservice.service.impl;
 
-
-import com.toyota.productservice.dao.ProductRepository;
-import com.toyota.productservice.domain.Product;
-
+import com.toyota.saleservice.config.ProductServiceClient;
 import com.toyota.saleservice.dao.SaleRepository;
 import com.toyota.saleservice.dao.SoldProductRepository;
 import com.toyota.saleservice.domain.Sale;
 import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.PaginationResponse;
+import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.exception.ProductNotFoundException;
 import com.toyota.saleservice.exception.ProductQuantityShortageException;
 import com.toyota.saleservice.exception.SaleNotFoundException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
+
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -25,25 +24,20 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
-public class SoldProductServiceImpl  implements SoldProductService {
+public class SoldProductServiceImpl implements SoldProductService {
 
     private final SoldProductRepository soldProductRepository;
     private final MapUtil mapUtil;
     private final Logger logger = LogManager.getLogger(SoldProductService.class);
 
-    private final ProductRepository productRepository;
+    private final ProductServiceClient productServiceClient;
     private final CampaignProductServiceImpl campaignProductService;
     private final SaleRepository saleRepository;
-
-
 
     @Override
     public SoldProductDto updateSoldProduct(Long id, SoldProductDto soldProductDto) {
@@ -65,21 +59,22 @@ public class SoldProductServiceImpl  implements SoldProductService {
 
     @Override
     public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean deleted, String sortBy, String sortDirection) {
-    logger.info("Getting sold products with filters");
-    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-    Page<SoldProduct> pageResponse = soldProductRepository.getSoldProductsFiltered(name, minPrice, maxPrice, deleted, pageable);
-    logger.debug("Retrieved {} sold products.", pageResponse.getContent().size());
+        logger.info("Getting sold products with filters");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+        Page<SoldProduct> pageResponse = soldProductRepository.getSoldProductsFiltered(name, minPrice, maxPrice, deleted, pageable);
+        logger.debug("Retrieved {} sold products.", pageResponse.getContent().size());
         List<SoldProductDto> soldProductDtos = pageResponse.stream().map(
                 mapUtil::convertSoldProductToSoldProductDto).toList();
-    logger.info("Retrieved and converted {} sold products to dto.", soldProductDtos.size());
+        logger.info("Retrieved and converted {} sold products to dto.", soldProductDtos.size());
 
-    return new PaginationResponse<>(soldProductDtos, pageResponse);
-
+        return new PaginationResponse<>(soldProductDtos, pageResponse);
     }
+
+    @Override
     public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {
         logger.info("Adding sold product with productId: {}", productId);
 
-        Product product = getProductById(productId);
+        ProductDTO product = getProductById(productId);
         Sale sale = getSaleById(saleId);
 
         // Check if this product is already added to this sale
@@ -100,12 +95,12 @@ public class SoldProductServiceImpl  implements SoldProductService {
 
         // Convert to DTO and return
         SoldProductDto resultDto = mapUtil.convertSoldProductToSoldProductDto(existingSoldProduct);
-        resultDto.setProductDto(mapUtil.convertProductToProductDto(product));
+        resultDto.setProductDto(product);
         return resultDto;
     }
 
-    private Product getProductById(Long productId) {
-        return productRepository.findById(productId)
+    private ProductDTO getProductById(Long productId) {
+        return productServiceClient.getProductById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
     }
 
@@ -115,7 +110,7 @@ public class SoldProductServiceImpl  implements SoldProductService {
     }
 
     private void updateExistingSoldProduct(SoldProduct existingSoldProduct, SoldProductDto soldProductDto,
-                                           Product product, Sale sale) {
+                                           ProductDTO product, Sale sale) {
         // Update quantity
         existingSoldProduct.setQuantity(existingSoldProduct.getQuantity() + soldProductDto.getQuantity());
 
@@ -136,19 +131,18 @@ public class SoldProductServiceImpl  implements SoldProductService {
     }
 
     private void createNewSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto,
-                                      Product product, Sale sale) {
+                                      ProductDTO product, Sale sale) {
         // Check if there is enough stock
         checkAndUpdateInventory(product, soldProductDto.getQuantity());
 
         SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
-        soldProduct.setProduct(product);
+        soldProduct.setProductId(productId); // productId kullanarak setleme
         soldProduct.setQuantity(soldProductDto.getQuantity());
         soldProduct.setPrice(product.getPrice());
 
         // Calculate total price
         double totalPrice = product.getPrice() * soldProduct.getQuantity();
         applyDiscountIfNeeded(soldProduct, totalPrice, productId);
-
 
         soldProduct.setSale(sale);
         soldProduct.setName(product.getName());
@@ -174,22 +168,20 @@ public class SoldProductServiceImpl  implements SoldProductService {
         soldProduct.setTotal(totalPrice);
     }
 
-    private void checkAndUpdateInventory(Product product, int quantity) {
+    private void checkAndUpdateInventory(ProductDTO product, int quantity) {
         if (product.getInventory() < quantity) {
             throw new ProductQuantityShortageException("Not enough stock available for product: " + product.getName());
         }
         product.setInventory(product.getInventory() - quantity);
-        productRepository.save(product); // Update product inventory
+        productServiceClient.updateProductInventory(product);
     }
-
-
 
     private void updateSoldProductDetails(SoldProduct existingSoldProduct, SoldProductDto soldProductDto) {
         existingSoldProduct.setQuantity(soldProductDto.getQuantity());
-        double originalPrice = existingSoldProduct.getProduct().getPrice();
+        double originalPrice = existingSoldProduct.getPrice();
         existingSoldProduct.setPrice(originalPrice);
         existingSoldProduct.setTotal(originalPrice * existingSoldProduct.getQuantity());
-        Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(existingSoldProduct.getProduct().getId());
+        Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(existingSoldProduct.getProductId());
         if (discountOptional.isPresent() && discountOptional.get() > 0.0) {
             double discount = discountOptional.get();
             double discountAmount = existingSoldProduct.getTotal() * (discount / 100);
@@ -199,7 +191,6 @@ public class SoldProductServiceImpl  implements SoldProductService {
             existingSoldProduct.setDiscount(0L);
         }
     }
-
 
     @Override
     public SoldProductDto deleteSoldProduct(Long id) {
@@ -218,6 +209,4 @@ public class SoldProductServiceImpl  implements SoldProductService {
             throw new ProductNotFoundException("Sold product not found with id: " + id);
         }
     }
-
-
 }

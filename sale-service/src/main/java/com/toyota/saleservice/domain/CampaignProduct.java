@@ -1,6 +1,6 @@
 package com.toyota.saleservice.domain;
 
-import com.toyota.productservice.domain.Product;
+
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,10 +24,9 @@ public class CampaignProduct {
     @JoinColumn(name = "campaign_id")
     private Campaign campaign;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product;
+    @Column(name = "product_id")
+    private Long productId;
 
     boolean deleted = Boolean.FALSE;
-    // Getter ve setter metotları
+
 }

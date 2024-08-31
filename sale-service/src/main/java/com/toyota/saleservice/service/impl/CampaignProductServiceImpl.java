@@ -1,8 +1,9 @@
 package com.toyota.saleservice.service.impl;
 
+import com.toyota.saleservice.config.ProductServiceClient;
 import com.toyota.saleservice.dao.CampaignProductRepository;
 import com.toyota.saleservice.dao.CampaignRepository;
-import com.toyota.productservice.dao.ProductRepository;
+
 import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.dto.CampaignProductDto;
 import com.toyota.saleservice.exception.CampaignNotFoundException;
@@ -28,7 +29,7 @@ public class CampaignProductServiceImpl implements CampaignProductService {
     private final MapUtil mapUtil;
     private final CampaignProductRepository campaignProductRepository;
     private final CampaignRepository campaignRepository;
-    private final ProductRepository productRepository;
+    private final ProductServiceClient productServiceClient;
 
     @Override
     public List<CampaignProductDto> getAllCampaignProducts() {
@@ -53,9 +54,9 @@ public class CampaignProductServiceImpl implements CampaignProductService {
         }
 
         // Check if the product exists
-        if (!productRepository.existsById(campaignProductDto.getProductId())) {
+        if (productServiceClient.getProductById(campaignProductDto.getProductId()).isEmpty()) {
             logger.error("Product not found with id: {}", campaignProductDto.getProductId());
-          throw new ProductNotFoundException("Product not found with id : " + campaignProductDto.getProductId());
+            throw new ProductNotFoundException("Product not found with id : " + campaignProductDto.getProductId());
         }
 
         CampaignProduct campaignProduct = mapUtil.convertCampaignProductDtoToCampaignProduct(campaignProductDto);
@@ -80,7 +81,7 @@ public class CampaignProductServiceImpl implements CampaignProductService {
                 }
 
                 // Check if the product exists
-                if (!productRepository.existsById(campaignProductDto.getProductId())) {
+                if (productServiceClient.getProductById(campaignProductDto.getProductId()).isEmpty()) {
                     logger.error("Product not found with id: {}", campaignProductDto.getProductId());
                     throw new EntityNotFoundException("Product not found with id: " + campaignProductDto.getProductId());
                 }
@@ -125,8 +126,6 @@ public class CampaignProductServiceImpl implements CampaignProductService {
         // Örneğin, ilk kampanyanın indirimini alabilirsiniz:
         return Optional.of(campaignProducts.get(0).getCampaign().getDiscount());
     }
-
-
 
     @Override
     public List<CampaignProductDto> getCampaignProductsByProductId(Long productId) {

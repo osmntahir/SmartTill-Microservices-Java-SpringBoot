@@ -1,20 +1,16 @@
 package com.toyota.productservice.service;
 
-import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDto;
+import com.toyota.productservice.dto.ProductDTO;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface ProductService {
-    ProductDto createProduct(ProductDto productDto);
+    ProductDTO createProduct(ProductDTO productDto);
 
-    ProductDto getProductById(Long id);
+    ProductDTO getProductById(Long id);
 
-    ProductDto updateProduct(Long id, ProductDto productDto);
+    ProductDTO updateProduct(Long id, ProductDTO productDto);
 
     void softDeleteProduct(Long id);
 
-    Page<ProductDto> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection);
+    Page<ProductDTO> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection);
 }

@@ -1,9 +1,8 @@
 package com.toyota.productservice.service;
 
-import com.toyota.productservice.Mapper.ProductMapper;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDto;
+import com.toyota.productservice.dto.ProductDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -39,7 +37,7 @@ class ProductServiceTests {
     @Test
     void TestCreateProduct() {
         // Arrange
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setName("Test Product");
         productDto.setPrice(10.0);
         productDto.setDescription("Test Description");
@@ -54,7 +52,7 @@ class ProductServiceTests {
         when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // Act
-        ProductDto createdProduct = productService.createProduct(productDto);
+        ProductDTO createdProduct = productService.createProduct(productDto);
 
         // Assert
         assertEquals(savedProduct.getId(), createdProduct.getId());
@@ -70,7 +68,7 @@ class ProductServiceTests {
     @Test
     public void testCreateProductNullNameThrowsIllegalArgumentException() {
         // Arrange
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setPrice(10.0);
 
         // Act & Assert
@@ -85,7 +83,7 @@ class ProductServiceTests {
     @Test
     public void testCreateProductNullPriceThrowsIllegalArgumentException() {
         // Arrange
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setName("Test Product");
 
         // Act & Assert
@@ -101,7 +99,7 @@ class ProductServiceTests {
     @Test
     void TestCreateProduct_NullNameAndPrice_ThrowsIllegalArgumentException() {
         // Arrange
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setDescription("Test Description");
         // productDto has no name and price. then it should throw IllegalArgumentException
 
@@ -117,7 +115,7 @@ class ProductServiceTests {
     @Test
     public void testCreateProduct_ZeroPrice_ThrowsIllegalArgumentException() {
         // Arrange
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setName("Test Product");
         productDto.setPrice(0.0);
 
@@ -140,7 +138,7 @@ class ProductServiceTests {
         when(productRepository.findById(id)).thenReturn(Optional.of(product));
 
         // Act
-        ProductDto result = productService.getProductById(id);
+        ProductDTO result = productService.getProductById(id);
 
         // Assert
         assertEquals(product.getId(), result.getId());
@@ -200,7 +198,7 @@ class ProductServiceTests {
     public void testUpdateProduct() {
         // Arrange
         Long id = 1L;
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setName("Test Product");
         productDto.setPrice(10.0);
         productDto.setDescription("Test Description");
@@ -224,7 +222,7 @@ class ProductServiceTests {
         when(productRepository.save(updatedProduct)).thenReturn(updatedProduct);
 
         // Act
-        ProductDto result = productService.updateProduct(id, productDto);
+        ProductDTO result = productService.updateProduct(id, productDto);
 
         // Assert
         assertEquals(updatedProduct.getId(), result.getId());
@@ -240,7 +238,7 @@ class ProductServiceTests {
     public void testUpdateProduct_NonExistingId_ThrowsEntityNotFoundException() {
         // Arrange
         Long id = 1L;
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         when(productRepository.findById(id)).thenReturn(Optional.empty());
         // Act & Assert
         assertThrows(EntityNotFoundException.class, () -> {
@@ -256,7 +254,7 @@ class ProductServiceTests {
     public void testUpdateProduct_InactiveProduct_ThrowsIllegalArgumentException() {
         // Arrange
         Long id = 1L;
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setActive(false);
         Product existingProduct = new Product();
         existingProduct.setActive(true);
@@ -274,7 +272,7 @@ class ProductServiceTests {
     public void testUpdateProduct_InactiveProduct_DoesNotUpdateProduct() {
         // Arrange
         Long id = 1L;
-        ProductDto productDto = new ProductDto();
+        ProductDTO productDto = new ProductDTO();
         productDto.setActive(false);
         Product existingProduct = new Product();
         existingProduct.setActive(true);
@@ -307,13 +305,13 @@ class ProductServiceTests {
         //when
         when(productRepository.getProductsFiltered(anyString(),anyDouble(),anyDouble(),anyBoolean(),any()))
                 .thenReturn(pageMock);
-        Page<ProductDto> result=productService.getProducts(page,size,name,minPrice,maxPrice,isActive,sortBy
+        Page<ProductDTO> result=productService.getProducts(page,size,name,minPrice,maxPrice,isActive,sortBy
                 ,sortDirection);
 
         //then
         assertEquals(page,result.getPageable().getPageNumber());
         assertEquals(size,result.getPageable().getPageSize());
-        assertEquals(ProductDto.class,result.getContent().get(0).getClass());
+        assertEquals(ProductDTO.class,result.getContent().get(0).getClass());
     }
     @Test
     void getProducts_DESC() {
@@ -334,13 +332,13 @@ class ProductServiceTests {
         //when
         when(productRepository.getProductsFiltered(anyString(),anyDouble(), anyDouble(),anyBoolean(),any()))
                 .thenReturn(pageMock);
-        Page<ProductDto> result=productService.getProducts(page,size,name,minPrice,maxPrice,isActive,sortBy
+        Page<ProductDTO> result=productService.getProducts(page,size,name,minPrice,maxPrice,isActive,sortBy
                 ,sortDirection);
 
         //then
         assertEquals(page,result.getPageable().getPageNumber());
         assertEquals(size,result.getPageable().getPageSize());
-        assertEquals(ProductDto.class,result.getContent().get(0).getClass());
+        assertEquals(ProductDTO.class,result.getContent().get(0).getClass());
     }
 
 }

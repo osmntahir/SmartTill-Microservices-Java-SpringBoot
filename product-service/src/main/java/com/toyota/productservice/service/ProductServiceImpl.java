@@ -1,10 +1,9 @@
 package com.toyota.productservice.service;
 
 import com.toyota.productservice.Mapper.ProductMapper;
-import com.toyota.productservice.config.WebClientConfig;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDto;
+import com.toyota.productservice.dto.ProductDTO;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -13,13 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -42,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
      * @throws IllegalArgumentException if the name or price of the productDto is null
      */
     @Override
-    public ProductDto createProduct(ProductDto productDto) {
+    public ProductDTO createProduct(ProductDTO productDto) {
 
         if (productDto.getName() != null && productDto.getPrice() != 0.0) {
             Product product = ProductMapper.mapToEntity(productDto);
@@ -68,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
      * @return               a page of ProductDto objects representing the products
      */
     @Override
-    public Page<ProductDto> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection) {
+    public Page<ProductDTO> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(createSortOrder(sortBy, sortDirection)));
         Page<Product> products = productRepository.getProductsFiltered(name, minPrice, maxPrice, isActive, pageable);
         logger.info("Fetched products. Page: {}, Size: {}, Sorted By: {}, Total Pages: {}, Total Elements: {}",
@@ -99,10 +95,10 @@ public class ProductServiceImpl implements ProductService {
      * @throws EntityNotFoundException if no product is found with the given ID
      */
     @Override
-    public ProductDto getProductById(Long id) {
+    public ProductDTO getProductById(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
-            ProductDto productDto = ProductMapper.mapToDto(optionalProduct.get());
+            ProductDTO productDto = ProductMapper.mapToDto(optionalProduct.get());
             logger.info("Retrieved product with id: {}", id);
             return productDto;
         } else {
@@ -123,7 +119,7 @@ public class ProductServiceImpl implements ProductService {
      * @throws EntityNotFoundException   if no product is found with the given ID
      */
     @Override
-    public ProductDto updateProduct(Long id, ProductDto productDto) {
+    public ProductDTO updateProduct(Long id, ProductDTO productDto) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();

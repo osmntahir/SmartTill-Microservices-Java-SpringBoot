@@ -1,8 +1,5 @@
 package com.toyota.saleservice.service.impl;
 
-import com.toyota.productservice.Mapper.ProductMapper;
-import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDto;
 import com.toyota.saleservice.dao.CampaignRepository;
 import com.toyota.saleservice.domain.Campaign;
 import com.toyota.saleservice.dto.CampaignDto;
@@ -12,7 +9,6 @@ import com.toyota.saleservice.exception.CampaignNotFoundException;
 import com.toyota.saleservice.service.abstracts.CampaignService;
 import com.toyota.saleservice.service.common.MapUtil;
 import com.toyota.saleservice.service.common.SortUtil;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.data.domain.Page;
@@ -74,17 +70,20 @@ public class CampaignServiceImpl implements CampaignService {
         if (campaignRepository.existsByName(campaignDto.getName())) {
             logger.warn("Campaign update failed due to existing campaign with name: {}", campaignDto.getName());
             throw new CampaignAlreadyExistsException("Campaign with this name already exists! " + campaignDto.getName());
-
         }
+
         Optional<Campaign> optionalCampaign = campaignRepository.findById(id);
         if (optionalCampaign.isPresent()) {
             Campaign existingCampaign = optionalCampaign.get();
             if (!campaignDto.isDeleted()) {
-                Campaign updatedCampaign = mapUtil.convertCampaignDtoToCampaign(campaignDto);
-                updatedCampaign.setId(existingCampaign.getId());
-                updatedCampaign.setDeleted(false);
+
+                existingCampaign.setName(campaignDto.getName());
+                existingCampaign.setDiscount(campaignDto.getDiscount());
+                existingCampaign.setDescription(campaignDto.getDescription());
+                existingCampaign.setDeleted(false);
+
                 logger.info("Campaign with id {} is updated", id);
-                return mapUtil.convertCampaignToCampaignDto(campaignRepository.save(updatedCampaign));
+                return mapUtil.convertCampaignToCampaignDto(campaignRepository.save(existingCampaign));
             } else {
                 logger.warn("Attempted to update Campaign with inactive status");
                 throw new IllegalArgumentException("Cannot update Campaign with inactive status");
@@ -94,6 +93,7 @@ public class CampaignServiceImpl implements CampaignService {
             throw new CampaignNotFoundException("Campaign not found with id: " + id);
         }
     }
+
 
     @Override
     public CampaignDto deleteCampaign(Long id) {

@@ -1,31 +1,31 @@
 package com.toyota.saleservice.service;
 
-import com.toyota.productservice.domain.Product;
+import com.toyota.saleservice.config.ProductServiceClient;
 import com.toyota.saleservice.dao.CampaignProductRepository;
 import com.toyota.saleservice.dao.CampaignRepository;
-import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.saleservice.domain.Campaign;
 import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.dto.CampaignProductDto;
+import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.exception.CampaignNotFoundException;
 import com.toyota.saleservice.exception.CampaignProductNotFoundException;
 import com.toyota.saleservice.exception.ProductNotFoundException;
 import com.toyota.saleservice.service.common.MapUtil;
 import com.toyota.saleservice.service.impl.CampaignProductServiceImpl;
+
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,7 +41,7 @@ public class CampaignProductServiceImplTest {
     private CampaignRepository campaignRepository;
 
     @Mock
-    private ProductRepository productRepository;
+    private ProductServiceClient productServiceClient;
 
     @Mock
     private MapUtil mapUtil;
@@ -60,7 +60,7 @@ public class CampaignProductServiceImplTest {
         campaignProduct = new CampaignProduct();
         campaignProduct.setId(1L);
         campaignProduct.setCampaign(new Campaign());
-        campaignProduct.setProduct(new Product());
+        campaignProduct.setProductId(1L);
 
         campaign = new Campaign();
         campaign.setId(1L);
@@ -82,7 +82,7 @@ public class CampaignProductServiceImplTest {
     @Test
     void testAddCampaignProduct() {
         when(campaignRepository.existsById(anyLong())).thenReturn(true);
-        when(productRepository.existsById(anyLong())).thenReturn(true);
+        when(productServiceClient.getProductById(anyLong())).thenReturn(Optional.of(new ProductDTO()));
         when(mapUtil.convertCampaignProductDtoToCampaignProduct(any(CampaignProductDto.class))).thenReturn(campaignProduct);
         when(campaignProductRepository.save(any(CampaignProduct.class))).thenReturn(campaignProduct);
         when(mapUtil.convertCampaignProductToCampaignProductDto(any(CampaignProduct.class))).thenReturn(campaignProductDto);
@@ -92,7 +92,7 @@ public class CampaignProductServiceImplTest {
         assertNotNull(result);
         assertEquals(campaignProductDto.getId(), result.getId());
         verify(campaignRepository, times(1)).existsById(anyLong());
-        verify(productRepository, times(1)).existsById(anyLong());
+        verify(productServiceClient, times(1)).getProductById(anyLong());
         verify(campaignProductRepository, times(1)).save(any(CampaignProduct.class));
         verify(mapUtil, times(1)).convertCampaignProductToCampaignProductDto(any(CampaignProduct.class));
     }
@@ -108,18 +108,18 @@ public class CampaignProductServiceImplTest {
     @Test
     void testAddCampaignProductProductNotFound() {
         when(campaignRepository.existsById(anyLong())).thenReturn(true);
-        when(productRepository.existsById(anyLong())).thenReturn(false);
+        when(productServiceClient.getProductById(anyLong())).thenReturn(Optional.empty());
 
         assertThrows(ProductNotFoundException.class, () -> campaignProductService.addCampaignProduct(campaignProductDto));
         verify(campaignRepository, times(1)).existsById(anyLong());
-        verify(productRepository, times(1)).existsById(anyLong());
+        verify(productServiceClient, times(1)).getProductById(anyLong());
     }
 
     @Test
     void testUpdateCampaignProduct() {
         when(campaignProductRepository.findById(anyLong())).thenReturn(Optional.of(campaignProduct));
         when(campaignRepository.existsById(anyLong())).thenReturn(true);
-        when(productRepository.existsById(anyLong())).thenReturn(true);
+        when(productServiceClient.getProductById(anyLong())).thenReturn(Optional.of(new ProductDTO()));
         when(mapUtil.convertCampaignProductDtoToCampaignProduct(any(CampaignProductDto.class))).thenReturn(campaignProduct);
         when(campaignProductRepository.save(any(CampaignProduct.class))).thenReturn(campaignProduct);
         when(mapUtil.convertCampaignProductToCampaignProductDto(any(CampaignProduct.class))).thenReturn(campaignProductDto);
@@ -130,7 +130,7 @@ public class CampaignProductServiceImplTest {
         assertEquals(campaignProductDto.getId(), result.getId());
         verify(campaignProductRepository, times(1)).findById(anyLong());
         verify(campaignRepository, times(1)).existsById(anyLong());
-        verify(productRepository, times(1)).existsById(anyLong());
+        verify(productServiceClient, times(1)).getProductById(anyLong());
         verify(campaignProductRepository, times(1)).save(any(CampaignProduct.class));
     }
 
@@ -153,34 +153,23 @@ public class CampaignProductServiceImplTest {
 
     @Test
     void testDeleteCampaignProduct() {
-        // Initialize the campaignProduct object
         campaignProduct.setDeleted(false);
 
-        // Mock the repository to return the campaignProduct
         when(campaignProductRepository.findById(anyLong())).thenReturn(Optional.of(campaignProduct));
-        // Mock the save method to return the modified campaignProduct
         when(campaignProductRepository.save(any(CampaignProduct.class))).thenAnswer(invocation -> invocation.getArgument(0));
-        // Mock the mapUtil to return the campaignProductDto with deleted = true
         campaignProductDto.setDeleted(true);
         when(mapUtil.convertCampaignProductToCampaignProductDto(any(CampaignProduct.class))).thenReturn(campaignProductDto);
 
-        // Call the service method
         CampaignProductDto result = campaignProductService.deleteCampaignProduct(1L);
 
-        // Verify that the result is not null
         assertNotNull(result);
-        // Verify that the result's deleted field is true
         assertTrue(result.isDeleted());
 
-        // Verify that campaignProductRepository.findById() was called once
         verify(campaignProductRepository, times(1)).findById(anyLong());
-        // Verify that campaignProductRepository.save() was called once
         verify(campaignProductRepository, times(1)).save(any(CampaignProduct.class));
 
-        // Check if the deleted field of campaignProduct is actually true
         assertTrue(campaignProduct.isDeleted());
     }
-
 
     @Test
     void testDeleteCampaignProductNotFound() {
@@ -255,7 +244,7 @@ public class CampaignProductServiceImplTest {
     void testUpdateCampaignProduct_ProductNotFound() {
         when(campaignProductRepository.findById(anyLong())).thenReturn(Optional.of(campaignProduct));
         when(campaignRepository.existsById(anyLong())).thenReturn(true);
-        when(productRepository.existsById(anyLong())).thenReturn(false);
+        when(productServiceClient.getProductById(anyLong())).thenReturn(Optional.empty());
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
             campaignProductService.updateCampaignProduct(1L, campaignProductDto);
@@ -294,4 +283,3 @@ public class CampaignProductServiceImplTest {
         verify(campaignProductRepository, never()).save(any(CampaignProduct.class));
     }
 }
-

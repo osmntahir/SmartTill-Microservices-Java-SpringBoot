@@ -5,8 +5,9 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.toyota.productservice.dto.ProductDto;
+
 import com.toyota.saleservice.dto.PaginationResponse;
+import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import org.junit.jupiter.api.Test;
@@ -40,9 +41,7 @@ class SoldProductControllerTest {
         when(soldProductService.addSoldProduct(Mockito.<Long>any(), Mockito.<Long>any(), Mockito.<SoldProductDto>any()))
                 .thenReturn(new SoldProductDto());
 
-        ProductDto productDto = new ProductDto();
-        productDto.setActive(true);
-        productDto.setDescription("The characteristics of someone or something");
+        ProductDTO productDto = new ProductDTO();
         productDto.setId(1L);
         productDto.setInventory(1);
         productDto.setName("Name");
@@ -80,9 +79,7 @@ class SoldProductControllerTest {
         when(soldProductService.updateSoldProduct(Mockito.<Long>any(), Mockito.<SoldProductDto>any()))
                 .thenReturn(new SoldProductDto());
 
-        ProductDto productDto = new ProductDto();
-        productDto.setActive(true);
-        productDto.setDescription("The characteristics of someone or something");
+        ProductDTO productDto = new ProductDTO();
         productDto.setId(1L);
         productDto.setInventory(1);
         productDto.setName("Name");

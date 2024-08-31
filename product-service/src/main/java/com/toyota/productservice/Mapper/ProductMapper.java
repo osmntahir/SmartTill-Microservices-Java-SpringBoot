@@ -1,7 +1,7 @@
 package com.toyota.productservice.Mapper;
 
 import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDto;
+import com.toyota.productservice.dto.ProductDTO;
 
 /**
  * Utility class for mapping between Product and ProductDto objects.
@@ -14,8 +14,8 @@ public class ProductMapper {
      * @param product the Product object to map
      * @return a ProductDto object mapped from the given Product object
      */
-    public static ProductDto mapToDto(Product product) {
-        ProductDto productDto = new ProductDto();
+    public static ProductDTO mapToDto(Product product) {
+        ProductDTO productDto = new ProductDTO();
         productDto.setId(product.getId());
         productDto.setName(product.getName());
         productDto.setDescription(product.getDescription());
@@ -31,7 +31,7 @@ public class ProductMapper {
      * @param productDto the ProductDto object to map
      * @return a Product object mapped from the given ProductDto object
      */
-    public static Product mapToEntity(ProductDto productDto) {
+    public static Product mapToEntity(ProductDTO productDto) {
         Product product = new Product();
         product.setName(productDto.getName());
         product.setDescription(productDto.getDescription());

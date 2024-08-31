@@ -10,13 +10,11 @@ import java.util.Optional;
 
 public interface SoldProductRepository extends JpaRepository<SoldProduct, Long> {
 
-
     @Query("SELECT s FROM SoldProduct s WHERE " +
-            "(:name is null or s.product.name like %:name%) and " +
-            "(:minPrice is null or s.product.price >= :minPrice) and " +
-            "(:maxPrice is null or s.product.price <= :maxPrice) and " +
+            "(:name is null or s.name like %:name%) and " +
+            "(:minPrice is null or s.price >= :minPrice) and " +
+            "(:maxPrice is null or s.price <= :maxPrice) and " +
             "(:deleted is null or s.deleted = :deleted)")
-
     Page<SoldProduct> getSoldProductsFiltered(String name, Double minPrice, Double maxPrice, boolean deleted, Pageable pageable);
 
     Optional<SoldProduct> findBySaleIdAndProductId(Long saleId, Long productId);

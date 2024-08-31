@@ -5,7 +5,7 @@ import lombok.Data;
 
 // Structure mirrors Product.java but NO database annotations
 @Data
-public class ProductDto {
+public class ProductDTO {
     private Long id;
     private String name;
     private String description;

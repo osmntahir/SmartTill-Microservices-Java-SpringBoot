@@ -1,8 +1,6 @@
 package com.toyota.saleservice.domain;
 
-import com.toyota.productservice.domain.Product;
 import org.junit.jupiter.api.Test;
-
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class CampaignProductTest {
@@ -16,12 +14,12 @@ public class CampaignProductTest {
     @Test
     public void testAllArgsConstructor() {
         Campaign campaign = new Campaign();
-        Product product = new Product();
-        CampaignProduct campaignProduct = new CampaignProduct(1L, campaign, product, false);
+        Long productId = 1L;
+        CampaignProduct campaignProduct = new CampaignProduct(1L, campaign, productId, false);
 
         assertThat(campaignProduct.getId()).isEqualTo(1L);
         assertThat(campaignProduct.getCampaign()).isEqualTo(campaign);
-        assertThat(campaignProduct.getProduct()).isEqualTo(product);
+        assertThat(campaignProduct.getProductId()).isEqualTo(productId);
         assertThat(campaignProduct.isDeleted()).isFalse();
     }
 
@@ -29,16 +27,16 @@ public class CampaignProductTest {
     public void testSettersAndGetters() {
         CampaignProduct campaignProduct = new CampaignProduct();
         Campaign campaign = new Campaign();
-        Product product = new Product();
+        Long productId = 1L;
 
         campaignProduct.setId(1L);
         campaignProduct.setCampaign(campaign);
-        campaignProduct.setProduct(product);
+        campaignProduct.setProductId(productId);
         campaignProduct.setDeleted(false);
 
         assertThat(campaignProduct.getId()).isEqualTo(1L);
         assertThat(campaignProduct.getCampaign()).isEqualTo(campaign);
-        assertThat(campaignProduct.getProduct()).isEqualTo(product);
+        assertThat(campaignProduct.getProductId()).isEqualTo(productId);
         assertThat(campaignProduct.isDeleted()).isFalse();
     }
 }

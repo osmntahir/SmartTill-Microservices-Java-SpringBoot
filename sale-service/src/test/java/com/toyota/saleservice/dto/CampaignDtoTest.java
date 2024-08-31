@@ -18,11 +18,11 @@ public class CampaignDtoTest {
     @Test
     void testValidCampaignDto() {
         // Given
-        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, false);
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
 
         // When
         Set<ConstraintViolation<CampaignDto>> violations = validator.validate(dto);
-
+    
         // Then
         assertTrue(violations.isEmpty(), "Validation should pass with valid CampaignDto");
     }
@@ -30,7 +30,8 @@ public class CampaignDtoTest {
     @Test
     void testInvalidName() {
         // Given
-        CampaignDto dto = new CampaignDto(null, "", "Test Description", 25L, false);
+
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
 
         // When
         Set<ConstraintViolation<CampaignDto>> violations = validator.validate(dto);
@@ -44,7 +45,8 @@ public class CampaignDtoTest {
     @Test
     void testInvalidDiscountNegative() {
         // Given
-        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", -10L, false);
+
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
 
         // When
         Set<ConstraintViolation<CampaignDto>> violations = validator.validate(dto);
@@ -58,7 +60,7 @@ public class CampaignDtoTest {
     @Test
     void testInvalidDiscountTooHigh() {
         // Given
-        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 110L, false);
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
 
         // When
         Set<ConstraintViolation<CampaignDto>> violations = validator.validate(dto);
@@ -72,7 +74,7 @@ public class CampaignDtoTest {
     @Test
     void testDefaultDeletedValue() {
         // Given
-        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, false);
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
 
         // When
         boolean deleted = dto.isDeleted();
@@ -100,7 +102,7 @@ public class CampaignDtoTest {
         boolean deleted = true;
 
         // When
-        CampaignDto dto = new CampaignDto(id, name, description, discount, deleted);
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
 
         // Then
         assertEquals(id, dto.getId(), "Id should be set correctly");
@@ -112,7 +114,7 @@ public class CampaignDtoTest {
     @Test
     void TestDataAnnotaion()
     {
-        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, false);
+        CampaignDto dto = new CampaignDto(null, "Test Campaign", "Test Description", 25L, null,false);
         dto.setId(1L);
         dto.setName("Test Campaign");
         dto.setDescription("Test Description");

@@ -1,6 +1,6 @@
 package com.toyota.productservice.resource;
 
-import com.toyota.productservice.dto.ProductDTO;
+import com.toyota.productservice.dto.ProductDto;
 import com.toyota.productservice.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -41,7 +41,7 @@ public class ProductController {
      * @return               a page of ProductDto objects representing the active products
      */
     @GetMapping("/getAll")
-    public Page<ProductDTO> getActiveProducts(@RequestParam(defaultValue = "0") int page,
+    public Page<ProductDto> getActiveProducts(@RequestParam(defaultValue = "0") int page,
                                               @RequestParam(defaultValue = "5") int size,
                                               @RequestParam(defaultValue = "") String name,
                                               @RequestParam(required = false, defaultValue = "0") Double minPrice,
@@ -59,8 +59,8 @@ public class ProductController {
      */
 
     @GetMapping("/{id}")
-    public ResponseEntity<ProductDTO> getProductById(@PathVariable Long id) {
-        ProductDTO product = productService.getProductById(id);
+    public ResponseEntity<ProductDto> getProductById(@PathVariable Long id) {
+        ProductDto product = productService.getProductById(id);
         return ResponseEntity.ok(product);
     }
 /**
@@ -69,8 +69,8 @@ public class ProductController {
      * @return ProductDto
      */
     @PostMapping("/add")
-    public ResponseEntity<ProductDTO> createProduct(@RequestBody ProductDTO productDto) {
-        ProductDTO createdProduct = productService.createProduct(productDto);
+    public ResponseEntity<ProductDto> createProduct(@RequestBody ProductDto productDto) {
+        ProductDto createdProduct = productService.createProduct(productDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdProduct);
     }
 /**
@@ -80,8 +80,8 @@ public class ProductController {
      * @return ProductDto
      */
     @PutMapping("/update/{id}")
-    public ResponseEntity<ProductDTO> updateProduct(@PathVariable Long id, @RequestBody ProductDTO productDto) {
-        ProductDTO updatedProduct = productService.updateProduct(id, productDto);
+    public ResponseEntity<ProductDto> updateProduct(@PathVariable Long id, @RequestBody ProductDto productDto) {
+        ProductDto updatedProduct = productService.updateProduct(id, productDto);
         return ResponseEntity.ok(updatedProduct);
     }
 /**         * Method to delete product

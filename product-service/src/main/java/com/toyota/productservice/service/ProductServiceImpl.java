@@ -3,7 +3,7 @@ package com.toyota.productservice.service;
 import com.toyota.productservice.Mapper.ProductMapper;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDTO;
+import com.toyota.productservice.dto.ProductDto;
 import jakarta.persistence.EntityNotFoundException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -38,7 +38,7 @@ public class ProductServiceImpl implements ProductService {
      * @throws IllegalArgumentException if the name or price of the productDto is null
      */
     @Override
-    public ProductDTO createProduct(ProductDTO productDto) {
+    public ProductDto createProduct(ProductDto productDto) {
 
         if (productDto.getName() != null && productDto.getPrice() != 0.0) {
             Product product = ProductMapper.mapToEntity(productDto);
@@ -64,7 +64,7 @@ public class ProductServiceImpl implements ProductService {
      * @return               a page of ProductDto objects representing the products
      */
     @Override
-    public Page<ProductDTO> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection) {
+    public Page<ProductDto> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection) {
         Pageable pageable = PageRequest.of(page, size, Sort.by(createSortOrder(sortBy, sortDirection)));
         Page<Product> products = productRepository.getProductsFiltered(name, minPrice, maxPrice, isActive, pageable);
         logger.info("Fetched products. Page: {}, Size: {}, Sorted By: {}, Total Pages: {}, Total Elements: {}",
@@ -95,10 +95,10 @@ public class ProductServiceImpl implements ProductService {
      * @throws EntityNotFoundException if no product is found with the given ID
      */
     @Override
-    public ProductDTO getProductById(Long id) {
+    public ProductDto getProductById(Long id) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
-            ProductDTO productDto = ProductMapper.mapToDto(optionalProduct.get());
+            ProductDto productDto = ProductMapper.mapToDto(optionalProduct.get());
             logger.info("Retrieved product with id: {}", id);
             return productDto;
         } else {
@@ -119,7 +119,7 @@ public class ProductServiceImpl implements ProductService {
      * @throws EntityNotFoundException   if no product is found with the given ID
      */
     @Override
-    public ProductDTO updateProduct(Long id, ProductDTO productDto) {
+    public ProductDto updateProduct(Long id, ProductDto productDto) {
         Optional<Product> optionalProduct = productRepository.findById(id);
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();

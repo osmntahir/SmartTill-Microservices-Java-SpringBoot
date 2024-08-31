@@ -1,6 +1,6 @@
 package com.toyota.productservice.resource;
 
-import com.toyota.productservice.dto.ProductDTO;
+import com.toyota.productservice.dto.ProductDto;
 import com.toyota.productservice.service.ProductService;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -26,12 +26,12 @@ public class ProductControllerTest {
     @Test
     public void testGetActiveProducts() {
         // Mock the ProductService
-        Page<ProductDTO> mockProductPage = Page.empty();
+        Page<ProductDto> mockProductPage = Page.empty();
         when(productService.getProducts(anyInt(), anyInt(), anyString(), anyDouble(), anyDouble(), anyBoolean(), anyString(), anyString()))
                 .thenReturn(mockProductPage);
 
         // Call the controller method
-        Page<ProductDTO> result = productController.getActiveProducts(0, 5, "", 0.0, Double.MAX_VALUE, true, "name", "ASC");
+        Page<ProductDto> result = productController.getActiveProducts(0, 5, "", 0.0, Double.MAX_VALUE, true, "name", "ASC");
 
         // Assertions
         assertNotNull(result);
@@ -41,12 +41,12 @@ public class ProductControllerTest {
     @Test
     public void testGetProductById() {
         // Mock the ProductService
-        ProductDTO mockProductDto = new ProductDTO();
+        ProductDto mockProductDto = new ProductDto();
         mockProductDto.setId(1L);
         when(productService.getProductById(anyLong())).thenReturn(mockProductDto);
 
         // Call the controller method
-        ProductDTO result = productController.getProductById(1L).getBody();
+        ProductDto result = productController.getProductById(1L).getBody();
 
         // Assertions
         assertNotNull(result);
@@ -56,12 +56,12 @@ public class ProductControllerTest {
     @Test
     public void testCreateProduct() {
         // Mock the ProductService
-        ProductDTO mockProductDto = new ProductDTO();
+        ProductDto mockProductDto = new ProductDto();
         mockProductDto.setId(1L);
-        when(productService.createProduct(any(ProductDTO.class))).thenReturn(mockProductDto);
+        when(productService.createProduct(any(ProductDto.class))).thenReturn(mockProductDto);
 
         // Call the controller method
-        ProductDTO result = productController.createProduct(new ProductDTO()).getBody();
+        ProductDto result = productController.createProduct(new ProductDto()).getBody();
 
         // Assertions
         assertNotNull(result);
@@ -71,12 +71,12 @@ public class ProductControllerTest {
     @Test
     public void testUpdateProduct() {
         // Mock the ProductService
-        ProductDTO mockProductDto = new ProductDTO();
+        ProductDto mockProductDto = new ProductDto();
         mockProductDto.setId(1L);
-        when(productService.updateProduct(anyLong(), any(ProductDTO.class))).thenReturn(mockProductDto);
+        when(productService.updateProduct(anyLong(), any(ProductDto.class))).thenReturn(mockProductDto);
 
         // Call the controller method
-        ProductDTO result = productController.updateProduct(1L, new ProductDTO()).getBody();
+        ProductDto result = productController.updateProduct(1L, new ProductDto()).getBody();
 
         // Assertions
         assertNotNull(result);

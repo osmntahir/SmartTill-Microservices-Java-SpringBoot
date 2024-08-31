@@ -1,7 +1,7 @@
 package com.toyota.productservice.Mapper;
 
 import com.toyota.productservice.domain.Product;
-import com.toyota.productservice.dto.ProductDTO;
+import com.toyota.productservice.dto.ProductDto;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -27,7 +27,7 @@ public class ProductMapperTest {
         product.setActive(true);
 
         // Map Product to ProductDto
-        ProductDTO productDto = ProductMapper.mapToDto(product);
+        ProductDto productDto = ProductMapper.mapToDto(product);
 
         // Assert mapping
         assertNotNull(productDto);
@@ -45,7 +45,7 @@ public class ProductMapperTest {
     @Test
     public void testMapToEntity() {
         // Create a ProductDto
-        ProductDTO productDto = new ProductDTO();
+        ProductDto productDto = new ProductDto();
         productDto.setName("Test Product");
         productDto.setDescription("Test Description");
         productDto.setPrice(10.0);

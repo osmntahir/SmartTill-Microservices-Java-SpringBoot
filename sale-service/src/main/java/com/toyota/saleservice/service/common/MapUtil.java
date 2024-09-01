@@ -52,7 +52,12 @@ public class MapUtil {
     public SoldProduct convertSoldProductDtoToSoldProduct(SoldProductDto soldProductDto) {
         SoldProduct soldProduct = modelMapper.map(soldProductDto, SoldProduct.class);
 
-        soldProduct.setProductId(soldProductDto.getProductDto().getId());
+        if (soldProductDto.getProductDto() != null) {
+            soldProduct.setProductId(soldProductDto.getProductDto().getId());
+        } else {
+            throw new IllegalArgumentException("ProductDTO cannot be null when converting SoldProductDto to SoldProduct");
+        }
+
         return soldProduct;
     }
 

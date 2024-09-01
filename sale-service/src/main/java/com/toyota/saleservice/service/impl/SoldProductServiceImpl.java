@@ -74,7 +74,10 @@ public class SoldProductServiceImpl implements SoldProductService {
     public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {
         logger.info("Adding sold product with productId: {}", productId);
 
+        // Fetch the product using the productId from the URL
         ProductDTO product = getProductById(productId);
+        soldProductDto.setProductDto(product); // Set the product details in the SoldProductDto
+
         Sale sale = getSaleById(saleId);
 
         // Check if this product is already added to this sale
@@ -95,9 +98,34 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         // Convert to DTO and return
         SoldProductDto resultDto = mapUtil.convertSoldProductToSoldProductDto(existingSoldProduct);
-        resultDto.setProductDto(product);
+        resultDto.setProductDto(product); // Ensure the product details are included in the response DTO
         return resultDto;
     }
+
+    private void createNewSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto,
+                                      ProductDTO product, Sale sale) {
+        // Check if there is enough stock
+        checkAndUpdateInventory(product, soldProductDto.getQuantity());
+
+        SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
+        soldProduct.setProductId(productId); // productId set through URL
+        soldProduct.setQuantity(soldProductDto.getQuantity());
+        soldProduct.setPrice(product.getPrice());
+
+        // Calculate total price
+        double totalPrice = product.getPrice() * soldProduct.getQuantity();
+        applyDiscountIfNeeded(soldProduct, totalPrice, productId);
+
+        soldProduct.setSale(sale);
+        soldProduct.setName(product.getName());
+
+        // Update sale's total price
+        sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
+
+        // Save new sold product
+        soldProductRepository.save(soldProduct);
+    }
+
 
     private ProductDTO getProductById(Long productId) {
         return productServiceClient.getProductById(productId)
@@ -129,31 +157,6 @@ public class SoldProductServiceImpl implements SoldProductService {
         // Save existing sold product
         soldProductRepository.save(existingSoldProduct);
     }
-
-    private void createNewSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto,
-                                      ProductDTO product, Sale sale) {
-        // Check if there is enough stock
-        checkAndUpdateInventory(product, soldProductDto.getQuantity());
-
-        SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
-        soldProduct.setProductId(productId); // productId kullanarak setleme
-        soldProduct.setQuantity(soldProductDto.getQuantity());
-        soldProduct.setPrice(product.getPrice());
-
-        // Calculate total price
-        double totalPrice = product.getPrice() * soldProduct.getQuantity();
-        applyDiscountIfNeeded(soldProduct, totalPrice, productId);
-
-        soldProduct.setSale(sale);
-        soldProduct.setName(product.getName());
-
-        // Update sale's total price
-        sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
-
-        // Save new sold product
-        soldProductRepository.save(soldProduct);
-    }
-
     private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
         // Check if there is a discount available for the product
         Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);

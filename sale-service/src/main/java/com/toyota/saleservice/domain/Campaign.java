@@ -1,6 +1,7 @@
 package com.toyota.saleservice.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +29,7 @@ public class Campaign {
     private boolean deleted;
 
     @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<CampaignProduct> campaignProducts;
 
 }

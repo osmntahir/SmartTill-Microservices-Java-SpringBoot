@@ -2,6 +2,7 @@ package com.toyota.saleservice.domain;
 
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
@@ -22,6 +23,7 @@ public class CampaignProduct {
 
     @ManyToOne
     @JoinColumn(name = "campaign_id")
+    @JsonBackReference
     private Campaign campaign;
 
     @Column(name = "product_id")

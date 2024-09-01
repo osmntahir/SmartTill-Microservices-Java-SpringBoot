@@ -47,8 +47,22 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         if (optionalSoldProduct.isPresent()) {
             SoldProduct existingSoldProduct = optionalSoldProduct.get();
+            Sale sale = existingSoldProduct.getSale();
+
+            // Calculate the difference in total price before and after the update
+            double oldTotalPrice = existingSoldProduct.getTotal();
+
             updateSoldProductDetails(existingSoldProduct, soldProductDto);
+
             SoldProduct updatedSoldProduct = soldProductRepository.save(existingSoldProduct);
+
+            // Calculate the new total price for the sale
+            double newTotalPrice = sale.getTotalPrice() - oldTotalPrice + updatedSoldProduct.getTotal();
+            sale.setTotalPrice(newTotalPrice);
+
+            // Save the updated sale with the new total price
+            saleRepository.save(sale);
+
             logger.info("Sold product with id {} is updated", id);
             return mapUtil.convertSoldProductToSoldProductDto(updatedSoldProduct);
         } else {
@@ -56,6 +70,7 @@ public class SoldProductServiceImpl implements SoldProductService {
             throw new ProductNotFoundException("Sold Product not found with id: " + id);
         }
     }
+
 
     @Override
     public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean deleted, String sortBy, String sortDirection) {

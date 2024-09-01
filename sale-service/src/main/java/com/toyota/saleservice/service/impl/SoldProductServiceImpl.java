@@ -203,8 +203,19 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         if (optionalSoldProduct.isPresent()) {
             SoldProduct soldProduct = optionalSoldProduct.get();
+            Sale sale = soldProduct.getSale();
+
+
+            double adjustedTotalPrice = sale.getTotalPrice() - soldProduct.getTotal();
+            sale.setTotalPrice(adjustedTotalPrice);
+
+
             soldProduct.setDeleted(true);
             SoldProduct saved = soldProductRepository.save(soldProduct);
+
+
+            saleRepository.save(sale);
+
             logger.info("Sold product deleted with id: {}", saved.getId());
             return mapUtil.convertSoldProductToSoldProductDto(saved);
         } else {
@@ -212,4 +223,5 @@ public class SoldProductServiceImpl implements SoldProductService {
             throw new ProductNotFoundException("Sold product not found with id: " + id);
         }
     }
+
 }

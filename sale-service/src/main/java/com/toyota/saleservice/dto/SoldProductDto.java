@@ -13,10 +13,13 @@ import lombok.NoArgsConstructor;
 public class SoldProductDto {
     private Long id;
 
-    @Valid
-    private ProductDTO productDto;
+//    @Valid
+//    private ProductDTO productDto;
 
-
+    private Long productId;
+    private String productName;
+    private double price;
+    private int inventory;
     private double discount;
     private double total;
 

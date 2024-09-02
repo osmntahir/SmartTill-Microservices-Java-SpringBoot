@@ -13,7 +13,6 @@ import com.toyota.saleservice.exception.ProductQuantityShortageException;
 import com.toyota.saleservice.exception.SaleNotFoundException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
-
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +33,6 @@ public class SoldProductServiceImpl implements SoldProductService {
     private final SoldProductRepository soldProductRepository;
     private final MapUtil mapUtil;
     private final Logger logger = LogManager.getLogger(SoldProductService.class);
-
     private final ProductServiceClient productServiceClient;
     private final CampaignProductServiceImpl campaignProductService;
     private final SaleRepository saleRepository;
@@ -71,7 +69,6 @@ public class SoldProductServiceImpl implements SoldProductService {
         }
     }
 
-
     @Override
     public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean deleted, String sortBy, String sortDirection) {
         logger.info("Getting sold products with filters");
@@ -91,7 +88,9 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         // Fetch the product using the productId from the URL
         ProductDTO product = getProductById(productId);
-        soldProductDto.setProductDto(product); // Set the product details in the SoldProductDto
+        soldProductDto.setProductId(productId); // Set the product ID in SoldProductDto
+        soldProductDto.setProductName(product.getName()); // Set product name
+        soldProductDto.setPrice(product.getPrice()); // Set product price
 
         Sale sale = getSaleById(saleId);
 
@@ -111,10 +110,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         existingSoldProduct = soldProductRepository.findBySaleIdAndProductId(saleId, productId)
                 .orElseThrow(() -> new IllegalStateException("Failed to fetch saved sold product"));
 
-        // Convert to DTO and return
-        SoldProductDto resultDto = mapUtil.convertSoldProductToSoldProductDto(existingSoldProduct);
-        resultDto.setProductDto(product); // Ensure the product details are included in the response DTO
-        return resultDto;
+        return mapUtil.convertSoldProductToSoldProductDto(existingSoldProduct);
     }
 
     private void createNewSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto,
@@ -140,7 +136,6 @@ public class SoldProductServiceImpl implements SoldProductService {
         // Save new sold product
         soldProductRepository.save(soldProduct);
     }
-
 
     private ProductDTO getProductById(Long productId) {
         return productServiceClient.getProductById(productId)
@@ -172,6 +167,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         // Save existing sold product
         soldProductRepository.save(existingSoldProduct);
     }
+
     private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
         // Check if there is a discount available for the product
         Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
@@ -219,24 +215,15 @@ public class SoldProductServiceImpl implements SoldProductService {
         if (optionalSoldProduct.isPresent()) {
             SoldProduct soldProduct = optionalSoldProduct.get();
             Sale sale = soldProduct.getSale();
-
-
-            double adjustedTotalPrice = sale.getTotalPrice() - soldProduct.getTotal();
-            sale.setTotalPrice(adjustedTotalPrice);
-
-
-            soldProduct.setDeleted(true);
-            SoldProduct saved = soldProductRepository.save(soldProduct);
-
-
+            double totalPrice = sale.getTotalPrice() - soldProduct.getTotal();
+            sale.setTotalPrice(totalPrice);
             saleRepository.save(sale);
-
-            logger.info("Sold product deleted with id: {}", saved.getId());
-            return mapUtil.convertSoldProductToSoldProductDto(saved);
+            soldProductRepository.delete(soldProduct);
+            logger.info("Sold product with id {} deleted successfully.", id);
+            return mapUtil.convertSoldProductToSoldProductDto(soldProduct);
         } else {
-            logger.error("Sold product not found with id: {}", id);
-            throw new ProductNotFoundException("Sold product not found with id: " + id);
+            logger.warn("Sold product delete failed due to non-existent sold product with id: {}", id);
+            throw new ProductNotFoundException("Sold product with id " + id + " not found!");
         }
     }
-
 }

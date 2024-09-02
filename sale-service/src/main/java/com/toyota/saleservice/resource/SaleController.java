@@ -37,6 +37,18 @@ public class SaleController {
         return saleService.getSalesFiltered(page, size, sortBy, sortOrder, minTotalPrice, maxTotalPrice, startDate, endDate, paymentType, deleted);
     }
 
+    @GetMapping("/get/{id}")
+    public ResponseEntity <SaleDto> getSale(@PathVariable Long id){
+
+            SaleDto response = saleService.getSale(id);
+
+            if(response == null){
+                return ResponseEntity.badRequest().build();
+            }
+
+       return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
     @PostMapping("/add")
     public ResponseEntity <SaleDto> addSale(@RequestBody /*@Valid*/SaleDto saleDto){

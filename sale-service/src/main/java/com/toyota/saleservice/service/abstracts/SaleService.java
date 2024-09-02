@@ -24,4 +24,6 @@ public interface SaleService {
     SaleDto updateSale(Long id, SaleDto saleDto);
 
     SaleDto deleteSale(Long id);
+
+    SaleDto getSale(Long id);
 }

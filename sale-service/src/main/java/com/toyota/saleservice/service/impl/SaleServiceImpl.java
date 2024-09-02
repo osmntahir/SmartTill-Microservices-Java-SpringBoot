@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
 @Service
 @RequiredArgsConstructor
 public class SaleServiceImpl implements SaleService {
@@ -39,6 +38,7 @@ public class SaleServiceImpl implements SaleService {
     private final ProductServiceClient productServiceClient;
     private final Logger logger = LogManager.getLogger(SaleService.class);
     private final MapUtil mapUtil;
+
     @Override
     public PaginationResponse<SaleDto> getSalesFiltered(int page,
                                                         int size,
@@ -86,20 +86,17 @@ public class SaleServiceImpl implements SaleService {
             throw new SaleAlreadyExistsException("Sale already exists with id: " + saleDto.getId());
         }
 
-
         double totalPrice = 0.0;
 
-
         for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
-            if (soldProductDto.getProductDto() != null) {
-                double productPrice = soldProductDto.getProductDto().getPrice();
+            if (soldProductDto != null) {
+                double productPrice = soldProductDto.getPrice();
                 int quantity = soldProductDto.getQuantity();
                 totalPrice += productPrice * quantity;
             } else {
                 logger.warn("Product details are missing for sold product with id: {}", soldProductDto.getId());
             }
         }
-
 
         saleDto.setTotalPrice(totalPrice);
 
@@ -111,56 +108,46 @@ public class SaleServiceImpl implements SaleService {
         return mapUtil.convertSaleToSaleDto(saved);
     }
 
-
     @Override
     public SaleDto updateSale(Long id, SaleDto saleDto) {
         logger.info("Updating sale with id: {}", id);
 
-
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + id));
 
-
         existingSale.setPaymentType(saleDto.getPaymentType());
 
+        if (saleDto.getSoldProducts() != null) {
+            soldProductRepository.deleteAll(existingSale.getSoldProducts());
+            existingSale.getSoldProducts().clear();
 
-        soldProductRepository.deleteAll(existingSale.getSoldProducts());
-        existingSale.getSoldProducts().clear();
+            double newTotalPrice = 0.0;
 
+            for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
 
-        double newTotalPrice = 0.0;
+                ProductDTO product = productServiceClient.getProductById(soldProductDto.getProductId())
+                        .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProductDto.getProductId()));
 
+                SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
+                soldProduct.setSale(existingSale);
 
-        for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
+                double productTotal = product.getPrice() * soldProductDto.getQuantity();
+                soldProduct.setTotal(productTotal);
 
-            ProductDTO product = productServiceClient.getProductById(soldProductDto.getProductDto().getId())
-                    .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProductDto.getProductDto().getId()));
+                newTotalPrice += productTotal;
 
+                existingSale.getSoldProducts().add(soldProduct);
+            }
 
-            SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
-            soldProduct.setSale(existingSale);
-
-
-            double productTotal = product.getPrice() * soldProductDto.getQuantity();
-            soldProduct.setTotal(productTotal);
-
-
-            newTotalPrice += productTotal;
-
-
-            existingSale.getSoldProducts().add(soldProduct);
+            existingSale.setTotalPrice(newTotalPrice);
         }
-
-
-        existingSale.setTotalPrice(newTotalPrice);
-
 
         Sale updatedSale = saleRepository.save(existingSale);
         logger.info("Sale with id {} is updated", id);
 
-       
         return mapUtil.convertSaleToSaleDto(updatedSale);
     }
+
 
     @Override
     public SaleDto deleteSale(Long id) {
@@ -174,5 +161,16 @@ public class SaleServiceImpl implements SaleService {
 
         logger.info("Sale with id {} is deleted", id);
         return mapUtil.convertSaleToSaleDto(savedSale);
+    }
+
+    @Override
+    public SaleDto getSale(Long id) {
+        logger.info("Getting sale with id: {}", id);
+
+        Sale sale = saleRepository.findById(id)
+                .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + id));
+
+        logger.info("Sale with id {} is retrieved", id);
+        return mapUtil.convertSaleToSaleDto(sale);
     }
 }

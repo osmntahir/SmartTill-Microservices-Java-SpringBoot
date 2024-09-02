@@ -96,9 +96,9 @@ public class PdfGenerator {
         productTable.addCell("Total");
 
         for (SoldProductDto product : soldProducts) {
-            productTable.addCell(product.getProductDto().getName());
+            productTable.addCell(product.getProductName());
             productTable.addCell(String.valueOf(product.getQuantity()));
-            productTable.addCell("$" + product.getProductDto().getPrice());
+            productTable.addCell("$" + product.getPrice());
             productTable.addCell("$" + product.getTotal());
         }
 

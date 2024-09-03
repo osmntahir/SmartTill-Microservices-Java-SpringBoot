@@ -14,8 +14,7 @@ import com.toyota.saleservice.exception.SaleNotFoundException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
 import lombok.RequiredArgsConstructor;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +24,8 @@ import org.springframework.stereotype.Service;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import java.util.stream.Collectors;
 
 @Service
@@ -133,8 +134,8 @@ public class SoldProductServiceImpl implements SoldProductService {
         soldProductRepository.save(existingSoldProduct);
     }
 
-    private void createNewSoldProduct(SoldProductDto soldProductDto,
-                                      ProductDTO product, Sale sale, SoldProduct soldProduct) {
+    void createNewSoldProduct(SoldProductDto soldProductDto,
+                              ProductDTO product, Sale sale, SoldProduct soldProduct) {
         soldProduct.setProductId(product.getId());
         soldProduct.setName(product.getName());
         soldProduct.setPrice(product.getPrice());
@@ -168,7 +169,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         soldProduct.setTotal(totalPrice);
     }
 
-    private void checkAndUpdateInventory(ProductDTO product, int quantity) {
+    void checkAndUpdateInventory(ProductDTO product, int quantity) {
         if (product.getInventory() < quantity) {
             throw new ProductQuantityShortageException("Not enough stock available for product: " + product.getName());
         }

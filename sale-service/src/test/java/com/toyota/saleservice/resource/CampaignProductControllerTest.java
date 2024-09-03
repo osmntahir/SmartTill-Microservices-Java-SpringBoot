@@ -1,177 +1,200 @@
 package com.toyota.saleservice.resource;
 
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.dto.CampaignProductDto;
-import com.toyota.saleservice.resource.CampaignProductController;
 import com.toyota.saleservice.service.abstracts.CampaignProductService;
-import org.junit.jupiter.api.BeforeEach;
+
+import java.util.ArrayList;
+
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.aot.DisabledInAotMode;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-import java.util.Collections;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@ExtendWith(MockitoExtension.class)
-public class CampaignProductControllerTest {
-
-    @Mock
-    private CampaignProductService campaignProductService;
-
-    @InjectMocks
+@ContextConfiguration(classes = {CampaignProductController.class})
+@ExtendWith(SpringExtension.class)
+@DisabledInAotMode
+class CampaignProductControllerTest {
+    @Autowired
     private CampaignProductController campaignProductController;
 
-    private MockMvc mockMvc;
+    @MockBean
+    private CampaignProductService campaignProductService;
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(campaignProductController).build();
-    }
 
     @Test
     void testGetAllCampaignProducts() throws Exception {
-        // Prepare mock data
-        CampaignProductDto campaignProductDto = new CampaignProductDto();
-        campaignProductDto.setId(1L);
+        // Arrange
+        when(campaignProductService.getAllCampaignProducts()).thenReturn(new ArrayList<>());
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/campaign-product/getAll");
+
+        // Act
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder);
+
+        // Assert
+        actualPerformResult.andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 
 
-        List<CampaignProductDto> mockCampaignProducts = Collections.singletonList(campaignProductDto);
-        when(campaignProductService.getAllCampaignProducts()).thenReturn(mockCampaignProducts);
+    @Test
+    void testGetAllCampaignProducts2() throws Exception {
+        // Arrange
+        ArrayList<CampaignProductDto> campaignProductDtoList = new ArrayList<>();
+        campaignProductDtoList.add(new CampaignProductDto());
+        when(campaignProductService.getAllCampaignProducts()).thenReturn(campaignProductDtoList);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.get("/campaign-product/getAll");
 
-        // Perform GET request
-        mockMvc.perform(get("/campaign-products/getAll"))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].id").value(1));
-
+        // Act and Assert
+        MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("[{\"id\":null,\"campaignId\":null,\"productId\":null,\"deleted\":false}]"));
     }
 
     @Test
     void testAddCampaignProduct() throws Exception {
-        // Prepare mock data
+        // Arrange
+        when(campaignProductService.addCampaignProduct(Mockito.<CampaignProductDto>any()))
+                .thenReturn(new CampaignProductDto());
+
         CampaignProductDto campaignProductDto = new CampaignProductDto();
+        campaignProductDto.setCampaignId(1L);
+        campaignProductDto.setDeleted(true);
         campaignProductDto.setId(1L);
+        campaignProductDto.setProductId(1L);
+        String content = (new ObjectMapper()).writeValueAsString(campaignProductDto);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.post("/campaign-product/add")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
 
+        // Act
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder);
 
-        when(campaignProductService.addCampaignProduct(any(CampaignProductDto.class)))
-                .thenReturn(campaignProductDto);
-
-        // Perform POST request
-        mockMvc.perform(post("/campaign-products/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignProductDto)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1));
-
+        // Assert
+        actualPerformResult.andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"id\":null,\"campaignId\":null,\"productId\":null,\"deleted\":false}"));
     }
+
 
     @Test
     void testUpdateCampaignProduct() throws Exception {
-        // Prepare mock data
+        // Arrange
+        when(campaignProductService.updateCampaignProduct(Mockito.<Long>any(), Mockito.<CampaignProductDto>any()))
+                .thenReturn(new CampaignProductDto());
+
         CampaignProductDto campaignProductDto = new CampaignProductDto();
+        campaignProductDto.setCampaignId(1L);
+        campaignProductDto.setDeleted(true);
         campaignProductDto.setId(1L);
+        campaignProductDto.setProductId(1L);
+        String content = (new ObjectMapper()).writeValueAsString(campaignProductDto);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/campaign-product/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
 
-
-        when(campaignProductService.updateCampaignProduct(eq(1L), any(CampaignProductDto.class)))
-                .thenReturn(campaignProductDto);
-
-        // Perform PUT request
-        mockMvc.perform(put("/campaign-products/update/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignProductDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1));
-
+        // Act and Assert
+        MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"id\":null,\"campaignId\":null,\"productId\":null,\"deleted\":false}"));
     }
+
+
+    @Test
+    void testUpdateCampaignProduct2() throws Exception {
+        // Arrange
+        when(campaignProductService.updateCampaignProduct(Mockito.<Long>any(), Mockito.<CampaignProductDto>any()))
+                .thenReturn(null);
+
+        CampaignProductDto campaignProductDto = new CampaignProductDto();
+        campaignProductDto.setCampaignId(1L);
+        campaignProductDto.setDeleted(true);
+        campaignProductDto.setId(1L);
+        campaignProductDto.setProductId(1L);
+        String content = (new ObjectMapper()).writeValueAsString(campaignProductDto);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/campaign-product/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        // Act
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder);
+
+        // Assert
+        actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
+    }
+
 
     @Test
     void testDeleteCampaignProduct() throws Exception {
-        // Prepare mock data
+        // Arrange
+        when(campaignProductService.deleteCampaignProduct(Mockito.<Long>any())).thenReturn(new CampaignProductDto());
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/campaign-product/delete/{id}", 1L);
+
+        // Act and Assert
+        MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
+                .andExpect(MockMvcResultMatchers.content()
+                        .string("{\"id\":null,\"campaignId\":null,\"productId\":null,\"deleted\":false}"));
+    }
+
+
+    @Test
+    void testDeleteCampaignProduct2() throws Exception {
+        // Arrange
+        when(campaignProductService.deleteCampaignProduct(Mockito.<Long>any())).thenReturn(null);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/campaign-product/delete/{id}", 1L);
+
+        // Act
+        ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(campaignProductController)
+                .build()
+                .perform(requestBuilder);
+
+        // Assert
+        actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
+    }
+    @Test
+    void addCampaignProductWithFailure()
+    {
         CampaignProductDto campaignProductDto = new CampaignProductDto();
+        campaignProductDto.setCampaignId(1L);
+        campaignProductDto.setDeleted(true);
         campaignProductDto.setId(1L);
-
-
-        when(campaignProductService.deleteCampaignProduct(eq(1L)))
-                .thenReturn(campaignProductDto);
-
-        // Perform DELETE request
-        mockMvc.perform(delete("/campaign-products/delete/{id}", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id").value(1));
-
-    }
-
-    @Test
-    void testAddCampaignProduct_NullResponse() throws Exception {
-        CampaignProductDto campaignProductDto = new CampaignProductDto();
-
-
-        when(campaignProductService.addCampaignProduct(any(CampaignProductDto.class))).thenReturn(null);
-
-        mockMvc.perform(post("/campaign-products/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignProductDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testUpdateCampaignProduct_NullResponse() throws Exception {
-        CampaignProductDto campaignProductDto = new CampaignProductDto();
-        campaignProductDto.setId(1L);
-
-
-        when(campaignProductService.updateCampaignProduct(eq(1L), any(CampaignProductDto.class))).thenReturn(null);
-
-        mockMvc.perform(put("/campaign-products/update/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignProductDto)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testDeleteCampaignProduct_NullResponse() throws Exception {
-        CampaignProductDto campaignProductDto = new CampaignProductDto();
-        campaignProductDto.setId(1L);
-
-
-        when(campaignProductService.deleteCampaignProduct(eq(1L))).thenReturn(null);
-
-        mockMvc.perform(delete("/campaign-products/delete/{id}", 1))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void testGetAllCampaignProducts_NoContent() {
-        // Prepare mock data
-        when(campaignProductService.getAllCampaignProducts()).thenReturn(Collections.emptyList());
-
-        // Perform GET request
-        try {
-            mockMvc.perform(get("/campaign-products/getAll"))
-                    .andExpect(status().isNoContent());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        campaignProductDto.setProductId(1L);
+        when(this.campaignProductService.addCampaignProduct((CampaignProductDto) Mockito.any())).thenReturn(null);
+        ResponseEntity<CampaignProductDto> actualAddCampaignProductResult = this.campaignProductController.addCampaignProduct(campaignProductDto);
+        HttpStatus actualAddCampaignProductResultHttpStatus = (HttpStatus) actualAddCampaignProductResult.getStatusCode();
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, actualAddCampaignProductResultHttpStatus);
     }
 }

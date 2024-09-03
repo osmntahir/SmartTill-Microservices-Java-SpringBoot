@@ -5,16 +5,22 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-
+import com.toyota.saleservice.dao.SoldProductRepository;
+import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.PaginationResponse;
-import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
+import com.toyota.saleservice.service.common.MapUtil;
+import com.toyota.saleservice.service.impl.SoldProductServiceImpl;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
@@ -24,6 +30,8 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+
+import java.util.List;
 
 @ContextConfiguration(classes = {SoldProductController.class})
 @ExtendWith(SpringExtension.class)
@@ -35,28 +43,29 @@ class SoldProductControllerTest {
     @MockBean
     private SoldProductService soldProductService;
 
+    /**
+     * Method under test:
+     * {@link SoldProductController#addSoldProduct(Long, Long, SoldProductDto)}
+     */
     @Test
     void testAddSoldProduct() throws Exception {
         // Arrange
         when(soldProductService.addSoldProduct(Mockito.<Long>any(), Mockito.<Long>any(), Mockito.<SoldProductDto>any()))
                 .thenReturn(new SoldProductDto());
 
-        ProductDTO productDto = new ProductDTO();
-        productDto.setId(1L);
-        productDto.setInventory(1);
-        productDto.setName("Name");
-        productDto.setPrice(10.0d);
-
         SoldProductDto soldProductDto = new SoldProductDto();
         soldProductDto.setDeleted(true);
         soldProductDto.setDiscount(10.0d);
         soldProductDto.setId(1L);
-        soldProductDto.setProductDto(productDto);
+        soldProductDto.setInventory(1);
+        soldProductDto.setPrice(10.0d);
+        soldProductDto.setProductId(1L);
+        soldProductDto.setProductName("Product Name");
         soldProductDto.setQuantity(1);
         soldProductDto.setTotal(10.0d);
         String content = (new ObjectMapper()).writeValueAsString(soldProductDto);
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .post("/sold-products/add/{productId}/{saleId}", 1L, 1L)
+                .post("/sold-product/add/{productId}/{saleId}", 1L, 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
 
@@ -70,30 +79,32 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":null,\"productDto\":null,\"discount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
+                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"total\":0.0,"
+                                        + "\"quantity\":0,\"deleted\":false}"));
     }
 
+    /**
+     * Method under test:
+     * {@link SoldProductController#updateSoldProduct(Long, SoldProductDto)}
+     */
     @Test
     void testUpdateSoldProduct() throws Exception {
         // Arrange
         when(soldProductService.updateSoldProduct(Mockito.<Long>any(), Mockito.<SoldProductDto>any()))
                 .thenReturn(new SoldProductDto());
 
-        ProductDTO productDto = new ProductDTO();
-        productDto.setId(1L);
-        productDto.setInventory(1);
-        productDto.setName("Name");
-        productDto.setPrice(10.0d);
-
         SoldProductDto soldProductDto = new SoldProductDto();
         soldProductDto.setDeleted(true);
         soldProductDto.setDiscount(10.0d);
         soldProductDto.setId(1L);
-        soldProductDto.setProductDto(productDto);
+        soldProductDto.setInventory(1);
+        soldProductDto.setPrice(10.0d);
+        soldProductDto.setProductId(1L);
+        soldProductDto.setProductName("Product Name");
         soldProductDto.setQuantity(1);
         soldProductDto.setTotal(10.0d);
         String content = (new ObjectMapper()).writeValueAsString(soldProductDto);
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/sold-products/update/{id}", 1L)
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/sold-product/update/{id}", 1L)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(content);
 
@@ -105,15 +116,18 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":null,\"productDto\":null,\"discount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
+                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"total\":0.0,"
+                                        + "\"quantity\":0,\"deleted\":false}"));
     }
 
-
+    /**
+     * Method under test: {@link SoldProductController#deleteSoldProduct(Long)}
+     */
     @Test
     void testDeleteSoldProduct() throws Exception {
         // Arrange
         when(soldProductService.deleteSoldProduct(Mockito.<Long>any())).thenReturn(new SoldProductDto());
-        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/sold-products/delete/{id}", 1L);
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/sold-product/delete/{id}", 1L);
 
         // Act and Assert
         MockMvcBuilders.standaloneSetup(soldProductController)
@@ -123,17 +137,21 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":null,\"productDto\":null,\"discount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
+                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"total\":0.0,"
+                                        + "\"quantity\":0,\"deleted\":false}"));
     }
 
-
+    /**
+     * Method under test:
+     * {@link SoldProductController#getAllSoldProducts(int, int, String, Double, Double, boolean, String, String)}
+     */
     @Test
     void testGetAllSoldProducts() throws Exception {
         // Arrange
         when(soldProductService.getSoldProducts(anyInt(), anyInt(), Mockito.<String>any(), Mockito.<Double>any(),
                 Mockito.<Double>any(), anyBoolean(), Mockito.<String>any(), Mockito.<String>any()))
                 .thenReturn(new PaginationResponse<>());
-        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/sold-products/getAll");
+        MockHttpServletRequestBuilder getResult = MockMvcRequestBuilders.get("/sold-product/getAll");
         MockHttpServletRequestBuilder paramResult = getResult.param("deleted", String.valueOf(true)).param("name", "foo");
         MockHttpServletRequestBuilder paramResult2 = paramResult.param("page", String.valueOf(1));
         MockHttpServletRequestBuilder requestBuilder = paramResult2.param("size", String.valueOf(1))
@@ -148,4 +166,6 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content().string("{\"content\":null,\"pageable\":null}"));
     }
+
+
 }

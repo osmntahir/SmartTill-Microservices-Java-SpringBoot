@@ -1,165 +1,151 @@
 package com.toyota.saleservice.resource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+
 import com.toyota.saleservice.dto.CampaignDto;
-import com.toyota.saleservice.dto.CustomPageable;
 import com.toyota.saleservice.dto.PaginationResponse;
+
+
 import com.toyota.saleservice.service.abstracts.CampaignService;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.mockito.Mockito;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 
 import java.util.Collections;
-import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.anyDouble;
-import static org.mockito.ArgumentMatchers.anyBoolean;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.Assert.*;
 
-@ExtendWith(MockitoExtension.class)
 public class CampaignControllerTest {
 
-    @Mock
-    private CampaignService campaignService;
 
-    @InjectMocks
-    private CampaignController campaignController;
+    // Retrieve all campaigns with default pagination and sorting
+    @Test
+    public void test_get_all_campaigns_with_default_pagination_and_sorting() {
+        // Arrange
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        CampaignController campaignController = new CampaignController(campaignService);
+        PaginationResponse<CampaignDto> expectedResponse = new PaginationResponse<>();
+        Mockito.when(campaignService.getCampaignsFiltered(0, 10, "", 0.0, 100.0, false, Collections.emptyList(), "ASC"))
+               .thenReturn(expectedResponse);
 
-    private MockMvc mockMvc;
+        // Act
+        PaginationResponse<CampaignDto> actualResponse = campaignController.getAllCampaigns(0, 10, "", 0.0, 100.0, false, Collections.emptyList(), "ASC");
 
-    @BeforeEach
-    void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(campaignController).build();
+        // Assert
+        Assertions.assertEquals(expectedResponse, actualResponse);
     }
 
-
+    // Retrieve campaigns with non-existent page number
     @Test
-    void testGetAllCampaigns() {
-        //given
-        List<CampaignDto> mockVehicles = List.of(
-                new CampaignDto(),
-                new CampaignDto(),
-                new CampaignDto()
-        );
-        CustomPageable customPageable = new CustomPageable(0, 5, 3, 10);
-        PaginationResponse<CampaignDto> paginationResponse = new PaginationResponse<>(mockVehicles, customPageable);
+    public void test_get_campaigns_with_non_existent_page_number() {
+        // Arrange
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        CampaignController campaignController = new CampaignController(campaignService);
+        PaginationResponse<CampaignDto> expectedResponse = new PaginationResponse<>();
+        Mockito.when(campaignService.getCampaignsFiltered(999, 10, "", 0.0, 100.0, false, Collections.emptyList(), "ASC"))
+               .thenReturn(expectedResponse);
 
-        //when
-        Mockito.when(campaignService.getCampaignsFiltered(anyInt(), anyInt(), anyString(), anyDouble(),
-                        anyDouble(), anyBoolean(), anyList(), anyString()))
-                .thenReturn(paginationResponse);
-        PaginationResponse<CampaignDto> result = campaignController.getAllCampaigns(0, 5
-                , "", 0.0, 100.0, false, Collections.emptyList()
-                , "ASC");
+        // Act
+        PaginationResponse<CampaignDto> actualResponse = campaignController.getAllCampaigns(999, 10, "", 0.0, 100.0, false, Collections.emptyList(), "ASC");
 
-        //then
-        assertEquals(0, result.getPageable().getPageNumber());
-        assertEquals(5, result.getPageable().getPageSize());
-        assertEquals(3, result.getPageable().getTotalPages());
-        assertEquals(10, result.getPageable().getTotalElements());
+        // Assert
+        Assertions.assertEquals(expectedResponse, actualResponse);
     }
-
-
+    // Handles null input for the campaignDto and returns a 400 BAD REQUEST status
     @Test
-    void testAddCampaign() throws Exception {
+    public void test_add_campaign_null_input() {
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        CampaignController campaignController = new CampaignController(campaignService);
+
+        Mockito.when(campaignService.addCampaign(null)).thenReturn(null);
+
+        ResponseEntity<CampaignDto> response = campaignController.addCampaign(null);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        Assertions.assertNull(response.getBody());
+    }
+    // Successfully adds a campaign and returns a 201 CREATED status with the campaign details
+    @Test
+    public void test_add_campaign_success() {
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        CampaignController campaignController = new CampaignController(campaignService);
+
+        CampaignDto campaignDto = new CampaignDto(1L, "Campaign Name", "Description", 10, null, false);
+        Mockito.when(campaignService.addCampaign(Mockito.any(CampaignDto.class))).thenReturn(campaignDto);
+
+        ResponseEntity<CampaignDto> response = campaignController.addCampaign(campaignDto);
+
+        Assertions.assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals("Campaign Name", response.getBody().getName());
+    }
+    // Returns HTTP 400 status when CampaignDto is invalid
+    @Test
+    public void test_update_campaign_invalid_dto() {
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        CampaignController campaignController = new CampaignController(campaignService);
+        Long validId = 1L;
+        CampaignDto invalidCampaignDto = new CampaignDto(validId, "", "Description", 10, null, false);
+        Mockito.when(campaignService.updateCampaign(validId, invalidCampaignDto)).thenReturn(null);
+
+        ResponseEntity<CampaignDto> response = campaignController.updateCampaign(validId, invalidCampaignDto);
+
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }    // Successfully updates a campaign when valid ID and CampaignDto are provided
+    @Test
+    public void test_update_campaign_success() {
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        CampaignController campaignController = new CampaignController(campaignService);
+        Long validId = 1L;
+        CampaignDto validCampaignDto = new CampaignDto(validId, "Campaign Name", "Description", 10, null, false);
+        Mockito.when(campaignService.updateCampaign(validId, validCampaignDto)).thenReturn(validCampaignDto);
+
+        ResponseEntity<CampaignDto> response = campaignController.updateCampaign(validId, validCampaignDto);
+
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertEquals(validCampaignDto, response.getBody());
+    }
+    // Attempt to delete a campaign with a non-existent ID
+    @Test
+    public void test_delete_campaign_non_existent_id() {
+        // Arrange
+        Long nonExistentId = 999L;
+
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        Mockito.when(campaignService.deleteCampaign(nonExistentId)).thenReturn(null);
+
+        CampaignController campaignController = new CampaignController(campaignService);
+
+        // Act
+        ResponseEntity<CampaignDto> response = campaignController.deleteCampaign(nonExistentId);
+
+        // Assert
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        Assertions.assertNull(response.getBody());
+    }
+    // Successfully delete a campaign when a valid ID is provided
+    @Test
+    public void test_delete_campaign_success() {
+        // Arrange
+        Long validId = 1L;
         CampaignDto campaignDto = new CampaignDto();
-        campaignDto.setId(1L);
+        campaignDto.setId(validId);
         campaignDto.setName("Test Campaign");
+        campaignDto.setDiscount(10);
+        campaignDto.setDeleted(true);
 
-        when(campaignService.addCampaign(any(CampaignDto.class)))
-                .thenReturn(campaignDto);
+        CampaignService campaignService = Mockito.mock(CampaignService.class);
+        Mockito.when(campaignService.deleteCampaign(validId)).thenReturn(campaignDto);
 
-        mockMvc.perform(post("/campaigns/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignDto)))
-                .andExpect(status().isCreated())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-    }
+        CampaignController campaignController = new CampaignController(campaignService);
 
-    @Test
-    void testUpdateCampaign() throws Exception {
-        CampaignDto campaignDto = new CampaignDto();
-        campaignDto.setId(1L);
-        campaignDto.setName("Updated Campaign");
+        // Act
+        ResponseEntity<CampaignDto> response = campaignController.deleteCampaign(validId);
 
-        when(campaignService.updateCampaign(eq(1L), any(CampaignDto.class)))
-                .thenReturn(campaignDto);
-
-        mockMvc.perform(put("/campaigns/update/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignDto)))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-    }
-
-    @Test
-    void testDeleteCampaign() throws Exception {
-        CampaignDto campaignDto = new CampaignDto();
-        campaignDto.setId(1L);
-
-        when(campaignService.deleteCampaign(eq(1L)))
-                .thenReturn(campaignDto);
-
-        mockMvc.perform(delete("/campaigns/delete/{id}", 1))
-                .andExpect(status().isOk())
-                .andExpect(content().contentType(MediaType.APPLICATION_JSON));
-    }
-    @Test
-    void testAddCampaignWhenServiceReturnsNull() throws Exception {
-        CampaignDto campaignDto = new CampaignDto();
-        campaignDto.setId(1L);
-        campaignDto.setName("Test Campaign");
-
-        // Mock the service to return null
-        when(campaignService.addCampaign(any(CampaignDto.class)))
-                .thenReturn(null);
-
-        mockMvc.perform(post("/campaigns/add")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(""));
-    }
-
-    @Test
-    void testUpdateCampaignWhenServiceReturnsNull() throws Exception {
-        CampaignDto campaignDto = new CampaignDto();
-        campaignDto.setId(1L);
-        campaignDto.setName("Updated Campaign");
-
-        // Mock the service to return null
-        when(campaignService.updateCampaign(eq(1L), any(CampaignDto.class)))
-                .thenReturn(null);
-
-        mockMvc.perform(put("/campaigns/update/{id}", 1)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(new ObjectMapper().writeValueAsString(campaignDto)))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(""));
-    }
-
-    @Test
-    void testDeleteCampaignWhenServiceReturnsNull() throws Exception {
-        // Mock the service to return null
-        when(campaignService.deleteCampaign(eq(1L)))
-                .thenReturn(null);
-
-        mockMvc.perform(delete("/campaigns/delete/{id}", 1))
-                .andExpect(status().isNotFound());
+        // Assert
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
+        Assertions.assertEquals(validId, response.getBody().getId());
     }
 }

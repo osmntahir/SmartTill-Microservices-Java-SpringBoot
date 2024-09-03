@@ -124,7 +124,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         double totalPrice = existingSoldProduct.getPrice() * existingSoldProduct.getQuantity();
         applyDiscountIfNeeded(existingSoldProduct, totalPrice, product.getId());
 
-        existingSoldProduct.setTotal(totalPrice);
+     //   existingSoldProduct.setTotal(totalPrice);
 
         // Update product stock quantity
         checkAndUpdateInventory(product, soldProductDto.getQuantity());
@@ -148,7 +148,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         applyDiscountIfNeeded(soldProduct, totalPrice, product.getId());
 
         soldProduct.setSale(sale);
-        soldProduct.setTotal(totalPrice);
+       // soldProduct.setTotal(totalPrice);
 
         // Save new sold product
         soldProductRepository.save(soldProduct);

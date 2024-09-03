@@ -13,7 +13,6 @@ import com.toyota.saleservice.exception.ProductQuantityShortageException;
 import com.toyota.saleservice.exception.SaleNotFoundException;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,8 +22,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -45,22 +46,8 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         if (optionalSoldProduct.isPresent()) {
             SoldProduct existingSoldProduct = optionalSoldProduct.get();
-            Sale sale = existingSoldProduct.getSale();
-
-            // Calculate the difference in total price before and after the update
-            double oldTotalPrice = existingSoldProduct.getTotal();
-
             updateSoldProductDetails(existingSoldProduct, soldProductDto);
-
             SoldProduct updatedSoldProduct = soldProductRepository.save(existingSoldProduct);
-
-            // Calculate the new total price for the sale
-            double newTotalPrice = sale.getTotalPrice() - oldTotalPrice + updatedSoldProduct.getTotal();
-            sale.setTotalPrice(newTotalPrice);
-
-            // Save the updated sale with the new total price
-            saleRepository.save(sale);
-
             logger.info("Sold product with id {} is updated", id);
             return mapUtil.convertSoldProductToSoldProductDto(updatedSoldProduct);
         } else {
@@ -86,55 +73,32 @@ public class SoldProductServiceImpl implements SoldProductService {
     public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {
         logger.info("Adding sold product with productId: {}", productId);
 
-        // Fetch the product using the productId from the URL
         ProductDTO product = getProductById(productId);
-        soldProductDto.setProductId(productId); // Set the product ID in SoldProductDto
-        soldProductDto.setProductName(product.getName()); // Set product name
-        soldProductDto.setPrice(product.getPrice()); // Set product price
-
         Sale sale = getSaleById(saleId);
 
         // Check if this product is already added to this sale
-        SoldProduct existingSoldProduct = soldProductRepository.findBySaleIdAndProductId(saleId, productId)
-                .orElse(null);
+        Optional<SoldProduct> existingSoldProductOpt = soldProductRepository.findBySaleIdAndProductId(saleId, productId);
 
-        if (existingSoldProduct != null) {
+        if (existingSoldProductOpt.isPresent()) {
             // Product already exists in the sale, update quantity and total price
+            SoldProduct existingSoldProduct = existingSoldProductOpt.get();
             updateExistingSoldProduct(existingSoldProduct, soldProductDto, product, sale);
         } else {
-            // Product doesn't exist in the sale, create a new entry
-            createNewSoldProduct(productId, saleId, soldProductDto, product, sale);
+            // Create a new SoldProduct entry
+            SoldProduct soldProduct = new SoldProduct();
+            createNewSoldProduct(soldProductDto, product, sale, soldProduct);
         }
 
-        // Fetch existing sold product again if updated or created
-        existingSoldProduct = soldProductRepository.findBySaleIdAndProductId(saleId, productId)
-                .orElseThrow(() -> new IllegalStateException("Failed to fetch saved sold product"));
+        // Recalculate and save the total price for the sale
+        sale.setTotalPrice(sale.getSoldProducts().stream()
+                .mapToDouble(SoldProduct::getTotal)
+                .sum());
+        saleRepository.save(sale);
 
-        return mapUtil.convertSoldProductToSoldProductDto(existingSoldProduct);
-    }
-
-    private void createNewSoldProduct(Long productId, Long saleId, SoldProductDto soldProductDto,
-                                      ProductDTO product, Sale sale) {
-        // Check if there is enough stock
-        checkAndUpdateInventory(product, soldProductDto.getQuantity());
-
-        SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
-        soldProduct.setProductId(productId); // productId set through URL
-        soldProduct.setQuantity(soldProductDto.getQuantity());
-        soldProduct.setPrice(product.getPrice());
-
-        // Calculate total price
-        double totalPrice = product.getPrice() * soldProduct.getQuantity();
-        applyDiscountIfNeeded(soldProduct, totalPrice, productId);
-
-        soldProduct.setSale(sale);
-        soldProduct.setName(product.getName());
-
-        // Update sale's total price
-        sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
-
-        // Save new sold product
-        soldProductRepository.save(soldProduct);
+        // Convert the saved SoldProduct to DTO and return
+        return soldProductRepository.findBySaleIdAndProductId(saleId, productId)
+                .map(mapUtil::convertSoldProductToSoldProductDto)
+                .orElseThrow(() -> new IllegalStateException("Sold product not found after save"));
     }
 
     private ProductDTO getProductById(Long productId) {
@@ -149,6 +113,10 @@ public class SoldProductServiceImpl implements SoldProductService {
 
     private void updateExistingSoldProduct(SoldProduct existingSoldProduct, SoldProductDto soldProductDto,
                                            ProductDTO product, Sale sale) {
+        existingSoldProduct.setProductId(product.getId());
+        existingSoldProduct.setName(product.getName());
+        existingSoldProduct.setPrice(product.getPrice());
+
         // Update quantity
         existingSoldProduct.setQuantity(existingSoldProduct.getQuantity() + soldProductDto.getQuantity());
 
@@ -158,14 +126,32 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         existingSoldProduct.setTotal(totalPrice);
 
-        // Update sale's total price
-        sale.setTotalPrice(sale.getTotalPrice() + totalPrice);
-
         // Update product stock quantity
         checkAndUpdateInventory(product, soldProductDto.getQuantity());
 
         // Save existing sold product
         soldProductRepository.save(existingSoldProduct);
+    }
+
+    private void createNewSoldProduct(SoldProductDto soldProductDto,
+                                      ProductDTO product, Sale sale, SoldProduct soldProduct) {
+        soldProduct.setProductId(product.getId());
+        soldProduct.setName(product.getName());
+        soldProduct.setPrice(product.getPrice());
+        soldProduct.setQuantity(soldProductDto.getQuantity());
+
+        // Check if there is enough stock
+        checkAndUpdateInventory(product, soldProductDto.getQuantity());
+
+        // Calculate total price
+        double totalPrice = product.getPrice() * soldProduct.getQuantity();
+        applyDiscountIfNeeded(soldProduct, totalPrice, product.getId());
+
+        soldProduct.setSale(sale);
+        soldProduct.setTotal(totalPrice);
+
+        // Save new sold product
+        soldProductRepository.save(soldProduct);
     }
 
     private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
@@ -214,16 +200,13 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         if (optionalSoldProduct.isPresent()) {
             SoldProduct soldProduct = optionalSoldProduct.get();
-            Sale sale = soldProduct.getSale();
-            double totalPrice = sale.getTotalPrice() - soldProduct.getTotal();
-            sale.setTotalPrice(totalPrice);
-            saleRepository.save(sale);
-            soldProductRepository.delete(soldProduct);
-            logger.info("Sold product with id {} deleted successfully.", id);
-            return mapUtil.convertSoldProductToSoldProductDto(soldProduct);
+            soldProduct.setDeleted(true);
+            SoldProduct saved = soldProductRepository.save(soldProduct);
+            logger.info("Sold product deleted with id: {}", saved.getId());
+            return mapUtil.convertSoldProductToSoldProductDto(saved);
         } else {
-            logger.warn("Sold product delete failed due to non-existent sold product with id: {}", id);
-            throw new ProductNotFoundException("Sold product with id " + id + " not found!");
+            logger.error("Sold product not found with id: {}", id);
+            throw new ProductNotFoundException("Sold product not found with id: " + id);
         }
     }
 }

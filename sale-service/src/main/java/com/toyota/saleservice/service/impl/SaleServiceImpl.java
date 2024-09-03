@@ -164,13 +164,26 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public SaleDto getSale(Long id) {
-        logger.info("Getting sale with id: {}", id);
+    public SaleDto getSale(Long saleId) {
+        logger.info("Getting sale with id: {}", saleId);
 
-        Sale sale = saleRepository.findById(id)
-                .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + id));
+        Sale sale = saleRepository.findById(saleId)
+                .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + saleId));
 
-        logger.info("Sale with id {} is retrieved", id);
-        return mapUtil.convertSaleToSaleDto(sale);
+        // Satışa ait tüm SoldProduct'ları al
+        List<SoldProduct> soldProducts = soldProductRepository.findAllBySaleId(saleId);
+
+        // SoldProduct'ları DTO'ya dönüştürürken yinelenen verileri filtrele
+        List<SoldProductDto> soldProductDtos = soldProducts.stream()
+                .map(mapUtil::convertSoldProductToSoldProductDto)
+                .distinct()  // Duplicate kayıtlardan kurtulmak için
+                .collect(Collectors.toList());
+
+        // Sale DTO oluştur ve SoldProductDTO'ları ekle
+        SaleDto saleDto = mapUtil.convertSaleToSaleDto(sale);
+        saleDto.setSoldProducts(soldProductDtos);
+
+        return saleDto;
     }
+
 }

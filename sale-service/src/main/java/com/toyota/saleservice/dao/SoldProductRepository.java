@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface SoldProductRepository extends JpaRepository<SoldProduct, Long> {
@@ -18,4 +19,6 @@ public interface SoldProductRepository extends JpaRepository<SoldProduct, Long> 
     Page<SoldProduct> getSoldProductsFiltered(String name, Double minPrice, Double maxPrice, boolean deleted, Pageable pageable);
 
     Optional<SoldProduct> findBySaleIdAndProductId(Long saleId, Long productId);
+
+    List<SoldProduct> findAllBySaleId(Long saleId);
 }

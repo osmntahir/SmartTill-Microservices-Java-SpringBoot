@@ -10,7 +10,6 @@
         <module name="discovery-server" />
         <module name="sale-service" />
         <module name="user-management-service" />
-        <module name="keycloak-auth-service" />
         <module name="api-gateway" />
         <module name="product-service" />
         <module name="report-service" />
@@ -18,6 +17,7 @@
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="auth-service" target="17" />
+      <module name="keycloak-auth-service" target="17" />
       <module name="keycloak-config-service" target="1.5" />
       <module name="keycloak-config-service (1)" target="17" />
       <module name="order-service" target="17" />

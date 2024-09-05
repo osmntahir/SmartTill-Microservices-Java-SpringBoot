@@ -49,4 +49,9 @@ public class UserController {
     public ResponseEntity<String> assignRole(@PathVariable String id, @RequestParam String roleName) {
         return userManagementService.assignRole(id, roleName);
     }
+    @PostMapping("/unassign-role/{id}")
+    public ResponseEntity<String> unassignRole(@PathVariable String id, @RequestParam String roleName) {
+        return userManagementService.unassignRole(id, roleName);
+    }
+
 }

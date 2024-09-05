@@ -3,16 +3,15 @@ package com.toyota.usermanagementservice.service;
 
 import com.toyota.usermanagementservice.dto.UserDto;
 import com.toyota.usermanagementservice.dto.UserRole;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.RoleMappingResource;
-import org.keycloak.admin.client.resource.RoleScopeResource;
+import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.keycloak.admin.client.resource.UsersResource;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -124,7 +123,7 @@ public class UserManagementService {
 
         return ResponseEntity.ok("User updated successfully with role adjustments.");
     }
-    
+
     public ResponseEntity<String> deleteUser(String userId) {
         UsersResource usersResource = keycloak.realm(realm).users();
         UserRepresentation user = usersResource.get(userId).toRepresentation();
@@ -136,11 +135,28 @@ public class UserManagementService {
     }
 
     public ResponseEntity<String> assignRole(String userId, String roleName) {
-        RoleRepresentation role = keycloak.realm(realm).roles().get(roleName).toRepresentation();
-        keycloak.realm(realm).users().get(userId).roles().realmLevel().add(Collections.singletonList(role));
 
-        return ResponseEntity.ok("Role assigned successfully");
+        UserResource userResource = keycloak.realm(realm).users().get(userId);
+        if (userResource == null) {
+            return ResponseEntity.badRequest().body("User not found.");
+        }
+
+        RoleRepresentation role;
+        try {
+            role = keycloak.realm(realm).roles().get(roleName).toRepresentation();
+        } catch (NotFoundException e) {
+            return ResponseEntity.badRequest().body("Role not found.");
+        }
+
+        try {
+            ( userResource).roles().realmLevel().add(Collections.singletonList(role));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to assign role.");
+        }
+
+        return ResponseEntity.ok("Role assigned successfully.");
     }
+
 
     private CredentialRepresentation createPasswordCredential(String password) {
         CredentialRepresentation passwordCred = new CredentialRepresentation();
@@ -183,6 +199,16 @@ public class UserManagementService {
                     return userDto;
                 })
                 .collect(Collectors.toList());
+    }
+
+    public ResponseEntity<String> unassignRole(String userId, String roleName) {
+        try {
+            RoleRepresentation role = keycloak.realm(realm).roles().get(roleName).toRepresentation();
+            keycloak.realm(realm).users().get(userId).roles().realmLevel().remove(Collections.singletonList(role));
+            return ResponseEntity.ok("Role unassigned successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unassign role: " + e.getMessage());
+        }
     }
 
 }

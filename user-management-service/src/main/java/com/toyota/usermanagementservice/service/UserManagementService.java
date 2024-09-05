@@ -1,8 +1,6 @@
 package com.toyota.usermanagementservice.service;
 
-
 import com.toyota.usermanagementservice.dto.UserDto;
-import com.toyota.usermanagementservice.dto.UserRole;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import org.keycloak.admin.client.Keycloak;
@@ -18,6 +16,11 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * Service class for managing users in Keycloak.
+ * This service provides functionalities to create, update, delete users, as well as assign and unassign roles.
+ * It communicates with Keycloak's Admin REST API to perform operations.
+ */
 @Service
 public class UserManagementService {
 
@@ -26,10 +29,22 @@ public class UserManagementService {
     @Value("${keycloak.realm}")
     private String realm;
 
+    /**
+     * Constructs a new {@link UserManagementService} with the provided Keycloak instance.
+     *
+     * @param keycloak the Keycloak client used to interact with the Keycloak server
+     */
     public UserManagementService(Keycloak keycloak) {
         this.keycloak = keycloak;
     }
 
+    /**
+     * Creates a new user in Keycloak.
+     * The user must have at least one valid role (ADMIN, CASHIER, or MANAGER).
+     *
+     * @param userDto the user data to create
+     * @return a {@link ResponseEntity} containing the result of the creation process
+     */
     public ResponseEntity<String> createUser(UserDto userDto) {
         UsersResource usersResource = keycloak.realm(realm).users();
 
@@ -77,6 +92,15 @@ public class UserManagementService {
             return ResponseEntity.status(response.getStatus()).body("Failed to create user");
         }
     }
+
+    /**
+     * Updates an existing user in Keycloak.
+     * The user data such as name, email, and roles can be updated.
+     *
+     * @param userId the ID of the user to update
+     * @param userDto the new user data
+     * @return a {@link ResponseEntity} containing the result of the update process
+     */
     public ResponseEntity<String> updateUser(String userId, UserDto userDto) {
         UsersResource usersResource = keycloak.realm(realm).users();
         UserRepresentation user = usersResource.get(userId).toRepresentation();
@@ -124,6 +148,12 @@ public class UserManagementService {
         return ResponseEntity.ok("User updated successfully with role adjustments.");
     }
 
+    /**
+     * Soft deletes a user by disabling them in Keycloak.
+     *
+     * @param userId the ID of the user to disable
+     * @return a {@link ResponseEntity} containing the result of the deletion process
+     */
     public ResponseEntity<String> deleteUser(String userId) {
         UsersResource usersResource = keycloak.realm(realm).users();
         UserRepresentation user = usersResource.get(userId).toRepresentation();
@@ -134,8 +164,14 @@ public class UserManagementService {
         return ResponseEntity.ok("User disabled successfully");
     }
 
+    /**
+     * Assigns a role to a user in Keycloak.
+     *
+     * @param userId the ID of the user
+     * @param roleName the name of the role to assign
+     * @return a {@link ResponseEntity} containing the result of the role assignment
+     */
     public ResponseEntity<String> assignRole(String userId, String roleName) {
-
         UserResource userResource = keycloak.realm(realm).users().get(userId);
         if (userResource == null) {
             return ResponseEntity.badRequest().body("User not found.");
@@ -149,7 +185,7 @@ public class UserManagementService {
         }
 
         try {
-            ( userResource).roles().realmLevel().add(Collections.singletonList(role));
+            userResource.roles().realmLevel().add(Collections.singletonList(role));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to assign role.");
         }
@@ -157,24 +193,34 @@ public class UserManagementService {
         return ResponseEntity.ok("Role assigned successfully.");
     }
 
-
-    private CredentialRepresentation createPasswordCredential(String password) {
-        CredentialRepresentation passwordCred = new CredentialRepresentation();
-        passwordCred.setTemporary(false);
-        passwordCred.setType(CredentialRepresentation.PASSWORD);
-        passwordCred.setValue(password);
-        return passwordCred;
+    /**
+     * Unassigns a role from a user in Keycloak.
+     *
+     * @param userId the ID of the user
+     * @param roleName the name of the role to unassign
+     * @return a {@link ResponseEntity} containing the result of the role unassignment
+     */
+    public ResponseEntity<String> unassignRole(String userId, String roleName) {
+        try {
+            RoleRepresentation role = keycloak.realm(realm).roles().get(roleName).toRepresentation();
+            keycloak.realm(realm).users().get(userId).roles().realmLevel().remove(Collections.singletonList(role));
+            return ResponseEntity.ok("Role unassigned successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unassign role: " + e.getMessage());
+        }
     }
 
+    /**
+     * Retrieves all users in the system and filters out disabled users.
+     *
+     * @return a list of {@link UserDto} representing all enabled users
+     */
     public List<UserDto> getUsers() {
-
         List<UserRepresentation> allUsers = keycloak.realm(realm).users().list();
-
 
         return allUsers.stream()
                 .filter(UserRepresentation::isEnabled)
                 .map(user -> {
-
                     UserDto userDto = new UserDto();
                     userDto.setUsername(user.getUsername());
                     userDto.setFirstName(user.getFirstName());
@@ -201,14 +247,17 @@ public class UserManagementService {
                 .collect(Collectors.toList());
     }
 
-    public ResponseEntity<String> unassignRole(String userId, String roleName) {
-        try {
-            RoleRepresentation role = keycloak.realm(realm).roles().get(roleName).toRepresentation();
-            keycloak.realm(realm).users().get(userId).roles().realmLevel().remove(Collections.singletonList(role));
-            return ResponseEntity.ok("Role unassigned successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to unassign role: " + e.getMessage());
-        }
+    /**
+     * Creates a password credential for Keycloak.
+     *
+     * @param password the user's password
+     * @return a {@link CredentialRepresentation} for the user's password
+     */
+    private CredentialRepresentation createPasswordCredential(String password) {
+        CredentialRepresentation passwordCred = new CredentialRepresentation();
+        passwordCred.setTemporary(false);
+        passwordCred.setType(CredentialRepresentation.PASSWORD);
+        passwordCred.setValue(password);
+        return passwordCred;
     }
-
 }

@@ -16,7 +16,7 @@ public class SecurityConfig {
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/eureka/**").permitAll()  // Allow access to Eureka
                         .pathMatchers("/product/**").hasRole("ADMIN")  // Role-based access for ADMIN
-                        .pathMatchers("/user/**").hasRole("USER")    // Role-based access for USER
+                        .pathMatchers("/user/**").hasRole("ADMIN")    // Role-based access for USER
                         .anyExchange().authenticated()               // All other requests must be authenticated
                 )
                 .oauth2ResourceServer((oauth) -> oauth

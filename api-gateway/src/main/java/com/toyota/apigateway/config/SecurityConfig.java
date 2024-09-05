@@ -15,8 +15,10 @@ public class SecurityConfig {
         return serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/eureka/**").permitAll()  // Allow access to Eureka
-                        .pathMatchers("/product/**").hasRole("ADMIN")  // Role-based access for ADMIN
+                        .pathMatchers("/product/**").hasAnyRole("ADMIN","CASHIER","MANAGER")  // Role-based access for ADMIN
                         .pathMatchers("/user/**").hasRole("ADMIN")    // Role-based access for USER
+                        .pathMatchers("/sale/**").hasRole("CASHIER")   // Role-based access for SALE
+                        .pathMatchers("/report/**").hasRole("MANAGER")  // Role-based access for MANAGER
                         .anyExchange().authenticated()               // All other requests must be authenticated
                 )
                 .oauth2ResourceServer((oauth) -> oauth

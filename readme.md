@@ -579,6 +579,137 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 }
 
-```
+## Product Service
 
----
+The **Product Service** manages all the product-related operations within the system. Below is a list of available endpoints and their usage.
+
+### Get All Products
+- **Endpoint**: `GET /product/getAll`
+- **Description**: Retrieve a list of all products with pagination, filtering, and sorting.
+- **Response**:
+    ```json
+    {
+    "content": [
+        {
+            "id": 9,
+            "name": "elma",
+            "description": null,
+            "price": 15.0,
+            "inventory": 44,
+            "active": true
+        },
+        {
+            "id": 8,
+            "name": "erik",
+            "description": null,
+            "price": 12.0,
+            "inventory": 43,
+            "active": true
+        },
+        {
+            "id": 1,
+            "name": "incir",
+            "description": null,
+            "price": 10.0,
+            "inventory": 83,
+            "active": true
+        },
+        {
+            "id": 4,
+            "name": "karpuz",
+            "description": null,
+            "price": 5.0,
+            "inventory": 15,
+            "active": true
+        },
+        {
+            "id": 6,
+            "name": "kayisi",
+            "description": null,
+            "price": 7.0,
+            "inventory": 26,
+            "active": true
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+        },
+        "offset": 0,
+        "unpaged": false,
+        "paged": true
+    },
+    "last": false,
+    "totalPages": 2,
+    "totalElements": 9,
+    "first": true,
+    "size": 5,
+    "number": 0,
+    "sort": {
+        "empty": false,
+        "sorted": true,
+        "unsorted": false
+    },
+    "numberOfElements": 5,
+    "empty": false
+    }
+    ```
+### Create Product
+- **Endpoint**: `POST /product/add`
+- **Description**: Create a new product.
+- **Request**:
+    ```json
+    {
+    "name": "muz",
+    "description": "muz",
+    "price": 10.0,
+    "inventory": 10
+    }
+    ```
+- **Response**: 
+    ```json
+    {
+    "id": 10,
+    "name": "muz",
+    "description": "muz",
+    "price": 10.0,
+    "inventory": 10,
+    "active": true
+    }
+    ```
+### Update Product
+- **Endpoint**: `PUT /product/update/{id}`
+- **Description**: Update the details of a product.
+- **Request**:
+    ```json
+    {
+    "name": "Updated Product Namee",
+    "price": 199.99,
+    "inventory": 50
+    }
+    ```
+- **Response**:
+    ```json
+    {
+    "id": 11,
+    "name": "Updated Product Namee",
+    "description": null,
+    "price": 199.99,
+    "inventory": 50,
+    "active": true
+    }
+    ```
+### Delete Product
+- **Endpoint**: `DELETE /product/delete/{id}`
+- **Description**: Delete a product by its ID.
+- **Response**:
+    ```json
+    {
+      "status": 204,
+      "message": "No content."
+    }
+    ```

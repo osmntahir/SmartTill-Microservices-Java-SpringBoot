@@ -43,7 +43,7 @@ public class PdfGenerator {
         return outputStream.toByteArray();
     }
 
-    private void savePDFToFile(byte[] pdfContent, Long saleId) throws IOException {
+    void savePDFToFile(byte[] pdfContent, Long saleId) throws IOException {
         String directoryPath = "reports";
         File directory = new File(directoryPath);
         if (!directory.exists()) {

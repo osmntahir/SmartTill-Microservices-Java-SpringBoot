@@ -713,3 +713,89 @@ The **Product Service** manages all the product-related operations within the sy
       "message": "No content."
     }
     ```
+## User Management Service
+
+The **User Management Service** is responsible for managing users and their roles within the system. Below is a list of available endpoints and their usage.
+
+### Create User
+- **Endpoint**: `POST /user`
+- **Description**: Create a new user with roles.
+- **Request**:
+    ```json
+   {
+   "firstName": "mahmut",
+  "lastName": "mahmut",
+  "email": "mahmut.ersoy@example.com",
+  "username": "mahmut",
+  "roles": ["MANAGER"],
+  "password": "123"
+   }
+    ```
+- **Response**:
+    ```json
+    {
+    "message": "User created and roles assigned successfully",
+  }
+    ```
+### Update User
+- **Endpoint**: `PUT /user/{id}`
+- **Description**: Update user details.
+- **Request**:
+    ```json
+    {
+    "firstName": "UpdatedFirstName",
+  "lastName": "UpdatedLastName"
+    }
+    ```
+- **Response**:
+    ```json
+    {
+    "message": "User updated successfully"
+    }
+    ```
+- **Request**:
+    ```json
+    {
+    "roles": ["CASHIER"]
+     }
+    ```
+- **Response**:
+    ```json
+    {
+    "message": "User updated successfully with role adjustments."
+    }
+    ```
+### Delete User
+- **Endpoint**: `DELETE /user/{id}`
+- **Description**: Soft delete a user by ID.
+- **Response**:
+    ```json
+    {
+    "message": "User disabled successfully",
+    }
+    ```
+### Assign Role
+- **Endpoint**: `POST /assign-role/{id}?roleName={roleName}`
+- **Description**: Assign a role to a user.
+- **Response**:
+    ```json
+    {
+    "message": "Role assigned successfully"
+    }
+    ```
+### Unassign Role
+- **Endpoint**: `POST /unassign-role/{id}?roleName={roleName}`
+- **Description**: Remove a role from a user.
+- **Response**:
+    ```json
+    {
+    "message": "Role unassigned successfully"
+    }
+    ```
+## Report Service
+- **Endpoint**: `GET /report/sale/{id}`
+- **Description**: Generate a PDF receipt for a specific sale.
+- **Response**: PDF file
+
+  [sale_report_43.pdf](reports%2Fsale_report_43.pdf)
+

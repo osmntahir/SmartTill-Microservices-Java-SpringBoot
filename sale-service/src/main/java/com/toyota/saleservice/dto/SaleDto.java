@@ -23,7 +23,7 @@ public class SaleDto {
     private Long id;
     @NotNull(message = "Creation date must be not null")
     private LocalDateTime date;
-    @NotNull(message = "Total price must be not null")
+    @NotNull(message = "Payment type must be not null")
     private PaymentType paymentType;
     @DecimalMin(value = "0.0", inclusive = false, message = "Total price must be greater than 0.0")
     private double totalPrice = 0.0;

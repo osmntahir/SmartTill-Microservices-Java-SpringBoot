@@ -5,22 +5,14 @@ import static org.mockito.Mockito.anyInt;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.toyota.saleservice.dao.SoldProductRepository;
-import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
-import com.toyota.saleservice.service.common.MapUtil;
-import com.toyota.saleservice.service.impl.SoldProductServiceImpl;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.*;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.aot.DisabledInAotMode;
@@ -30,8 +22,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-
-import java.util.List;
 
 @ContextConfiguration(classes = {SoldProductController.class})
 @ExtendWith(SpringExtension.class)
@@ -43,10 +33,7 @@ class SoldProductControllerTest {
     @MockBean
     private SoldProductService soldProductService;
 
-    /**
-     * Method under test:
-     * {@link SoldProductController#addSoldProduct(Long, Long, SoldProductDto)}
-     */
+
     @Test
     void testAddSoldProduct() throws Exception {
         // Arrange
@@ -56,6 +43,8 @@ class SoldProductControllerTest {
         SoldProductDto soldProductDto = new SoldProductDto();
         soldProductDto.setDeleted(true);
         soldProductDto.setDiscount(10.0d);
+        soldProductDto.setDiscountAmount(10.0d);
+        soldProductDto.setFinalPriceAfterDiscount(10.0d);
         soldProductDto.setId(1L);
         soldProductDto.setInventory(1);
         soldProductDto.setPrice(10.0d);
@@ -79,14 +68,11 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"total\":0.0,"
-                                        + "\"quantity\":0,\"deleted\":false}"));
+                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"discountAmount"
+                                        + "\":0.0,\"finalPriceAfterDiscount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
     }
 
-    /**
-     * Method under test:
-     * {@link SoldProductController#updateSoldProduct(Long, SoldProductDto)}
-     */
+
     @Test
     void testUpdateSoldProduct() throws Exception {
         // Arrange
@@ -96,6 +82,8 @@ class SoldProductControllerTest {
         SoldProductDto soldProductDto = new SoldProductDto();
         soldProductDto.setDeleted(true);
         soldProductDto.setDiscount(10.0d);
+        soldProductDto.setDiscountAmount(10.0d);
+        soldProductDto.setFinalPriceAfterDiscount(10.0d);
         soldProductDto.setId(1L);
         soldProductDto.setInventory(1);
         soldProductDto.setPrice(10.0d);
@@ -116,13 +104,10 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"total\":0.0,"
-                                        + "\"quantity\":0,\"deleted\":false}"));
+                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"discountAmount"
+                                        + "\":0.0,\"finalPriceAfterDiscount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
     }
 
-    /**
-     * Method under test: {@link SoldProductController#deleteSoldProduct(Long)}
-     */
     @Test
     void testDeleteSoldProduct() throws Exception {
         // Arrange
@@ -137,14 +122,11 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
                         .string(
-                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"total\":0.0,"
-                                        + "\"quantity\":0,\"deleted\":false}"));
+                                "{\"id\":null,\"productId\":null,\"productName\":null,\"price\":0.0,\"inventory\":0,\"discount\":0.0,\"discountAmount"
+                                        + "\":0.0,\"finalPriceAfterDiscount\":0.0,\"total\":0.0,\"quantity\":0,\"deleted\":false}"));
     }
 
-    /**
-     * Method under test:
-     * {@link SoldProductController#getAllSoldProducts(int, int, String, Double, Double, boolean, String, String)}
-     */
+
     @Test
     void testGetAllSoldProducts() throws Exception {
         // Arrange
@@ -166,6 +148,4 @@ class SoldProductControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content().string("{\"content\":null,\"pageable\":null}"));
     }
-
-
 }

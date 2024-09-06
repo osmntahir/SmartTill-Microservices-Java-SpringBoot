@@ -1,128 +1,368 @@
 package com.toyota.saleservice.dto;
 
-import com.toyota.saleservice.domain.PaymentType;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.Validation;
-import jakarta.validation.Validator;
-import jakarta.validation.ValidatorFactory;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.toyota.saleservice.domain.PaymentType;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
-public class SaleDtoTest {
-
-    private Validator validator;
-
-    @BeforeEach
-    void setUp() {
-        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator();
-    }
+class SaleDtoTest {
 
     @Test
-    void testNoArgsConstructor() {
-        // When
+    void testEqualsAndHashCode_whenOtherIsEqual_thenReturnEqual() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+        SaleDto saleDto2 = new SaleDto();
+
+        // Act and Assert
+        assertEquals(saleDto, saleDto2);
+        int expectedHashCodeResult = saleDto.hashCode();
+        assertEquals(expectedHashCodeResult, saleDto2.hashCode());
+    }
+
+
+    @Test
+    void testEqualsAndHashCode_whenOtherIsEqual_thenReturnEqual2() {
+        // Arrange
+        LocalDateTime date = LocalDate.of(1970, 1, 1).atStartOfDay();
+        SaleDto saleDto = new SaleDto(1L, date, PaymentType.CASH, 10.0d, 10.0d, 10.0d, "Cashier Name", new ArrayList<>());
+        LocalDateTime date2 = LocalDate.of(1970, 1, 1).atStartOfDay();
+        SaleDto saleDto2 = new SaleDto(1L, date2, PaymentType.CASH, 10.0d, 10.0d, 10.0d, "Cashier Name", new ArrayList<>());
+
+        // Act and Assert
+        assertEquals(saleDto, saleDto2);
+        int expectedHashCodeResult = saleDto.hashCode();
+        assertEquals(expectedHashCodeResult, saleDto2.hashCode());
+    }
+
+    /**
+     * Methods under test:
+     * <ul>
+     *   <li>{@link SaleDto#equals(Object)}
+     *   <li>{@link SaleDto#hashCode()}
+     * </ul>
+     */
+    @Test
+    void testEqualsAndHashCode_whenOtherIsSame_thenReturnEqual() {
+        // Arrange
         SaleDto saleDto = new SaleDto();
 
-        // Then
-        assertNotNull(saleDto);
-        assertNull(saleDto.getId(), "Id should be null");
-        assertNull(saleDto.getDate(), "Date should be null");
-        assertNull(saleDto.getPaymentType(), "PaymentType should be null");
-        assertEquals(0.0, saleDto.getTotalPrice(), "TotalPrice should be 0.0");
-        assertNull(saleDto.getSoldProducts(), "SoldProducts should be null");
+        // Act and Assert
+        assertEquals(saleDto, saleDto);
+        int expectedHashCodeResult = saleDto.hashCode();
+        assertEquals(expectedHashCodeResult, saleDto.hashCode());
     }
 
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
     @Test
-    void testAllArgsConstructor() {
-        // Given
-        LocalDateTime now = LocalDateTime.now();
-        PaymentType paymentType = PaymentType.CREDIT_CARD;
-        List<SoldProductDto> soldProducts = new ArrayList<>();
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual() {
+        // Arrange
+        LocalDateTime date = LocalDate.of(1970, 1, 1).atStartOfDay();
+        SaleDto saleDto = new SaleDto(1L, date, PaymentType.CASH, 10.0d, 10.0d, 10.0d, "Cashier Name", new ArrayList<>());
 
-        // When
-        SaleDto saleDto = new SaleDto(1L, now, paymentType, 100.0, soldProducts);
-
-        // Then
-        assertNotNull(saleDto);
-        assertEquals(1L, saleDto.getId(), "Id getter/setter issue");
-        assertEquals(now, saleDto.getDate(), "Date getter/setter issue");
-        assertEquals(paymentType, saleDto.getPaymentType(), "PaymentType getter/setter issue");
-        assertEquals(100.0, saleDto.getTotalPrice(), 0.001, "TotalPrice getter/setter issue");
-        assertEquals(soldProducts, saleDto.getSoldProducts(), "SoldProducts getter/setter issue");
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
     }
 
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
     @Test
-    void testValidation_NullDate() {
-        // Given
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual2() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+        saleDto.setId(1L);
+
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual3() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+        saleDto.setDate(LocalDate.of(1970, 1, 1).atStartOfDay());
+
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual4() {
+        // Arrange
         SaleDto saleDto = new SaleDto();
         saleDto.setPaymentType(PaymentType.CASH);
-        saleDto.setTotalPrice(50.0);
-        saleDto.setSoldProducts(new ArrayList<>());
 
-        // When
-        Set<ConstraintViolation<SaleDto>> violations = validator.validate(saleDto);
-
-        // Then
-        assertFalse(violations.isEmpty(), "Validation should fail for null date");
-        assertEquals(1, violations.size(), "Exactly one violation expected for null date");
-        assertEquals("Creation date must be not null", violations.iterator().next().getMessage(), "Incorrect error message");
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
     }
 
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
     @Test
-    void testValidation_NullPaymentType() {
-        // Given
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual5() {
+        // Arrange
         SaleDto saleDto = new SaleDto();
-        saleDto.setDate(LocalDateTime.now());
-        saleDto.setTotalPrice(50.0);
-        saleDto.setSoldProducts(new ArrayList<>());
+        saleDto.setTotalDiscountAmount(10.0d);
 
-        // When
-        Set<ConstraintViolation<SaleDto>> violations = validator.validate(saleDto);
-
-        // Then
-        assertFalse(violations.isEmpty(), "Validation should fail for null payment type");
-        assertEquals(1, violations.size(), "Exactly one violation expected for null payment type");
-        assertEquals("Total price must be not null", violations.iterator().next().getMessage(), "Incorrect error message");
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
     }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
     @Test
-    void testValidation_ValidSaleDto() {
-        // Given
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual6() {
+        // Arrange
         SaleDto saleDto = new SaleDto();
-        saleDto.setDate(LocalDateTime.now());
-        saleDto.setPaymentType(PaymentType.CASH);
-        saleDto.setTotalPrice(50.0);
-        saleDto.setSoldProducts(new ArrayList<>());
+        saleDto.setTotalDiscountedPrice(10.0d);
 
-        // When
-        Set<ConstraintViolation<SaleDto>> violations = validator.validate(saleDto);
-
-        // Then
-        assertTrue(violations.isEmpty(), "Validation should pass for valid SaleDto");
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
     }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
     @Test
-    void testInvalidTotalPrice() {
-        // Given
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual7() {
+        // Arrange
         SaleDto saleDto = new SaleDto();
-        saleDto.setDate(LocalDateTime.now());
-        saleDto.setPaymentType(PaymentType.CASH);
-        saleDto.setTotalPrice(-50.0);
+        saleDto.setCashierName("Cashier Name");
+
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual8() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
         saleDto.setSoldProducts(new ArrayList<>());
 
-        // When
-        Set<ConstraintViolation<SaleDto>> violations = validator.validate(saleDto);
+        // Act and Assert
+        assertNotEquals(saleDto, new SaleDto());
+    }
 
-        // Then
-        assertFalse(violations.isEmpty(), "Validation should fail for negative total price");
-        assertEquals(1, violations.size(), "Exactly one violation expected for negative total price");
-        Assertions.assertEquals("Total price must be greater than 0.0", violations.iterator().next().getMessage());
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual9() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
 
+        SaleDto saleDto2 = new SaleDto();
+        saleDto2.setId(1L);
+
+        // Act and Assert
+        assertNotEquals(saleDto, saleDto2);
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual10() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+
+        SaleDto saleDto2 = new SaleDto();
+        saleDto2.setDate(LocalDate.of(1970, 1, 1).atStartOfDay());
+
+        // Act and Assert
+        assertNotEquals(saleDto, saleDto2);
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual11() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+
+        SaleDto saleDto2 = new SaleDto();
+        saleDto2.setPaymentType(PaymentType.CASH);
+
+        // Act and Assert
+        assertNotEquals(saleDto, saleDto2);
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual12() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+
+        SaleDto saleDto2 = new SaleDto();
+        saleDto2.setCashierName("Cashier Name");
+
+        // Act and Assert
+        assertNotEquals(saleDto, saleDto2);
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsDifferent_thenReturnNotEqual13() {
+        // Arrange
+        SaleDto saleDto = new SaleDto();
+
+        SaleDto saleDto2 = new SaleDto();
+        saleDto2.setSoldProducts(new ArrayList<>());
+
+        // Act and Assert
+        assertNotEquals(saleDto, saleDto2);
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsNull_thenReturnNotEqual() {
+        // Arrange, Act and Assert
+        assertNotEquals(new SaleDto(), null);
+    }
+
+    /**
+     * Method under test: {@link SaleDto#equals(Object)}
+     */
+    @Test
+    void testEquals_whenOtherIsWrongType_thenReturnNotEqual() {
+        // Arrange, Act and Assert
+        assertNotEquals(new SaleDto(), "Different type to SaleDto");
+    }
+
+
+    @Test
+    void testGettersAndSetters() {
+        // Arrange and Act
+        SaleDto actualSaleDto = new SaleDto();
+        actualSaleDto.setCashierName("Cashier Name");
+        LocalDateTime date = LocalDate.of(1970, 1, 1).atStartOfDay();
+        actualSaleDto.setDate(date);
+        actualSaleDto.setId(1L);
+        actualSaleDto.setPaymentType(PaymentType.CASH);
+        ArrayList<SoldProductDto> soldProducts = new ArrayList<>();
+        actualSaleDto.setSoldProducts(soldProducts);
+        actualSaleDto.setTotalDiscountAmount(10.0d);
+        actualSaleDto.setTotalDiscountedPrice(10.0d);
+        actualSaleDto.setTotalPrice(10.0d);
+        String actualToStringResult = actualSaleDto.toString();
+        String actualCashierName = actualSaleDto.getCashierName();
+        LocalDateTime actualDate = actualSaleDto.getDate();
+        Long actualId = actualSaleDto.getId();
+        PaymentType actualPaymentType = actualSaleDto.getPaymentType();
+        List<SoldProductDto> actualSoldProducts = actualSaleDto.getSoldProducts();
+        double actualTotalDiscountAmount = actualSaleDto.getTotalDiscountAmount();
+        double actualTotalDiscountedPrice = actualSaleDto.getTotalDiscountedPrice();
+
+        // Assert that nothing has changed
+        assertEquals("Cashier Name", actualCashierName);
+        assertEquals("SaleDto(id=1, date=1970-01-01T00:00, paymentType=CASH, totalPrice=10.0, totalDiscountAmount=10.0,"
+                + " totalDiscountedPrice=10.0, cashierName=Cashier Name, soldProducts=[])", actualToStringResult);
+        assertEquals(10.0d, actualTotalDiscountAmount);
+        assertEquals(10.0d, actualTotalDiscountedPrice);
+        assertEquals(10.0d, actualSaleDto.getTotalPrice());
+        assertEquals(1L, actualId.longValue());
+        assertEquals(PaymentType.CASH, actualPaymentType);
+        assertTrue(actualSoldProducts.isEmpty());
+        assertSame(soldProducts, actualSoldProducts);
+        assertSame(date, actualDate);
+    }
+
+
+    @Test
+    void testNewSaleDto() {
+        // Arrange
+        LocalDateTime date = LocalDate.of(1970, 1, 1).atStartOfDay();
+        ArrayList<SoldProductDto> soldProducts = new ArrayList<>();
+
+        // Act
+        SaleDto actualSaleDto = new SaleDto(1L, date, PaymentType.CASH, 10.0d, 10.0d, 10.0d, "Cashier Name", soldProducts);
+
+        // Assert
+        assertEquals("Cashier Name", actualSaleDto.getCashierName());
+        assertEquals(10.0d, actualSaleDto.getTotalDiscountAmount());
+        assertEquals(10.0d, actualSaleDto.getTotalDiscountedPrice());
+        assertEquals(10.0d, actualSaleDto.getTotalPrice());
+        assertEquals(1L, actualSaleDto.getId().longValue());
+        assertEquals(PaymentType.CASH, actualSaleDto.getPaymentType());
+        List<SoldProductDto> soldProducts2 = actualSaleDto.getSoldProducts();
+        assertTrue(soldProducts2.isEmpty());
+        assertSame(soldProducts, soldProducts2);
+        assertSame(date, actualSaleDto.getDate());
+    }
+
+
+    @Test
+    void testNewSaleDto2() {
+        // Arrange
+        LocalDateTime date = LocalDate.of(1970, 1, 1).atStartOfDay();
+
+        ArrayList<SoldProductDto> soldProducts = new ArrayList<>();
+        soldProducts.add(new SoldProductDto());
+
+        // Act
+        SaleDto actualSaleDto = new SaleDto(1L, date, PaymentType.CASH, 10.0d, 10.0d, 10.0d, "Cashier Name", soldProducts);
+
+        // Assert
+        assertEquals("Cashier Name", actualSaleDto.getCashierName());
+        assertEquals(10.0d, actualSaleDto.getTotalDiscountAmount());
+        assertEquals(10.0d, actualSaleDto.getTotalDiscountedPrice());
+        assertEquals(10.0d, actualSaleDto.getTotalPrice());
+        assertEquals(1L, actualSaleDto.getId().longValue());
+        assertEquals(PaymentType.CASH, actualSaleDto.getPaymentType());
+        assertSame(soldProducts, actualSaleDto.getSoldProducts());
+        assertSame(date, actualSaleDto.getDate());
+    }
+
+
+    @Test
+    void testNewSaleDto3() {
+        // Arrange
+        LocalDateTime date = LocalDate.of(1970, 1, 1).atStartOfDay();
+
+        ArrayList<SoldProductDto> soldProducts = new ArrayList<>();
+        soldProducts.add(new SoldProductDto());
+        soldProducts.add(new SoldProductDto());
+
+        // Act
+        SaleDto actualSaleDto = new SaleDto(1L, date, PaymentType.CASH, 10.0d, 10.0d, 10.0d, "Cashier Name", soldProducts);
+
+        // Assert
+        assertEquals("Cashier Name", actualSaleDto.getCashierName());
+        assertEquals(10.0d, actualSaleDto.getTotalDiscountAmount());
+        assertEquals(10.0d, actualSaleDto.getTotalDiscountedPrice());
+        assertEquals(10.0d, actualSaleDto.getTotalPrice());
+        assertEquals(1L, actualSaleDto.getId().longValue());
+        assertEquals(PaymentType.CASH, actualSaleDto.getPaymentType());
+        assertSame(soldProducts, actualSaleDto.getSoldProducts());
+        assertSame(date, actualSaleDto.getDate());
     }
 }

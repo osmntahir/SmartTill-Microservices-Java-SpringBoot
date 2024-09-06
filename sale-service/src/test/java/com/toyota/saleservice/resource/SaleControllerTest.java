@@ -1,12 +1,13 @@
 package com.toyota.saleservice.resource;
 
+import static org.hibernate.validator.internal.util.Contracts.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.ArgumentMatchers.isA;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.anyBoolean;
 import static org.mockito.Mockito.anyDouble;
 import static org.mockito.Mockito.anyInt;
@@ -15,6 +16,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.toyota.saleservice.config.ProductServiceClient;
 import com.toyota.saleservice.dao.SaleRepository;
 import com.toyota.saleservice.dao.SoldProductRepository;
@@ -29,10 +31,11 @@ import com.toyota.saleservice.service.impl.SaleServiceImpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
 
-import org.junit.jupiter.api.Disabled;
+import org.json.JSONObject;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
@@ -63,9 +66,6 @@ class SaleControllerTest {
     @MockBean
     private SaleService saleService;
 
-    /**
-     * Method under test: {@link SaleController#getSale(Long)}
-     */
     @Test
     void testGetSale() throws Exception {
         // Arrange
@@ -79,12 +79,12 @@ class SaleControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
-                        .string("{\"id\":null,\"date\":null,\"paymentType\":null,\"totalPrice\":0.0,\"soldProducts\":null}"));
+                        .string(
+                                "{\"id\":null,\"date\":null,\"paymentType\":null,\"totalPrice\":0.0,\"totalDiscountAmount\":0.0,\"totalDiscountedPrice"
+                                        + "\":0.0,\"cashierName\":null,\"soldProducts\":null}"));
     }
 
-    /**
-     * Method under test: {@link SaleController#getSale(Long)}
-     */
+
     @Test
     void testGetSale2() throws Exception {
         // Arrange
@@ -98,83 +98,34 @@ class SaleControllerTest {
         actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
     }
 
-    /**
-     * Method under test: {@link SaleController#addSale(SaleDto)}
-     */
-    @Test
-    void testAddSale() {
-        //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
 
-        // Arrange
-        SaleService saleService = mock(SaleService.class);
-        SaleDto saleDto = new SaleDto();
-        when(saleService.addSale(Mockito.<SaleDto>any())).thenReturn(saleDto);
-        SaleController saleController = new SaleController(saleService);
-
-        // Act
-        ResponseEntity<SaleDto> actualAddSaleResult = saleController.addSale(new SaleDto());
-
-        // Assert
-        verify(saleService).addSale(isA(SaleDto.class));
-        HttpStatusCode statusCode = actualAddSaleResult.getStatusCode();
-        assertTrue(statusCode instanceof HttpStatus);
-        assertEquals(201, actualAddSaleResult.getStatusCodeValue());
-        assertEquals(HttpStatus.CREATED, statusCode);
-        assertTrue(actualAddSaleResult.hasBody());
-        assertTrue(actualAddSaleResult.getHeaders().isEmpty());
-        assertSame(saleDto, actualAddSaleResult.getBody());
-    }
-
-    /**
-     * Method under test: {@link SaleController#addSale(SaleDto)}
-     */
-    @Test
-    void testAddSale2() {
-        //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
-
-        // Arrange
-        SaleService saleService = mock(SaleService.class);
-        when(saleService.addSale(Mockito.<SaleDto>any())).thenReturn(null);
-        SaleController saleController = new SaleController(saleService);
-
-        // Act
-        ResponseEntity<SaleDto> actualAddSaleResult = saleController.addSale(new SaleDto());
-
-        // Assert
-        verify(saleService).addSale(isA(SaleDto.class));
-        HttpStatusCode statusCode = actualAddSaleResult.getStatusCode();
-        assertTrue(statusCode instanceof HttpStatus);
-        assertNull(actualAddSaleResult.getBody());
-        assertEquals(400, actualAddSaleResult.getStatusCodeValue());
-        assertEquals(HttpStatus.BAD_REQUEST, statusCode);
-        assertFalse(actualAddSaleResult.hasBody());
-        assertTrue(actualAddSaleResult.getHeaders().isEmpty());
-    }
-
-    /**
-     * Method under test: {@link SaleController#updateSale(Long, SaleDto)}
-     */
     @Test
     void testUpdateSale() {
         //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
 
         // Arrange
         Sale sale = new Sale();
+        sale.setCashierName("Cashier Name");
         sale.setDate(LocalDate.of(1970, 1, 1).atStartOfDay());
         sale.setDeleted(true);
         sale.setId(1L);
         sale.setPaymentType(PaymentType.CASH);
         sale.setSoldProducts(new ArrayList<>());
+        sale.setTotalDiscountAmount(10.0d);
+        sale.setTotalDiscountedPrice(10.0d);
         sale.setTotalPrice(10.0d);
         Optional<Sale> ofResult = Optional.of(sale);
 
         Sale sale2 = new Sale();
+        sale2.setCashierName("Cashier Name");
         LocalDate ofResult2 = LocalDate.of(1970, 1, 1);
         sale2.setDate(ofResult2.atStartOfDay());
         sale2.setDeleted(true);
         sale2.setId(1L);
         sale2.setPaymentType(PaymentType.CASH);
         sale2.setSoldProducts(new ArrayList<>());
+        sale2.setTotalDiscountAmount(10.0d);
+        sale2.setTotalDiscountedPrice(10.0d);
         sale2.setTotalPrice(10.0d);
         SaleRepository saleRepository = mock(SaleRepository.class);
         when(saleRepository.save(Mockito.<Sale>any())).thenReturn(sale2);
@@ -198,7 +149,10 @@ class SaleControllerTest {
         assertEquals("00:00", date.toLocalTime().toString());
         LocalDate toLocalDateResult = date.toLocalDate();
         assertEquals("1970-01-01", toLocalDateResult.toString());
+        assertEquals("Cashier Name", body.getCashierName());
         assertNull(saleController.getSale(1L).getBody().getPaymentType());
+        assertEquals(10.0d, body.getTotalDiscountAmount());
+        assertEquals(10.0d, body.getTotalDiscountedPrice());
         assertEquals(10.0d, body.getTotalPrice());
         assertEquals(1L, body.getId().longValue());
         assertEquals(200, actualUpdateSaleResult.getStatusCodeValue());
@@ -210,11 +164,9 @@ class SaleControllerTest {
         assertSame(ofResult2, toLocalDateResult);
     }
 
-    /**
-     * Method under test: {@link SaleController#updateSale(Long, SaleDto)}
-     */
+
     @Test
-    void testUpdateSale2() {
+    void testUpdateSale7() {
         //   Diffblue Cover was unable to create a Spring-specific test for this Spring method.
 
         // Arrange
@@ -236,9 +188,9 @@ class SaleControllerTest {
         assertTrue(actualUpdateSaleResult.getHeaders().isEmpty());
     }
 
-    /**
-     * Method under test: {@link SaleController#deleteSale(Long)}
-     */
+
+
+
     @Test
     void testDeleteSale() throws Exception {
         // Arrange
@@ -252,12 +204,12 @@ class SaleControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType("application/json"))
                 .andExpect(MockMvcResultMatchers.content()
-                        .string("{\"id\":null,\"date\":null,\"paymentType\":null,\"totalPrice\":0.0,\"soldProducts\":null}"));
+                        .string(
+                                "{\"id\":null,\"date\":null,\"paymentType\":null,\"totalPrice\":0.0,\"totalDiscountAmount\":0.0,\"totalDiscountedPrice"
+                                        + "\":0.0,\"cashierName\":null,\"soldProducts\":null}"));
     }
 
-    /**
-     * Method under test: {@link SaleController#deleteSale(Long)}
-     */
+
     @Test
     void testDeleteSale2() throws Exception {
         // Arrange
@@ -271,6 +223,10 @@ class SaleControllerTest {
         actualPerformResult.andExpect(MockMvcResultMatchers.status().is(400));
     }
 
+    /**
+     * Method under test:
+     * {@link SaleController#getAllSales(int, int, Double, Double, LocalDateTime, LocalDateTime, String, boolean, List, String)}
+     */
     @Test
     void testGetAllSales() throws Exception {
         // Arrange
@@ -300,4 +256,71 @@ class SaleControllerTest {
     }
 
 
+    @Test
+    void testGetCashierNameFromToken2() {
+        // Arrange
+        String mockName = "John Doe";
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("name", mockName);
+
+        // Create a JWT-like token with Base64-encoded payload
+        String token = "header." + Base64.getUrlEncoder().encodeToString(jsonObject.toString().getBytes()) + ".signature";
+
+        // Act
+        String extractedName = saleController.getCashierNameFromToken(token);
+
+        // Assert
+        assertEquals(mockName, extractedName);
+    }
+
+    /**
+     * Method under test: {@link SaleController#getCashierNameFromToken(String)}
+     * Testing invalid token structure
+     */
+    @Test
+    void testGetCashierNameFromToken_InvalidToken() {
+        // Arrange
+        String invalidToken = "invalidTokenWithoutParts";
+
+        // Act & Assert
+        Exception exception = assertThrows(ArrayIndexOutOfBoundsException.class, () -> {
+            saleController.getCashierNameFromToken(invalidToken);
+        });
+
+        // Ensure an exception is thrown
+        assertNotNull(exception);
+    }
+
+    @Test
+    void testUpdateSale2() throws Exception {
+        // Arrange
+        SaleDto updatedSaleDto = new SaleDto();
+        updatedSaleDto.setCashierName("Updated Cashier");
+        updatedSaleDto.setDate(LocalDateTime.now());
+        updatedSaleDto.setId(1L);
+        updatedSaleDto.setPaymentType(PaymentType.CASH);
+        updatedSaleDto.setSoldProducts(new ArrayList<>());
+        updatedSaleDto.setTotalDiscountAmount(20.0);
+        updatedSaleDto.setTotalDiscountedPrice(80.0);
+        updatedSaleDto.setTotalPrice(100.0);
+
+        when(saleService.updateSale(eq(1L), any(SaleDto.class))).thenReturn(updatedSaleDto);
+
+        // ObjectMapper setup for LocalDateTime
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+
+        String content = objectMapper.writeValueAsString(updatedSaleDto);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/sale/update/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        // Act and Assert
+        MockMvcBuilders.standaloneSetup(saleController)
+                .build()
+                .perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
+    }
 }

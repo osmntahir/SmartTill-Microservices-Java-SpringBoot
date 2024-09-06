@@ -250,32 +250,13 @@ class SoldProductServiceImplTest {
         assertSame(soldProductDto, actualUpdateSoldProductResult);
     }
 
-    /**
-     * Method under test:
-     * {@link SoldProductServiceImpl#getSoldProducts(int, int, String, Double, Double, boolean, String, String)}
-     */
-    @Test
-    @Disabled("TODO: Complete this test")
-    void testGetSoldProducts() {
-        // TODO: Diffblue Cover was only able to create a partial test for this method:
-        //   Reason: No inputs found that don't throw a trivial exception.
-        //   Diffblue Cover tried to run the arrange/act section, but the method under
-        //   test threw
-        //   java.lang.IllegalArgumentException: Invalid value 'Sort Direction' for orders given; Has to be either 'desc' or 'asc' (case insensitive)
-        //       at com.toyota.saleservice.service.impl.SoldProductServiceImpl.getSoldProducts(SoldProductServiceImpl.java:62)
-        //   java.lang.IllegalArgumentException: No enum constant org.springframework.data.domain.Sort.Direction.SORT DIRECTION
-        //       at java.base/java.lang.Enum.valueOf(Enum.java:273)
-        //       at com.toyota.saleservice.service.impl.SoldProductServiceImpl.getSoldProducts(SoldProductServiceImpl.java:62)
-        //   See https://diff.blue/R013 to resolve this issue.
 
-        // Arrange and Act
-        soldProductServiceImpl.getSoldProducts(1, 3, "Name", 10.0d, 10.0d, true, "Sort By", "Sort Direction");
-    }
+//    @Test
+//    void testGetSoldProducts() {
+//        soldProductServiceImpl.getSoldProducts(1, 3, "Name", 10.0d, 10.0d, true, "Sort By", "Sort Direction");
+//    }
 
-    /**
-     * Method under test:
-     * {@link SoldProductServiceImpl#addSoldProduct(Long, Long, SoldProductDto)}
-     */
+
     @Test
     void testAddSoldProduct() {
         // Arrange
@@ -367,10 +348,7 @@ class SoldProductServiceImplTest {
         assertSame(soldProductDto, actualAddSoldProductResult);
     }
 
-    /**
-     * Method under test:
-     * {@link SoldProductServiceImpl#addSoldProduct(Long, Long, SoldProductDto)}
-     */
+
     @Test
     void testAddSoldProduct2() {
         // Arrange
@@ -449,10 +427,7 @@ class SoldProductServiceImplTest {
         verify(soldProductRepository).save(isA(SoldProduct.class));
     }
 
-    /**
-     * Method under test:
-     * {@link SoldProductServiceImpl#addSoldProduct(Long, Long, SoldProductDto)}
-     */
+
     @Test
     void testAddSoldProduct3() {
         // Arrange

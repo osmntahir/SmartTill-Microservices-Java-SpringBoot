@@ -55,25 +55,25 @@ public class SaleController {
 
     @PostMapping("/add")
     public ResponseEntity<?> addSale(@RequestHeader("Authorization") String token, @RequestBody SaleDto saleDto) {
-        // "Bearer " kısmını çıkararak JWT token'ı al
+
         String jwtToken = token.substring(7);
 
-        // Token'ı çözümle
+
         String cashierName = getCashierNameFromToken(jwtToken);
 
-        // Satış işlemi
+
         SaleDto sale = saleService.addSale(saleDto, cashierName);
 
         return ResponseEntity.ok(sale);
     }
 
-    // Token'dan kasiyer adını alma
-    private String getCashierNameFromToken(String token) {
-        // Token'ı base64 çözerek payload'ı al
-        String[] parts = token.split("\\."); // JWT header, payload ve signature'dan oluşur
+
+    String getCashierNameFromToken(String token) {
+
+        String[] parts = token.split("\\.");
         String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
 
-        // JSON içindeki "name" alanını al
+
         JSONObject jsonObject = new JSONObject(payload);
         return jsonObject.getString("name");
     }

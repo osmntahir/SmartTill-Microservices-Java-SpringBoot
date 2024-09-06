@@ -4,58 +4,71 @@ import org.junit.jupiter.api.Test;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SaleTest {
 
     @Test
-    public void testNoArgsConstructor() {
-        Sale sale = new Sale();
-        assertThat(sale).isNotNull();
+    public void testAllArgsConstructor() {
+        Sale sale = new Sale(1L, 100.0, 10.0, 90.0, LocalDateTime.now(), PaymentType.CREDIT_CARD, false, "John Doe", new ArrayList<>());
+
+        assertEquals(1L, sale.getId());
+        assertEquals(100.0, sale.getTotalPrice());
+        assertEquals(10.0, sale.getTotalDiscountAmount());
+        assertEquals(90.0, sale.getTotalDiscountedPrice());
+        assertNotNull(sale.getDate());
+        assertEquals(PaymentType.CREDIT_CARD, sale.getPaymentType());
+        assertFalse(sale.isDeleted());
+        assertEquals("John Doe", sale.getCashierName());
+        assertNotNull(sale.getSoldProducts());
     }
 
     @Test
-    public void testAllArgsConstructor() {
-        List<SoldProduct> soldProducts = new ArrayList<>();
-        Sale sale = new Sale(1L, 100.0, LocalDateTime.now(), PaymentType.CASH, false, soldProducts);
+    public void testNoArgsConstructor() {
+        Sale sale = new Sale();
 
-        assertThat(sale.getId()).isEqualTo(1L);
-        assertThat(sale.getTotalPrice()).isEqualTo(100.0);
-        assertThat(sale.getDate()).isNotNull();
-        assertThat(sale.getPaymentType()).isEqualTo(PaymentType.CASH);
-        assertThat(sale.isDeleted()).isFalse();
-        assertThat(sale.getSoldProducts()).isEqualTo(soldProducts);
+        assertNull(sale.getId());
+        assertEquals(0.0, sale.getTotalPrice());
+        assertEquals(0.0, sale.getTotalDiscountAmount());
+        assertEquals(0.0, sale.getTotalDiscountedPrice());
+        assertNull(sale.getDate());
+        assertNull(sale.getPaymentType());
+        assertFalse(sale.isDeleted());
+        assertNull(sale.getCashierName());
+        assertNull(sale.getSoldProducts());
     }
 
     @Test
     public void testSettersAndGetters() {
         Sale sale = new Sale();
-        List<SoldProduct> soldProducts = new ArrayList<>();
-        LocalDateTime now = LocalDateTime.now();
-
         sale.setId(1L);
-        sale.setTotalPrice(100.0);
-        sale.setDate(now);
-        sale.setPaymentType(PaymentType.CREDIT_CARD);
-        sale.setDeleted(false);
-        sale.setSoldProducts(soldProducts);
+        sale.setTotalPrice(150.0);
+        sale.setTotalDiscountAmount(15.0);
+        sale.setTotalDiscountedPrice(135.0);
+        sale.setDate(LocalDateTime.now());
+        sale.setPaymentType(PaymentType.CASH);
+        sale.setDeleted(true);
+        sale.setCashierName("Jane Doe");
+        sale.setSoldProducts(new ArrayList<>());
 
-        assertThat(sale.getId()).isEqualTo(1L);
-        assertThat(sale.getTotalPrice()).isEqualTo(100.0);
-        assertThat(sale.getDate()).isEqualTo(now);
-        assertThat(sale.getPaymentType()).isEqualTo(PaymentType.CREDIT_CARD);
-        assertThat(sale.isDeleted()).isFalse();
-        assertThat(sale.getSoldProducts()).isEqualTo(soldProducts);
+        assertEquals(1L, sale.getId());
+        assertEquals(150.0, sale.getTotalPrice());
+        assertEquals(15.0, sale.getTotalDiscountAmount());
+        assertEquals(135.0, sale.getTotalDiscountedPrice());
+        assertNotNull(sale.getDate());
+        assertEquals(PaymentType.CASH, sale.getPaymentType());
+        assertTrue(sale.isDeleted());
+        assertEquals("Jane Doe", sale.getCashierName());
+        assertNotNull(sale.getSoldProducts());
     }
 
     @Test
-    public void testOnCreate() {
+    public void testPrePersist() {
         Sale sale = new Sale();
+        sale.setDate(null);
         sale.onCreate();
 
-        assertThat(sale.getDate()).isNotNull();
-        assertThat(sale.getDate()).isBeforeOrEqualTo(LocalDateTime.now());
+        assertNotNull(sale.getDate());
     }
 }

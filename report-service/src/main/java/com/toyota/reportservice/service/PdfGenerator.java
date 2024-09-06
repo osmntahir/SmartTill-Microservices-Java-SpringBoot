@@ -4,9 +4,7 @@ import com.itextpdf.kernel.pdf.PdfDocument;
 import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
-import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
-import com.itextpdf.layout.properties.UnitValue;
 import com.toyota.reportservice.dto.SaleDto;
 import com.toyota.reportservice.dto.SoldProductDto;
 import org.springframework.stereotype.Component;
@@ -19,9 +17,7 @@ import java.util.List;
 @Component
 public class PdfGenerator {
 
-    // Generates PDF, saves to file, and returns byte array
     public byte[] generatePDF(SaleDto saleDto) throws IOException {
-        // Using ByteArrayOutputStream to create the PDF in memory
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         PdfWriter writer = new PdfWriter(outputStream);
         PdfDocument pdfDocument = new PdfDocument(writer);
@@ -33,8 +29,8 @@ public class PdfGenerator {
         // Add sale details
         addSaleDetails(document, saleDto);
 
-        // Add sold products table
-        addSoldProductsTable(document, saleDto.getSoldProducts());
+        // Add sold products details
+        addSoldProductsDetails(document, saleDto.getSoldProducts());
 
         // Add total and payment info
         addTotalInfo(document, saleDto);
@@ -44,25 +40,17 @@ public class PdfGenerator {
         // Save the PDF to a file
         savePDFToFile(outputStream.toByteArray(), saleDto.getId());
 
-        // Return the PDF as byte array
         return outputStream.toByteArray();
     }
 
-    // Saves the PDF to the file system
     private void savePDFToFile(byte[] pdfContent, Long saleId) throws IOException {
-        // Directory and filename
         String directoryPath = "reports";
         File directory = new File(directoryPath);
-
-        // Create directory if it doesn't exist
         if (!directory.exists()) {
             directory.mkdirs();
         }
 
-        // Construct the file path
         String filePath = directoryPath + "/sale_report_" + saleId + ".pdf";
-
-        // Write to the file
         try (FileOutputStream fos = new FileOutputStream(filePath)) {
             fos.write(pdfContent);
             fos.flush();
@@ -71,74 +59,97 @@ public class PdfGenerator {
         System.out.println("PDF saved at: " + filePath);
     }
 
-    // Adds store and company information
     private void addStoreInfo(Document document) {
-        Paragraph storeName = new Paragraph("32 BIT ")
+        Paragraph storeName = new Paragraph("32 BIT")
                 .setBold()
                 .setTextAlignment(TextAlignment.CENTER)
-                .setFontSize(16);
+                .setFontSize(14)
+                .setMarginBottom(2);
         document.add(storeName);
 
-        Paragraph storeAddress = new Paragraph("DEMIRCIKARA MAH. 1431 SOK. NO:12\nAntalya")
+        Paragraph storeAddress = new Paragraph("DEMIRCİKARA MAH. 1431 SOK. NO:12\n0242 311 41 21\nANTALYA")
                 .setTextAlignment(TextAlignment.CENTER)
-                .setFontSize(12);
+                .setFontSize(10)
+                .setMarginBottom(2);
         document.add(storeAddress);
 
-        document.add(new Paragraph("\n")); // Add space
+        document.add(new Paragraph("\n").setMarginBottom(2));  // Reduce space after store info
     }
 
-    // Adds sale details
     private void addSaleDetails(Document document, SaleDto saleDto) {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-        String formattedDateTime = now.format(formatter);
+        String formattedDate = saleDto.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
+        String formattedTime = saleDto.getDate().format(DateTimeFormatter.ofPattern("HH:mm"));
 
-        Paragraph saleDetails = new Paragraph("Date: " + formattedDateTime + "    Sale No: " + saleDto.getId() + "    Payment Type: " + saleDto.getPaymentType())
-                .setTextAlignment(TextAlignment.LEFT)
-                .setFontSize(12);
+        Paragraph saleDetails = new Paragraph("TARIH: " + formattedDate + "    SAAT: " + formattedTime)
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10)
+                .setMarginBottom(2);
         document.add(saleDetails);
 
-        Paragraph cashierInfo = new Paragraph("Cashier: " + saleDto.getCashierName())
-                .setTextAlignment(TextAlignment.LEFT)
-                .setFontSize(12);
-        document.add(cashierInfo);
+        Paragraph saleInfo = new Paragraph("SATIS NO: " + saleDto.getId() + "    KASIYER: " + saleDto.getCashierName())
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10)
+                .setMarginBottom(2);
+        document.add(saleInfo);
 
-        document.add(new Paragraph("\n")); // Add space
+        document.add(new Paragraph("------------------------------------")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginBottom(2));
     }
 
-    // Adds sold products table
-    private void addSoldProductsTable(Document document, List<SoldProductDto> soldProducts) {
-        Table productTable = new Table(2);
-        productTable.setWidth(UnitValue.createPercentValue(100));
-
-        // Table headers
-        productTable.addCell("Product Details");
-        productTable.addCell("Price");
-
-        // Product information
+    private void addSoldProductsDetails(Document document, List<SoldProductDto> soldProducts) {
         for (SoldProductDto product : soldProducts) {
-            productTable.addCell(product.getProductName() + " (" + product.getQuantity() + " pcs x " + product.getPrice() + ")");
-            productTable.addCell(String.format("%.2f", product.getQuantity() * product.getPrice()) + " TL");
-        }
+            // Product name, quantity, and unit price
+            String productInfo = product.getProductName() + " (" + product.getQuantity() + " ADET x " + String.format("%.2f", product.getPrice()) + " TL)";
+            Paragraph productParagraph = new Paragraph(productInfo)
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(2);
+            document.add(productParagraph);
 
-        document.add(productTable);
-        document.add(new Paragraph("\n"));
+            // Total price and discounted price with proper spacing
+            String totalInfo = "Toplam Fiyat: " + String.format("%.2f", product.getQuantity() * product.getPrice()) + " TL";
+            String discountInfo = "Indirim: " + String.format("%.2f", product.getDiscountAmount()) + " TL";
+            String finalPriceInfo = "Indirimli Fiyat: " + String.format("%.2f", product.getFinalPriceAfterDiscount()) + " TL";
+
+            Paragraph pricesParagraph = new Paragraph(totalInfo + "    " + discountInfo + "    " + finalPriceInfo)
+                    .setFontSize(10)
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(2);
+            document.add(pricesParagraph);
+
+            // Add separation line between products
+            document.add(new Paragraph("------------------------------------")
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setMarginBottom(2));
+        }
     }
 
-    // Adds total and payment information
     private void addTotalInfo(Document document, SaleDto saleDto) {
-        Paragraph totalPrice = new Paragraph("Total Price: " + String.format("%.2f", saleDto.getTotalPrice()) + " TL")
-                .setBold()
-                .setTextAlignment(TextAlignment.RIGHT)
-                .setFontSize(12);
-        document.add(totalPrice);
-
-        document.add(new Paragraph("\n"));
-
-        Paragraph footer = new Paragraph("THIS IS NOT A TAX INVOICE")
+        Paragraph totalPrice = new Paragraph("GENEL TOPLAM: " + String.format("%.2f", saleDto.getTotalPrice()) + " TL")
                 .setBold()
                 .setTextAlignment(TextAlignment.CENTER)
-                .setFontSize(12);
-        document.add(footer);
+                .setFontSize(10)
+                .setMarginBottom(2);
+        document.add(totalPrice);
+
+        if (saleDto.getTotalDiscountAmount() > 0) {
+            Paragraph discountedTotal = new Paragraph("INDIRIMLI TOPLAM: " + String.format("%.2f", saleDto.getTotalDiscountedPrice()) + " TL")
+                    .setBold()
+                    .setTextAlignment(TextAlignment.CENTER)
+                    .setFontSize(10)
+                    .setMarginBottom(2);
+            document.add(discountedTotal);
+        }
+
+        document.add(new Paragraph("------------------------------------")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setMarginBottom(2));
+
+        document.add(new Paragraph("KDV FISI DEGILDIR")
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(10)
+                .setMarginBottom(2));
     }
 }

@@ -6,102 +6,139 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.layout.properties.TextAlignment;
+import com.itextpdf.layout.properties.UnitValue;
 import com.toyota.reportservice.dto.SaleDto;
 import com.toyota.reportservice.dto.SoldProductDto;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
 
 @Component
 public class PdfGenerator {
 
+    // Generates PDF, saves to file, and returns byte array
     public byte[] generatePDF(SaleDto saleDto) throws IOException {
-        // Directory where the PDF will be saved
-        String directoryPath = "report-service/src/main/doc";
+        // Using ByteArrayOutputStream to create the PDF in memory
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDocument = new PdfDocument(writer);
+        Document document = new Document(pdfDocument);
+
+        // Add store and company information
+        addStoreInfo(document);
+
+        // Add sale details
+        addSaleDetails(document, saleDto);
+
+        // Add sold products table
+        addSoldProductsTable(document, saleDto.getSoldProducts());
+
+        // Add total and payment info
+        addTotalInfo(document, saleDto);
+
+        document.close();
+
+        // Save the PDF to a file
+        savePDFToFile(outputStream.toByteArray(), saleDto.getId());
+
+        // Return the PDF as byte array
+        return outputStream.toByteArray();
+    }
+
+    // Saves the PDF to the file system
+    private void savePDFToFile(byte[] pdfContent, Long saleId) throws IOException {
+        // Directory and filename
+        String directoryPath = "reports";
         File directory = new File(directoryPath);
+
+        // Create directory if it doesn't exist
         if (!directory.exists()) {
-            directory.mkdir(); // Create the directory if it doesn't exist
+            directory.mkdirs();
         }
 
-        // File path
-        String filePath = directoryPath + "/sale_report_" + saleDto.getId() + ".pdf";
+        // Construct the file path
+        String filePath = directoryPath + "/sale_report_" + saleId + ".pdf";
 
-        try (PdfWriter writer = new PdfWriter(new FileOutputStream(filePath));
-             PdfDocument pdfDocument = new PdfDocument(writer);
-             Document document = new Document(pdfDocument)) {
-
-            addTitleText(document, "Sales Report");
-            addSaleDetails(document, saleDto);
-            addSoldProductsTable(document, saleDto.getSoldProducts());
-
-            System.out.println("PDF generated at: " + filePath); // Optional: log the file path
+        // Write to the file
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(pdfContent);
+            fos.flush();
         }
 
-        // Convert the generated file to a byte array (optional)
-        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-             FileInputStream fis = new FileInputStream(filePath)) {
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = fis.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, length);
-            }
-            return outputStream.toByteArray();
-        }
-    }
-    public byte[] generatePDFs(List<SaleDto> sales) throws IOException {
-        ByteArrayOutputStream zipStream = new ByteArrayOutputStream();
-        try (ZipOutputStream zipOutputStream = new ZipOutputStream(zipStream)) {
-            for (int i = 0; i < sales.size(); i++) {
-                SaleDto sale = sales.get(i);
-                byte[] pdfContent = generatePDF(sale);  // Assuming generatePDF(SaleDto sale) is defined in PdfGenerator
-                zipOutputStream.putNextEntry(new ZipEntry("sale_report_" + (i + 1) + ".pdf"));
-                zipOutputStream.write(pdfContent);
-                zipOutputStream.closeEntry();
-            }
-        }
-        return zipStream.toByteArray();
+        System.out.println("PDF saved at: " + filePath);
     }
 
-
-    private void addTitleText(Document document, String titleText) {
-        Paragraph paragraph = new Paragraph(titleText)
+    // Adds store and company information
+    private void addStoreInfo(Document document) {
+        Paragraph storeName = new Paragraph("32 BIT ")
                 .setBold()
-                .setFontSize(20)
                 .setTextAlignment(TextAlignment.CENTER)
-                .setMarginTop(20);
-        document.add(paragraph);
+                .setFontSize(16);
+        document.add(storeName);
+
+        Paragraph storeAddress = new Paragraph("DEMIRCIKARA MAH. 1431 SOK. NO:12\nAntalya")
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(12);
+        document.add(storeAddress);
+
+        document.add(new Paragraph("\n")); // Add space
     }
 
+    // Adds sale details
     private void addSaleDetails(Document document, SaleDto saleDto) {
-        Table saleDetailsTable = new Table(2);
-        saleDetailsTable.addCell("Sale ID");
-        saleDetailsTable.addCell(String.valueOf(saleDto.getId()));
-        saleDetailsTable.addCell("Date");
-        saleDetailsTable.addCell(saleDto.getDate().toString());
-        saleDetailsTable.addCell("Payment Type");
-        saleDetailsTable.addCell(saleDto.getPaymentType().toString());
-        saleDetailsTable.addCell("Total Price");
-        saleDetailsTable.addCell("$" + saleDto.getTotalPrice());
-        document.add(saleDetailsTable);
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        String formattedDateTime = now.format(formatter);
+
+        Paragraph saleDetails = new Paragraph("Date: " + formattedDateTime + "    Sale No: " + saleDto.getId() + "    Payment Type: " + saleDto.getPaymentType())
+                .setTextAlignment(TextAlignment.LEFT)
+                .setFontSize(12);
+        document.add(saleDetails);
+
+        Paragraph cashierInfo = new Paragraph("Cashier: " + saleDto.getCashierName())
+                .setTextAlignment(TextAlignment.LEFT)
+                .setFontSize(12);
+        document.add(cashierInfo);
+
+        document.add(new Paragraph("\n")); // Add space
     }
 
+    // Adds sold products table
     private void addSoldProductsTable(Document document, List<SoldProductDto> soldProducts) {
-        Table productTable = new Table(4);
-        productTable.addCell("Product Name");
-        productTable.addCell("Quantity");
-        productTable.addCell("Unit Price");
-        productTable.addCell("Total");
+        Table productTable = new Table(2);
+        productTable.setWidth(UnitValue.createPercentValue(100));
 
+        // Table headers
+        productTable.addCell("Product Details");
+        productTable.addCell("Price");
+
+        // Product information
         for (SoldProductDto product : soldProducts) {
-            productTable.addCell(product.getProductName());
-            productTable.addCell(String.valueOf(product.getQuantity()));
-            productTable.addCell("$" + product.getPrice());
-            productTable.addCell("$" + product.getTotal());
+            productTable.addCell(product.getProductName() + " (" + product.getQuantity() + " pcs x " + product.getPrice() + ")");
+            productTable.addCell(String.format("%.2f", product.getQuantity() * product.getPrice()) + " TL");
         }
 
         document.add(productTable);
+        document.add(new Paragraph("\n"));
+    }
+
+    // Adds total and payment information
+    private void addTotalInfo(Document document, SaleDto saleDto) {
+        Paragraph totalPrice = new Paragraph("Total Price: " + String.format("%.2f", saleDto.getTotalPrice()) + " TL")
+                .setBold()
+                .setTextAlignment(TextAlignment.RIGHT)
+                .setFontSize(12);
+        document.add(totalPrice);
+
+        document.add(new Paragraph("\n"));
+
+        Paragraph footer = new Paragraph("THIS IS NOT A TAX INVOICE")
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(12);
+        document.add(footer);
     }
 }

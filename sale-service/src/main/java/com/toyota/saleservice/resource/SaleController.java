@@ -4,6 +4,7 @@ import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.dto.SaleDto;
 import com.toyota.saleservice.service.abstracts.SaleService;
 import lombok.RequiredArgsConstructor;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
 
 @RestController
@@ -50,16 +52,30 @@ public class SaleController {
     }
 
 
+
     @PostMapping("/add")
-    public ResponseEntity <SaleDto> addSale(@RequestBody /*@Valid*/SaleDto saleDto){
+    public ResponseEntity<?> addSale(@RequestHeader("Authorization") String token, @RequestBody SaleDto saleDto) {
+        // "Bearer " kısmını çıkararak JWT token'ı al
+        String jwtToken = token.substring(7);
 
-            SaleDto response = saleService.addSale(saleDto);
+        // Token'ı çözümle
+        String cashierName = getCashierNameFromToken(jwtToken);
 
-            if(response == null){
-                return ResponseEntity.badRequest().build();
-            }
+        // Satış işlemi
+        SaleDto sale = saleService.addSale(saleDto, cashierName);
 
-       return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return ResponseEntity.ok(sale);
+    }
+
+    // Token'dan kasiyer adını alma
+    private String getCashierNameFromToken(String token) {
+        // Token'ı base64 çözerek payload'ı al
+        String[] parts = token.split("\\."); // JWT header, payload ve signature'dan oluşur
+        String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
+
+        // JSON içindeki "name" alanını al
+        JSONObject jsonObject = new JSONObject(payload);
+        return jsonObject.getString("name");
     }
 
     @PutMapping("/update/{id}")

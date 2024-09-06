@@ -78,8 +78,9 @@ public class SaleServiceImpl implements SaleService {
     }
 
     @Override
-    public SaleDto addSale(SaleDto saleDto) {
+    public SaleDto addSale(SaleDto saleDto, String cashierName) {
         logger.info("Adding sale with id {}", saleDto.getId());
+        logger.info("Cashier name: {}", cashierName);
 
         if (saleRepository.existsByIdAndDeletedIsFalse(saleDto.getId())) {
             logger.warn("Sale add failed due to existing sale with id: {}", saleDto.getId());
@@ -99,6 +100,7 @@ public class SaleServiceImpl implements SaleService {
         }
 
         saleDto.setTotalPrice(totalPrice);
+        saleDto.setCashierName(cashierName);
 
         Sale sale = mapUtil.convertSaleDtoToSale(saleDto);
         Sale saved = saleRepository.save(sale);

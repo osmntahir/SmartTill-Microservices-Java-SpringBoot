@@ -33,7 +33,7 @@ public class CustomJwtAuthenticationConverter implements Converter<Jwt, Mono<Abs
             Collection<String> roles = (Collection<String>) realmAccess.get("roles");
             roles.forEach(role -> authorities.add(new SimpleGrantedAuthority("ROLE_" + role)));
         }
-        System.out.println("authorities = " + authorities);
+       //System.out.println("authorities = " + authorities);
         return authorities;
     }
 }

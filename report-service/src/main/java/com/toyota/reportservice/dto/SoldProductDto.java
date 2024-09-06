@@ -21,6 +21,8 @@ public class SoldProductDto {
     private double price;
     private int inventory;
     private double discount;
+    private double discountAmount;
+    private double finalPriceAfterDiscount;
     private double total;
 
 

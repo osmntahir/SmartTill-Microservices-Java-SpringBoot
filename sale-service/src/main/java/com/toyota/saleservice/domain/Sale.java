@@ -23,6 +23,8 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private double totalPrice;
+    private double totalDiscountAmount;
+    private double totalDiscountedPrice;
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)

@@ -40,24 +40,6 @@ public class SoldProductServiceImpl implements SoldProductService {
     private final SaleRepository saleRepository;
 
     @Override
-    public SoldProductDto updateSoldProduct(Long id, SoldProductDto soldProductDto) {
-        logger.info("Updating sold product with id: {}", id);
-
-        Optional<SoldProduct> optionalSoldProduct = soldProductRepository.findById(id);
-
-        if (optionalSoldProduct.isPresent()) {
-            SoldProduct existingSoldProduct = optionalSoldProduct.get();
-            updateSoldProductDetails(existingSoldProduct, soldProductDto);
-            SoldProduct updatedSoldProduct = soldProductRepository.save(existingSoldProduct);
-            logger.info("Sold product with id {} is updated", id);
-            return mapUtil.convertSoldProductToSoldProductDto(updatedSoldProduct);
-        } else {
-            logger.error("Sold Product not found with id: {}", id);
-            throw new ProductNotFoundException("Sold Product not found with id: " + id);
-        }
-    }
-
-    @Override
     public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean deleted, String sortBy, String sortDirection) {
         logger.info("Getting sold products with filters");
         Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
@@ -69,6 +51,7 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         return new PaginationResponse<>(soldProductDtos, pageResponse);
     }
+
 
     @Override
     public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {
@@ -90,9 +73,22 @@ public class SoldProductServiceImpl implements SoldProductService {
             createNewSoldProduct(soldProductDto, product, sale, soldProduct);
         }
 
-        // Recalculate and save the total price for the sale
+
+        double totalDiscountAmount = sale.getSoldProducts().stream()
+                .mapToDouble(SoldProduct::getDiscountAmount)
+                .sum();
+
+        double totalDiscountedPrice = sale.getSoldProducts().stream()
+                .mapToDouble(SoldProduct::getFinalPriceAfterDiscount)
+                .sum();
+
+
+        sale.setTotalDiscountAmount(totalDiscountAmount);
+        sale.setTotalDiscountedPrice(totalDiscountedPrice);
+
+
         sale.setTotalPrice(sale.getSoldProducts().stream()
-                .mapToDouble(SoldProduct::getTotal)
+                .mapToDouble(p -> p.getPrice() * p.getQuantity())
                 .sum());
         saleRepository.save(sale);
 
@@ -125,8 +121,6 @@ public class SoldProductServiceImpl implements SoldProductService {
         double totalPrice = existingSoldProduct.getPrice() * existingSoldProduct.getQuantity();
         applyDiscountIfNeeded(existingSoldProduct, totalPrice, product.getId());
 
-     //   existingSoldProduct.setTotal(totalPrice);
-
         // Update product stock quantity
         checkAndUpdateInventory(product, soldProductDto.getQuantity());
 
@@ -149,24 +143,30 @@ public class SoldProductServiceImpl implements SoldProductService {
         applyDiscountIfNeeded(soldProduct, totalPrice, product.getId());
 
         soldProduct.setSale(sale);
-       // soldProduct.setTotal(totalPrice);
 
         // Save new sold product
         soldProductRepository.save(soldProduct);
     }
 
     private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
-        // Check if there is a discount available for the product
         Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
+
         if (discountOptional.isPresent() && discountOptional.get() > 0) {
             double discount = discountOptional.get();
             double discountAmount = totalPrice * (discount / 100);
-            totalPrice -= discountAmount;
+            double finalPrice = totalPrice - discountAmount;
+
+            // Set the discount values
             soldProduct.setDiscount((long) discount);
+            soldProduct.setDiscountAmount(discountAmount);
+            soldProduct.setFinalPriceAfterDiscount(finalPrice);
+            soldProduct.setTotal(finalPrice); // Final price after discount is applied
         } else {
             soldProduct.setDiscount(0L);
+            soldProduct.setDiscountAmount(0);
+            soldProduct.setFinalPriceAfterDiscount(totalPrice);
+            soldProduct.setTotal(totalPrice);
         }
-        soldProduct.setTotal(totalPrice);
     }
 
     void checkAndUpdateInventory(ProductDTO product, int quantity) {
@@ -175,6 +175,24 @@ public class SoldProductServiceImpl implements SoldProductService {
         }
         product.setInventory(product.getInventory() - quantity);
         productServiceClient.updateProductInventory(product);
+    }
+
+    @Override
+    public SoldProductDto updateSoldProduct(Long id, SoldProductDto soldProductDto) {
+        logger.info("Updating sold product with id: {}", id);
+
+        Optional<SoldProduct> optionalSoldProduct = soldProductRepository.findById(id);
+
+        if (optionalSoldProduct.isPresent()) {
+            SoldProduct existingSoldProduct = optionalSoldProduct.get();
+            updateSoldProductDetails(existingSoldProduct, soldProductDto);
+            SoldProduct updatedSoldProduct = soldProductRepository.save(existingSoldProduct);
+            logger.info("Sold product with id {} is updated", id);
+            return mapUtil.convertSoldProductToSoldProductDto(updatedSoldProduct);
+        } else {
+            logger.error("Sold Product not found with id: {}", id);
+            throw new ProductNotFoundException("Sold Product not found with id: " + id);
+        }
     }
 
     private void updateSoldProductDetails(SoldProduct existingSoldProduct, SoldProductDto soldProductDto) {

@@ -30,6 +30,8 @@ public class SoldProduct {
     private int quantity;
     private double total;
     private long discount;
+    private double discountAmount;
+    private double finalPriceAfterDiscount;
 
     private boolean deleted = Boolean.FALSE;
 }

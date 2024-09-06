@@ -123,6 +123,9 @@ public class UserManagementService {
         if (userDto.getPassword() != null) user.setCredentials(Collections.singletonList(createPasswordCredential(userDto.getPassword())));
         usersResource.get(userId).update(user);
 
+        if (userDto.getRoles() == null ) {
+            return ResponseEntity.ok("User updated successfully.");
+        }
         // Handle role assignments
         RoleScopeResource rolesResource = usersResource.get(userId).roles().realmLevel();
 

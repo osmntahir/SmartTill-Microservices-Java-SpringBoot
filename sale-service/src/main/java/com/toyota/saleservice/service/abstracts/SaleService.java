@@ -19,7 +19,7 @@ public interface SaleService {
                                                  String paymentType,
                                                  boolean deleted);
 
-    SaleDto addSale(SaleDto saleDto);
+    SaleDto addSale(SaleDto saleDto, String cashierName);
 
     SaleDto updateSale(Long id, SaleDto saleDto);
 

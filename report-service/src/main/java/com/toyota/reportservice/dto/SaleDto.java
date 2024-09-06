@@ -26,6 +26,7 @@ public class SaleDto {
     private PaymentType paymentType;
     @DecimalMin(value = "0.0", inclusive = false, message = "Total price must be greater than 0.0")
     private double totalPrice = 0.0;
+    private String cashierName;
     @Valid
     private List<SoldProductDto> soldProducts;
 }

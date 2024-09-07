@@ -1117,6 +1117,50 @@ The **Product Service** manages all the product-related operations within the sy
 
 The **User Management Service** is responsible for managing users and their roles within the system. Below is a list of available endpoints and their usage.
 
+### Get User
+- **Endpoint**: `GET /user`
+- **Description**: Retrieve a list of all users.
+- **Response**:
+    ```json
+    [
+    {
+        "id": "1550629f-c91d-4ac3-8617-7747b503ccd2",
+        "username": "superuser",
+        "firstName": "osman tahir ",
+        "lastName": "ozdemir",
+        "email": "superuser@gmail.com",
+        "password": null,
+        "roles": [
+            "default-roles-32bit-realm",
+            "ADMIN"
+        ]
+    },
+  {
+        "id": "a23c6b13-481f-446b-a190-60bd26b862fe",
+        "username": "user4",
+        "firstName": "osman tahir ",
+        "lastName": "ozdemir",
+        "email": "user4@32bit.com",
+        "password": null,
+        "roles": [
+            "default-roles-32bit-realm",
+            "MANAGER"
+        ]
+    },
+    {
+        "id": "34eb3ff5-d56f-49f6-906c-464895cc1d4c",
+        "username": "user6",
+        "firstName": "UpdatedFirstName",
+        "lastName": "UpdatedLastName",
+        "email": "user6@example.com",
+        "password": null,
+        "roles": [
+            "CASHIER",
+            "default-roles-32bit-realm"
+        ]
+    }
+    ]
+    ```
 ### Create User
 - **Endpoint**: `POST /user`
 - **Description**: Create a new user with roles.

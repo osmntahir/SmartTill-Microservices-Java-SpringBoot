@@ -207,14 +207,327 @@ This service manages sales, including creating, updating, deleting, and retrievi
 ### Get All Sales
 
 - **Endpoint**: `GET /sale/getAll`
-- **Description**: Retrieve a list of all sales.
+- **Description**: Retrieve a list of all sales with pagination, filtering, and sorting.
 - **Response**:
     ```json
-    [
-      {
-  
-      }
-    ]
+   {
+    "content": [
+        {
+            "id": 45,
+            "date": "2024-09-07T12:16:11.403047",
+            "paymentType": "CREDIT_CARD",
+            "totalPrice": 134.0,
+            "totalDiscountAmount": 12.12,
+            "totalDiscountedPrice": 121.88,
+            "cashierName": "ali  veli",
+            "soldProducts": [
+                {
+                    "id": 118,
+                    "productId": 1,
+                    "productName": "incir",
+                    "price": 10.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 4.8,
+                    "finalPriceAfterDiscount": 35.2,
+                    "total": 35.2,
+                    "quantity": 4,
+                    "deleted": false
+                },
+                {
+                    "id": 119,
+                    "productId": 2,
+                    "productName": "kiraz",
+                    "price": 2.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 1.92,
+                    "finalPriceAfterDiscount": 14.08,
+                    "total": 14.08,
+                    "quantity": 8,
+                    "deleted": false
+                },
+                {
+                    "id": 120,
+                    "productId": 3,
+                    "productName": "limon",
+                    "price": 4.0,
+                    "inventory": 0,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 24.0,
+                    "total": 24.0,
+                    "quantity": 6,
+                    "deleted": false
+                },
+                {
+                    "id": 121,
+                    "productId": 4,
+                    "productName": "karpuz",
+                    "price": 5.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 5.3999999999999995,
+                    "finalPriceAfterDiscount": 39.6,
+                    "total": 39.6,
+                    "quantity": 9,
+                    "deleted": false
+                },
+                {
+                    "id": 122,
+                    "productId": 5,
+                    "productName": "visne",
+                    "price": 9.0,
+                    "inventory": 0,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 9.0,
+                    "total": 9.0,
+                    "quantity": 1,
+                    "deleted": false
+                },
+                {
+                    "id": 118,
+                    "productId": 1,
+                    "productName": "incir",
+                    "price": 10.0,
+                    "inventory": 79,
+                    "discount": 12.0,
+                    "discountAmount": 4.8,
+                    "finalPriceAfterDiscount": 35.2,
+                    "total": 35.2,
+                    "quantity": 4,
+                    "deleted": false
+                },
+                {
+                    "id": 119,
+                    "productId": 2,
+                    "productName": "kiraz",
+                    "price": 2.0,
+                    "inventory": 8,
+                    "discount": 12.0,
+                    "discountAmount": 1.92,
+                    "finalPriceAfterDiscount": 14.08,
+                    "total": 14.08,
+                    "quantity": 8,
+                    "deleted": false
+                },
+                {
+                    "id": 120,
+                    "productId": 3,
+                    "productName": "limon",
+                    "price": 4.0,
+                    "inventory": 14,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 24.0,
+                    "total": 24.0,
+                    "quantity": 6,
+                    "deleted": false
+                },
+                {
+                    "id": 121,
+                    "productId": 4,
+                    "productName": "karpuz",
+                    "price": 5.0,
+                    "inventory": 6,
+                    "discount": 12.0,
+                    "discountAmount": 5.3999999999999995,
+                    "finalPriceAfterDiscount": 39.6,
+                    "total": 39.6,
+                    "quantity": 9,
+                    "deleted": false
+                },
+                {
+                    "id": 122,
+                    "productId": 5,
+                    "productName": "visne",
+                    "price": 9.0,
+                    "inventory": 19,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 9.0,
+                    "total": 9.0,
+                    "quantity": 1,
+                    "deleted": false
+                }
+            ]
+        },
+        {
+            "id": 43,
+            "date": "2024-09-06T16:07:24.160748",
+            "paymentType": "CREDIT_CARD",
+            "totalPrice": 155.0,
+            "totalDiscountAmount": 6.6,
+            "totalDiscountedPrice": 148.4,
+            "cashierName": "Osman Tahir OZDEMIR",
+            "soldProducts": [
+                {
+                    "id": 111,
+                    "productId": 2,
+                    "productName": "kiraz",
+                    "price": 2.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 1.2,
+                    "finalPriceAfterDiscount": 8.8,
+                    "total": 8.8,
+                    "quantity": 5,
+                    "deleted": false
+                },
+                {
+                    "id": 112,
+                    "productId": 3,
+                    "productName": "limon",
+                    "price": 4.0,
+                    "inventory": 0,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 28.0,
+                    "total": 28.0,
+                    "quantity": 7,
+                    "deleted": false
+                },
+                {
+                    "id": 113,
+                    "productId": 4,
+                    "productName": "karpuz",
+                    "price": 5.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 2.4,
+                    "finalPriceAfterDiscount": 17.6,
+                    "total": 17.6,
+                    "quantity": 4,
+                    "deleted": false
+                },
+                {
+                    "id": 114,
+                    "productId": 5,
+                    "productName": "visne",
+                    "price": 9.0,
+                    "inventory": 0,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 72.0,
+                    "total": 72.0,
+                    "quantity": 8,
+                    "deleted": false
+                },
+                {
+                    "id": 115,
+                    "productId": 9,
+                    "productName": "elma",
+                    "price": 15.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 1.7999999999999998,
+                    "finalPriceAfterDiscount": 13.2,
+                    "total": 13.2,
+                    "quantity": 1,
+                    "deleted": false
+                },
+                {
+                    "id": 110,
+                    "productId": 1,
+                    "productName": "incir",
+                    "price": 10.0,
+                    "inventory": 0,
+                    "discount": 12.0,
+                    "discountAmount": 1.2,
+                    "finalPriceAfterDiscount": 8.8,
+                    "total": 8.8,
+                    "quantity": 1,
+                    "deleted": false
+                },
+                {
+                    "id": 111,
+                    "productId": 2,
+                    "productName": "kiraz",
+                    "price": 2.0,
+                    "inventory": 8,
+                    "discount": 12.0,
+                    "discountAmount": 1.2,
+                    "finalPriceAfterDiscount": 8.8,
+                    "total": 8.8,
+                    "quantity": 5,
+                    "deleted": false
+                },
+                {
+                    "id": 112,
+                    "productId": 3,
+                    "productName": "limon",
+                    "price": 4.0,
+                    "inventory": 14,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 28.0,
+                    "total": 28.0,
+                    "quantity": 7,
+                    "deleted": false
+                },
+                {
+                    "id": 113,
+                    "productId": 4,
+                    "productName": "karpuz",
+                    "price": 5.0,
+                    "inventory": 6,
+                    "discount": 12.0,
+                    "discountAmount": 2.4,
+                    "finalPriceAfterDiscount": 17.6,
+                    "total": 17.6,
+                    "quantity": 4,
+                    "deleted": false
+                },
+                {
+                    "id": 114,
+                    "productId": 5,
+                    "productName": "visne",
+                    "price": 9.0,
+                    "inventory": 19,
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 72.0,
+                    "total": 72.0,
+                    "quantity": 8,
+                    "deleted": false
+                },
+                {
+                    "id": 115,
+                    "productId": 9,
+                    "productName": "elma",
+                    "price": 15.0,
+                    "inventory": 44,
+                    "discount": 12.0,
+                    "discountAmount": 1.7999999999999998,
+                    "finalPriceAfterDiscount": 13.2,
+                    "total": 13.2,
+                    "quantity": 1,
+                    "deleted": false
+                },
+                {
+                    "id": 110,
+                    "productId": 1,
+                    "productName": "incir",
+                    "price": 10.0,
+                    "inventory": 79,
+                    "discount": 12.0,
+                    "discountAmount": 1.2,
+                    "finalPriceAfterDiscount": 8.8,
+                    "total": 8.8,
+                    "quantity": 1,
+                    "deleted": false
+                }
+            ]
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "totalPages": 1,
+        "totalElements": 2
+    }
+    }
     ```
 
 ### Get Sale by ID
@@ -224,6 +537,93 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
     {
+    "id": 43,
+    "date": "2024-09-06T16:07:24.160748",
+    "paymentType": "CREDIT_CARD",
+    "totalPrice": 155.0,
+    "totalDiscountAmount": 6.6,
+    "totalDiscountedPrice": 148.4,
+    "cashierName": "Osman Tahir OZDEMIR",
+    "soldProducts": [
+        {
+            "id": 111,
+            "productId": 2,
+            "productName": "kiraz",
+            "price": 2.0,
+            "inventory": 16,
+            "discount": 12.0,
+            "discountAmount": 1.2,
+            "finalPriceAfterDiscount": 8.8,
+            "total": 8.8,
+            "quantity": 5,
+            "deleted": false
+        },
+        {
+            "id": 112,
+            "productId": 3,
+            "productName": "limon",
+            "price": 4.0,
+            "inventory": 20,
+            "discount": 0.0,
+            "discountAmount": 0.0,
+            "finalPriceAfterDiscount": 28.0,
+            "total": 28.0,
+            "quantity": 7,
+            "deleted": false
+        },
+        {
+            "id": 113,
+            "productId": 4,
+            "productName": "karpuz",
+            "price": 5.0,
+            "inventory": 15,
+            "discount": 12.0,
+            "discountAmount": 2.4,
+            "finalPriceAfterDiscount": 17.6,
+            "total": 17.6,
+            "quantity": 4,
+            "deleted": false
+        },
+        {
+            "id": 114,
+            "productId": 5,
+            "productName": "visne",
+            "price": 9.0,
+            "inventory": 20,
+            "discount": 0.0,
+            "discountAmount": 0.0,
+            "finalPriceAfterDiscount": 72.0,
+            "total": 72.0,
+            "quantity": 8,
+            "deleted": false
+        },
+        {
+            "id": 115,
+            "productId": 9,
+            "productName": "elma",
+            "price": 15.0,
+            "inventory": 44,
+            "discount": 12.0,
+            "discountAmount": 1.7999999999999998,
+            "finalPriceAfterDiscount": 13.2,
+            "total": 13.2,
+            "quantity": 1,
+            "deleted": false
+        },
+        {
+            "id": 110,
+            "productId": 1,
+            "productName": "incir",
+            "price": 10.0,
+            "inventory": 83,
+            "discount": 12.0,
+            "discountAmount": 1.2,
+            "finalPriceAfterDiscount": 8.8,
+            "total": 8.8,
+            "quantity": 1,
+            "deleted": false
+        }
+    ]
     }
     ```
 

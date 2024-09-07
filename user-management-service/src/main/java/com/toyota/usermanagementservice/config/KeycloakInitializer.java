@@ -11,8 +11,13 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -41,7 +46,12 @@ public class KeycloakInitializer implements ApplicationRunner {
         // Create client if it doesn't exist
         if (!clientExists("new_realm", "new_client")) {
             createClient("new_realm", "new_client");
+            String clientSecret = getClientSecret("new_realm", "new_client");
+            writeSecretToFile(clientSecret, "client-secret.txt");
         }
+
+        String secretFromFile = readSecretFromFile("client-secret.txt");
+        System.out.println("Secret from file: " + secretFromFile);
 
         // Assign roles to the service account of the client
         assignRealmManagementRolesToServiceAccount("new_realm", "new_client", List.of("view-users", "manage-users", "manage-realm"));
@@ -51,6 +61,43 @@ public class KeycloakInitializer implements ApplicationRunner {
 
         // Create an admin user with the "ADMIN" role
         createUser("new_realm", "admin", "admin123", "ADMIN");
+    }
+
+    private String getClientSecret(String realmName, String clientId) {
+        ClientRepresentation client = adminKeycloak.realm(realmName)
+                .clients()
+                .findByClientId(clientId)
+                .get(0);
+        ClientResource clientResource = adminKeycloak.realm(realmName).clients().get(client.getId());
+        return clientResource.getSecret().getValue();
+    }
+
+    private void writeSecretToFile(String secret, String filePath) throws IOException {
+        String absoluteFilePath = System.getProperty("user.dir") + "/" + filePath;
+
+
+        if (!Files.exists(Paths.get(absoluteFilePath))) {
+
+            Files.createFile(Paths.get(absoluteFilePath));
+            System.out.println("File created: " + absoluteFilePath);
+        }
+
+        try (FileWriter writer = new FileWriter(absoluteFilePath)) {
+            writer.write(secret);
+            System.out.println("Client secret written to file: " + absoluteFilePath);
+        }
+    }
+
+    private String readSecretFromFile(String filePath) throws IOException {
+        String absoluteFilePath = System.getProperty("user.dir") + "/" + filePath;
+
+
+        if (!Files.exists(Paths.get(absoluteFilePath))) {
+            Files.createFile(Paths.get(absoluteFilePath));
+            System.out.println("File created: " + absoluteFilePath);
+        }
+
+        return Files.readString(Paths.get(absoluteFilePath));
     }
 
     /**
@@ -199,4 +246,5 @@ public class KeycloakInitializer implements ApplicationRunner {
             serviceAccountUserResource.roles().clientLevel(realmManagementClientResource.toRepresentation().getId()).add(Collections.singletonList(role));
         }
     }
+
 }

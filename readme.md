@@ -67,6 +67,73 @@ requests accordingly. The API Gateway ensures that all authorization rules are e
 The project is set up using **Docker Compose**. Each service has its container, and these containers communicate via the
 API Gateway. The database, PostgreSQL, is also containerized or can be set up externally based on your environment.
 
+## Keycloak Integration
+
+### 1. Starting Keycloak
+
+To run Keycloak on port `9090` using version `22.0.1`, use the following Docker command:
+
+```bash
+docker run -d --name keycloak -p 9090:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.1 start-dev
+```
+
+This starts Keycloak, which can be accessed through the admin console at `http://localhost:9090`. The credentials for direct access are:
+
+- **Username**: `admin`
+- **Password**: `admin`
+
+### 2. Keycloak Initialization on User Management Service Startup
+
+When the **User Management Service** starts, the following operations are automatically performed by the Keycloak initializer:
+
+- **Create Realm**: A new realm named `32bit_realm`.
+- **Create Client**: A client called `32bit_client`.
+- **Assign Service Account Roles**: Assign roles (`manage-users`, `view-users`, `manage-realm`) to the client’s service account.
+- **Create System Roles**: Automatically create `CASHIER`, `MANAGER`, and `ADMIN` roles.
+- **Create Admin User**: Add an admin user with the following credentials:
+  - **Username**: `admin`
+  - **Password**: `admin123`
+
+### 3. Keycloak Access via Postman
+
+To connect to Keycloak through Postman and get an access token, configure the following:
+
+- **Auth Type**: OAuth 2.0
+- **Grant Type**: Password Credentials
+- **Access Token URL**: `http://localhost:9090/realms/32bit_realm/protocol/openid-connect/token`
+- **Client ID**: `32bit_client`
+- **Client Secret**: Available in the `client-secret.txt` file in the project root directory.
+- **Scope**: `openid offline_access`
+- **Client Authentication**: Send as Basic Auth Header
+
+Once configured, click **Get New Access Token** to retrieve the token.
+
+### 4. Differentiated Password Usage
+
+- **Direct Internet Access**: When accessing the Keycloak admin console via the browser, use the credentials:
+  - **Username**: `admin`
+  - **Password**: `admin`
+
+- **Programmatic Access (via Endpoints)**: When accessing Keycloak through the User Management Service endpoints, the `admin123` password should be used. This is configured in the application’s properties as:
+
+  ```properties
+  keycloak.admin.username=admin
+  keycloak.admin.password=admin123
+  ```
+
+### 5. Using Access Tokens
+
+- After generating the admin token via Postman, you can use it to manage users or assign roles.
+- You can also generate tokens for other roles like `CASHIER` or `MANAGER` by logging in with the corresponding credentials.
+
+### 6. Security Considerations
+
+- Ensure that the `admin` password for direct access and the `admin123` password for programmatic access are securely managed.
+- Use environment variables or a secure secrets management system to store credentials in production environments.
+
+---
+
+
 ## Core Functionalities
 
 ### **User Management Service**

@@ -1,0 +1,116 @@
+version: '3.8'
+services:
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+    depends_on:
+      - postgres
+      - discovery-server
+      - keycloak
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - toyota
+
+  discovery-server:
+    build:
+      context: ./discovery-server
+      dockerfile: Dockerfile
+    ports:
+      - "8761:8761"
+    depends_on:
+      - postgres
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - toyota
+
+  report-service:
+    build:
+      context: ./report-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - toyota
+
+  sale-service:
+    build:
+      context: ./sale-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5433/storage
+    networks:
+      - toyota
+
+  product-service:
+    build:
+      context: ./product-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5433/storage
+    networks:
+      - toyota
+
+  user-management-service:
+    build:
+      context: ./user-management-service
+      dockerfile: Dockerfile
+    depends_on:
+      - postgres
+      - discovery-server
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    networks:
+      - toyota
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5433/keycloak
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=9414
+    ports:
+      - "9091:8080"
+    depends_on:
+      - postgres
+    networks:
+      - toyota
+    command: start-dev --spi-connections-jpa-default-datasource=local --spi-connections-jpa-default-provider=h2
+
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=9414
+      - POSTGRES_DB=storage
+    ports:
+      - '5433:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - toyota
+volumes:
+  postgres_data:
+networks:
+  toyota:

@@ -11,6 +11,7 @@ import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -23,12 +24,29 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
-@Component()
+/**
+ * This class initializes Keycloak configurations, including setting up realms, clients, roles,
+ * and an admin user. It runs once the application starts and ensures that Keycloak is correctly configured.
+ */
+@Component
 public class KeycloakInitializer implements ApplicationRunner {
 
     private static final Logger logger = LoggerFactory.getLogger(KeycloakInitializer.class);
     private Keycloak adminKeycloak;
 
+    /**
+     * Path to the file where the client secret will be stored, set in the application.properties.
+     */
+    @Value("${keycloak.client-secret-path}")
+    private String clientSecretPath;
+
+    /**
+     * The main method that runs at application startup. It connects to Keycloak, creates realms,
+     * clients, roles, and users if they do not already exist. It also writes the client secret to a file.
+     *
+     * @param args the application arguments.
+     * @throws Exception if there is an issue initializing Keycloak.
+     */
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Connect to Keycloak using admin credentials
@@ -52,12 +70,12 @@ public class KeycloakInitializer implements ApplicationRunner {
         if (!clientExists("32bit_realm", "32bit_client")) {
             createClient("32bit_realm", "32bit_client");
             String clientSecret = getClientSecret("32bit_realm", "32bit_client");
-            writeSecretToFile(clientSecret, "client-secret.txt");
+            writeSecretToFile(clientSecret, clientSecretPath); // Use the path from application.properties
         } else {
             logger.info("Client '32bit_client' already exists in '32bit_realm'.");
         }
 
-        String secretFromFile = readSecretFromFile("client-secret.txt");
+        String secretFromFile = readSecretFromFile(clientSecretPath);
         logger.info("Secret from file: {}", secretFromFile);
 
         // Assign roles to the service account of the client
@@ -70,6 +88,13 @@ public class KeycloakInitializer implements ApplicationRunner {
         createUser("32bit_realm", "admin", "admin123", "ADMIN");
     }
 
+    /**
+     * Retrieves the client secret for the given client in the specified realm.
+     *
+     * @param realmName the name of the realm.
+     * @param clientId the ID of the client.
+     * @return the client secret.
+     */
     private String getClientSecret(String realmName, String clientId) {
         ClientRepresentation client = adminKeycloak.realm(realmName)
                 .clients()
@@ -79,6 +104,13 @@ public class KeycloakInitializer implements ApplicationRunner {
         return clientResource.getSecret().getValue();
     }
 
+    /**
+     * Writes the client secret to a file at the specified path.
+     *
+     * @param secret the client secret to write.
+     * @param filePath the path to the file.
+     * @throws IOException if an I/O error occurs writing to or creating the file.
+     */
     private void writeSecretToFile(String secret, String filePath) throws IOException {
         String absoluteFilePath = System.getProperty("user.dir") + "/" + filePath;
 
@@ -93,16 +125,33 @@ public class KeycloakInitializer implements ApplicationRunner {
         }
     }
 
+    /**
+     * Reads the client secret from a file at the specified path.
+     *
+     * @param filePath the path to the file containing the client secret.
+     * @return the client secret read from the file.
+     * @throws IOException if an I/O error occurs reading the file.
+     */
     private String readSecretFromFile(String filePath) throws IOException {
         String absoluteFilePath = System.getProperty("user.dir") + "/" + filePath;
-
         return Files.readString(Paths.get(absoluteFilePath));
     }
 
+    /**
+     * Checks if the realm exists in Keycloak.
+     *
+     * @param realmName the name of the realm to check.
+     * @return true if the realm exists, false otherwise.
+     */
     private boolean realmExists(String realmName) {
         return adminKeycloak.realms().findAll().stream().anyMatch(realm -> realm.getRealm().equals(realmName));
     }
 
+    /**
+     * Creates a new realm in Keycloak with the specified name.
+     *
+     * @param realmName the name of the realm to create.
+     */
     private void createRealm(String realmName) {
         RealmRepresentation realmRepresentation = new RealmRepresentation();
         realmRepresentation.setRealm(realmName);
@@ -111,10 +160,23 @@ public class KeycloakInitializer implements ApplicationRunner {
         logger.info("Realm '{}' created.", realmName);
     }
 
+    /**
+     * Checks if a client exists in the specified realm.
+     *
+     * @param realmName the name of the realm.
+     * @param clientId the ID of the client.
+     * @return true if the client exists, false otherwise.
+     */
     private boolean clientExists(String realmName, String clientId) {
         return !adminKeycloak.realm(realmName).clients().findByClientId(clientId).isEmpty();
     }
 
+    /**
+     * Creates a new client in the specified realm with the given client ID.
+     *
+     * @param realmName the name of the realm.
+     * @param clientId the ID of the client to create.
+     */
     private void createClient(String realmName, String clientId) {
         ClientRepresentation clientRepresentation = new ClientRepresentation();
         clientRepresentation.setClientId(clientId);
@@ -126,18 +188,22 @@ public class KeycloakInitializer implements ApplicationRunner {
         logger.info("Client '{}' created in realm '{}'.", clientId, realmName);
     }
 
+    /**
+     * Creates realm roles if they don't already exist in the specified realm.
+     *
+     * @param realmName the name of the realm.
+     * @param roles the list of roles to create.
+     */
     private void createRealmRoles(String realmName, List<String> roles) {
         RealmResource realmResource = adminKeycloak.realm(realmName);
         for (String role : roles) {
             try {
-                // Check if the role already exists
                 RoleRepresentation existingRole = realmResource.roles().get(role).toRepresentation();
                 if (existingRole != null) {
                     logger.info("Role '{}' already exists.", role);
                     continue;
                 }
             } catch (jakarta.ws.rs.NotFoundException e) {
-                // Create the role if not found
                 RoleRepresentation roleRepresentation = new RoleRepresentation();
                 roleRepresentation.setName(role);
                 roleRepresentation.setDescription(role + " role");
@@ -147,6 +213,14 @@ public class KeycloakInitializer implements ApplicationRunner {
         }
     }
 
+    /**
+     * Creates a new user in the specified realm and assigns a role to the user.
+     *
+     * @param realmName the name of the realm.
+     * @param username the username for the new user.
+     * @param password the password for the new user.
+     * @param roleName the name of the role to assign to the user.
+     */
     private void createUser(String realmName, String username, String password, String roleName) {
         if (!userExists(realmName, username)) {
             UserRepresentation user = new UserRepresentation();
@@ -175,10 +249,24 @@ public class KeycloakInitializer implements ApplicationRunner {
         }
     }
 
+    /**
+     * Checks if a user exists in the specified realm.
+     *
+     * @param realmName the name of the realm.
+     * @param username the username to check.
+     * @return true if the user exists, false otherwise.
+     */
     private boolean userExists(String realmName, String username) {
         return !adminKeycloak.realm(realmName).users().search(username).isEmpty();
     }
 
+    /**
+     * Assigns realm-management roles to the service account of the client in the specified realm.
+     *
+     * @param realmName the name of the realm.
+     * @param clientId the ID of the client.
+     * @param roles the list of roles to assign.
+     */
     private void assignRealmManagementRolesToServiceAccount(String realmName, String clientId, List<String> roles) {
         RealmResource realmResource = adminKeycloak.realm(realmName);
         ClientRepresentation clientRepresentation = realmResource.clients().findByClientId(clientId).get(0);
@@ -207,10 +295,16 @@ public class KeycloakInitializer implements ApplicationRunner {
             logger.info("Role '{}' assigned to service account.", roleName);
         }
     }
+
+    /**
+     * Bean to initialize Keycloak when the application starts.
+     *
+     * @return A message indicating that Keycloak has been initialized.
+     * @throws Exception if there is an issue during initialization.
+     */
     @Bean
     public String initializeKeycloak() throws Exception {
         run(null);
         return "Keycloak Initialized";
     }
-    
 }

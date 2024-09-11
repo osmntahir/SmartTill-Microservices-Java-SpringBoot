@@ -6,12 +6,11 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8080:8080"
-    expose:
-      - "8080"
     depends_on:
       - postgres
       - discovery-server
-      - keycloak
+      - keycloak_web
+      - user-management-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -23,8 +22,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "8761:8761"
-    depends_on:
-      - postgres
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -51,7 +48,7 @@ services:
       - discovery-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5433/storage
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/storage
     networks:
       - toyota
 
@@ -64,7 +61,7 @@ services:
       - discovery-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5433/storage
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/storage
     networks:
       - toyota
 
@@ -75,27 +72,36 @@ services:
     depends_on:
       - postgres
       - discovery-server
+      - keycloak_web
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - toyota
 
-  keycloak:
+  keycloak_web:
     image: quay.io/keycloak/keycloak:22.0.1
+    container_name: keycloak
     environment:
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - KC_DB=postgres
-      - KC_DB_URL=jdbc:postgresql://postgres:5433/keycloak
-      - KC_DB_USERNAME=postgres
-      - KC_DB_PASSWORD=9414
-    ports:
-      - "9091:8080"
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: 9414
+      KC_HOSTNAME: keycloak_web
+      KC_HOSTNAME_PORT: 9090
+      KC_HOSTNAME_STRICT: false
+      KC_HOSTNAME_STRICT_HTTPS: false
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+      KC_HEALTH_ENABLED: true
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+    command: start-dev
     depends_on:
       - postgres
+    ports:
+      - "9090:8080"
     networks:
       - toyota
-    command: start-dev --spi-connections-jpa-default-datasource=local --spi-connections-jpa-default-provider=h2
 
   postgres:
     image: postgres:latest
@@ -103,14 +109,17 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=9414
-      - POSTGRES_DB=storage
+      - POSTGRES_DB=postgres
     ports:
-      - '5433:5432'
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - toyota
+
 volumes:
   postgres_data:
+
 networks:
   toyota:

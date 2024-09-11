@@ -50,11 +50,14 @@ public class KeycloakInitializer implements ApplicationRunner {
     @Value("${keycloak.admin.password}")
     private String adminPassword;
 
+    @Value("${keycloak.server-url}")
+    private String serverUrl;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
         // Connect to Keycloak using admin credentials
         adminKeycloak = KeycloakBuilder.builder()
-                .serverUrl("http://localhost:9090")
+                .serverUrl(serverUrl)
                 .realm("master")
                 .clientId("admin-cli")
                 .username(adminUsername)

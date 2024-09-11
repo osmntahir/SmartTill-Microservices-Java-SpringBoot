@@ -56,13 +56,6 @@ public class KeycloakConfig {
     @Value("${keycloak.scope}")
     private String scope;
 
-    private final ResourceLoader resourceLoader;
-
-    // Inject ResourceLoader to handle resource paths dynamically
-    public KeycloakConfig(ResourceLoader resourceLoader) {
-        this.resourceLoader = resourceLoader;
-    }
-
     /**
      * Reads the client secret from a file and creates a Keycloak instance.
      * This Keycloak client will be used for administrative tasks such as creating realms, clients, users, and assigning roles.

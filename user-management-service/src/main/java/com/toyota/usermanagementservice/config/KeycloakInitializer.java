@@ -14,6 +14,7 @@ import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
 
@@ -22,7 +23,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 
@@ -35,6 +35,7 @@ import java.util.List;
 public class KeycloakInitializer implements ApplicationRunner {
 
     private Keycloak adminKeycloak;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * The main method that runs at application startup. It connects to Keycloak, creates realms,
@@ -52,6 +53,10 @@ public class KeycloakInitializer implements ApplicationRunner {
 
     @Value("${keycloak.server-url}")
     private String serverUrl;
+
+    public KeycloakInitializer(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -72,21 +77,15 @@ public class KeycloakInitializer implements ApplicationRunner {
             log.info("Realm '32bit_realm' already exists.");
         }
 
-        // Use dynamic file path management to ensure the file path works in both normal run and test environments
-        Path clientSecretPath = Path.of("client-secret.txt");
-
         // Create client if it doesn't exist
         if (!clientExists("32bit_realm", "32bit_client")) {
             createClient("32bit_realm", "32bit_client");
-            String clientSecret = getClientSecret("32bit_realm", "32bit_client");
-            writeSecretToFile(clientSecret, clientSecretPath);
         } else {
             log.info("Client '32bit_client' already exists in '32bit_realm'.");
         }
+        String clientSecret = getClientSecret("32bit_realm", "32bit_client");
+        eventPublisher.publishEvent(new ClientSecretEvent(this, clientSecret));
 
-        // Read file content
-        String secretFromFile = readSecretFromFile(clientSecretPath);
-        log.info("Secret from file: {}", secretFromFile);
 
         // Assign roles to the service account of the client
         assignRealmManagementRolesToServiceAccount("32bit_realm", "32bit_client", List.of("view-users", "manage-users", "manage-realm"));
@@ -113,38 +112,6 @@ public class KeycloakInitializer implements ApplicationRunner {
         ClientResource clientResource = adminKeycloak.realm(realmName).clients().get(client.getId());
         return clientResource.getSecret().getValue();
     }
-
-    /**
-     * Writes the client secret to a file at the specified path.
-     *
-     * @param secret the client secret to write.
-     * @param filePath the path to the file.
-     * @throws IOException if an I/O error occurs writing to or creating the file.
-     */
-    private void writeSecretToFile(String secret, Path filePath) throws IOException {
-        File file = filePath.toFile();
-        if (!file.exists()) {
-            Files.createFile(filePath);
-            log.info("File created: {}", filePath);
-        }
-
-        try (FileWriter writer = new FileWriter(file, false)) {
-            writer.write(secret);
-            log.info("Client secret written to file: {}", filePath);
-        }
-    }
-
-    /**
-     * Reads the client secret from a file at the specified path.
-     *
-     * @param filePath the path to the file containing the client secret.
-     * @return the client secret read from the file.
-     * @throws IOException if an I/O error occurs reading the file.
-     */
-    private String readSecretFromFile(Path filePath) throws IOException {
-        return Files.readString(filePath);
-    }
-
     /**
      * Checks if the realm exists in Keycloak.
      *
@@ -304,15 +271,15 @@ public class KeycloakInitializer implements ApplicationRunner {
         }
     }
 
-    /**
-     * Bean to initialize Keycloak when the application starts.
-     *
-     * @return A message indicating that Keycloak has been initialized.
-     * @throws Exception if there is an issue during initialization.
-     */
-    @Bean
-    public String initializeKeycloak() throws Exception {
-        run(null);
-        return "Keycloak Initialized";
-    }
+//    /**
+//     * Bean to initialize Keycloak when the application starts.
+//     *
+//     * @return A message indicating that Keycloak has been initialized.
+//     * @throws Exception if there is an issue during initialization.
+//     */
+//    @Bean
+//    public String initializeKeycloak() throws Exception {
+//        run(null);
+//        return "Keycloak Initialized";
+//    }
 }

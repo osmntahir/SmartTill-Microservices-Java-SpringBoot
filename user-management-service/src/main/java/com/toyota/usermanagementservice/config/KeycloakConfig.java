@@ -4,6 +4,7 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +58,7 @@ public class KeycloakConfig {
 
         logger.info("Keycloak instance created with dynamic client secret.");
     }
+    @Lazy
     @Bean
     public Keycloak getKeycloak() {
         return keycloak;

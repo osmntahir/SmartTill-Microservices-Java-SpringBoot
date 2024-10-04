@@ -9,7 +9,6 @@ import org.keycloak.representations.idm.CredentialRepresentation;
 import org.keycloak.representations.idm.RoleRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class UserManagementService {
      *
      * @param keycloak the Keycloak client used to interact with the Keycloak server
      */
-    public UserManagementService(@Lazy Keycloak keycloak) {
+    public UserManagementService(Keycloak keycloak) {
         this.keycloak = keycloak;
     }
 

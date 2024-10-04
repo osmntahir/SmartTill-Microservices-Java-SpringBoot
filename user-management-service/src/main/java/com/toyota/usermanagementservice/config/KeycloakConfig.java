@@ -4,50 +4,56 @@ import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.context.event.EventListener;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Configuration;
 
-import java.util.logging.Logger;
 
 /**
  * Configuration class for Keycloak integration.
  * This class listens for client secret events and configures Keycloak with the dynamic client secret.
  */
-@Component
+@Configuration
 public class KeycloakConfig {
 
-    private static final Logger logger = Logger.getLogger(KeycloakConfig.class.getName());
-
+    /**
+     * The URL of the Keycloak server.
+     */
     @Value("${keycloak.server-url}")
     private String serverUrl;
-
+    /**
+     * The realm used for Keycloak authentication.
+     */
     @Value("${keycloak.realm}")
     private String realm;
-
+    /**
+     * The client ID used to authenticate against Keycloak.
+     */
     @Value("${keycloak.client-id}")
     private String clientId;
-
+    /**
+     * The client secret used for authenticating the client.
+     */
+    @Value("${keycloak.client-secret}")
+    private String clientSecret;
+    /**
+     * The OAuth2 grant type used for authentication (e.g., client_credentials).
+     */
     @Value("${keycloak.grant-type}")
     private String grantType;
-
+    /**
+     * The scope requested from Keycloak during authentication (e.g., openid, profile, email).
+     */
     @Value("${keycloak.scope}")
     private String scope;
-
-    private Keycloak keycloak;
-
     /**
-     * Event listener for client secret events. When the event is triggered, the client secret is used to configure Keycloak.
+     * Creates and configures a Keycloak instance to interact with the Keycloak server.
+     * This Keycloak client will be used for administrative tasks, such as creating realms,
+     * clients, users, and assigning roles.
      *
-     * @param event the event containing the client secret.
+     * @return A configured {@link Keycloak} instance.
      */
-    @EventListener
-    public void onClientSecretEvent(ClientSecretEvent event) {
-        String clientSecret = event.getClientSecret();
-        logger.info("Client secret received: " + clientSecret);
-
-
-        keycloak = KeycloakBuilder.builder()
+    @Bean
+    public Keycloak keycloak() {
+        return KeycloakBuilder.builder()
                 .serverUrl(serverUrl)
                 .realm(realm)
                 .clientId(clientId)
@@ -55,13 +61,6 @@ public class KeycloakConfig {
                 .grantType(grantType)
                 .scope(scope)
                 .build();
-
-        logger.info("Keycloak instance created with dynamic client secret.");
-    }
-    @Lazy
-    @Bean
-    public Keycloak getKeycloak() {
-        return keycloak;
     }
 
 }

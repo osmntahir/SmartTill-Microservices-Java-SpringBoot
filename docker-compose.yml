@@ -1,4 +1,5 @@
 version: '3.8'
+
 services:
   api-gateway:
     build:
@@ -8,8 +9,8 @@ services:
       - "8080:8080"
     depends_on:
       - postgres
+      - keycloak
       - discovery-server
-      - keycloak_web
       - user-management-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
@@ -48,7 +49,6 @@ services:
       - discovery-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/storage
     networks:
       - toyota
 
@@ -61,7 +61,6 @@ services:
       - discovery-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/storage
     networks:
       - toyota
 
@@ -72,41 +71,39 @@ services:
     depends_on:
       - postgres
       - discovery-server
-      - keycloak_web
+      - keycloak
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - toyota
     restart: always
 
-  keycloak_web:
+  keycloak:
     image: quay.io/keycloak/keycloak:22.0.1
     container_name: keycloak
     environment:
-      KC_DB: postgres
-      KC_DB_URL: jdbc:postgresql://postgres:5432/postgres
-      KC_DB_USERNAME: postgres
-      KC_DB_PASSWORD: 9414
-      KC_HOSTNAME: localhost
-      KC_HOSTNAME_PORT: 9090
-      KC_HOSTNAME_STRICT: false
-      KC_HOSTNAME_STRICT_HTTPS: false
-      KC_LOG_LEVEL: info
-      KC_METRICS_ENABLED: true
-      KC_HEALTH_ENABLED: true
-      KEYCLOAK_ADMIN: admin
-      KEYCLOAK_ADMIN_PASSWORD: admin
-    command: start-dev
-    depends_on:
-      - postgres
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://postgres:5432/keycloak_db
+      - KC_DB_USERNAME=postgres
+      - KC_DB_PASSWORD=9414
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_IMPORT=/opt/keycloak/data/import/32bit_realm-realm.json
     ports:
       - "9090:8080"
+    volumes:
+      - keycloak_data:/opt/keycloak/data
+      - ./keycloak-import:/opt/keycloak/data/import
     networks:
       - toyota
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command: start-dev --import-realm
 
   postgres:
-    image: postgres:latest
-    restart: always
+    image: postgres:16
+    container_name: postgres
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=9414
@@ -118,9 +115,15 @@ services:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - toyota
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
 volumes:
   postgres_data:
+  keycloak_data:
 
 networks:
   toyota:

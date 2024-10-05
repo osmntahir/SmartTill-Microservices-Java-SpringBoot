@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 @Repository
 public interface SaleRepository extends JpaRepository<Sale, Long> {
 
-    @Query("SELECT s FROM Sale s WHERE s.totalPrice >= :minTotalPrice " +
+    @Query("SELECT DISTINCT s FROM Sale s LEFT JOIN FETCH s.soldProducts sp WHERE s.totalPrice >= :minTotalPrice " +
             "AND s.totalPrice <= :maxTotalPrice " +
             "AND s.date BETWEEN :startDate AND :endDate " +
             "AND (:paymentType IS NULL OR s.paymentType = :paymentType) " +
@@ -26,6 +26,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
                                 PaymentType paymentType,
                                 boolean deleted,
                                 Pageable pageable);
+
 
     boolean existsByIdAndDeletedIsFalse(Long id);
 }

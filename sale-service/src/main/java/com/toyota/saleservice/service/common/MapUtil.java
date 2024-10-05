@@ -17,6 +17,9 @@ import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Component
 public class MapUtil {
 
@@ -77,13 +80,16 @@ public class MapUtil {
     public SaleDto convertSaleToSaleDto(Sale sale) {
         SaleDto saleDto = modelMapper.map(sale, SaleDto.class);
 
-        for (SoldProduct soldProduct : sale.getSoldProducts()) {
-            SoldProductDto soldProductDto = convertSoldProductToSoldProductDto(soldProduct);
-            saleDto.getSoldProducts().add(soldProductDto);
-        }
+
+        List<SoldProductDto> soldProductDtos = sale.getSoldProducts().stream()
+                .map(this::convertSoldProductToSoldProductDto)
+                .collect(Collectors.toList());
+
+        saleDto.setSoldProducts(soldProductDtos);
 
         return saleDto;
     }
+
 
     public Sale convertSaleDtoToSale(SaleDto saleDto) {
         return modelMapper.map(saleDto, Sale.class);

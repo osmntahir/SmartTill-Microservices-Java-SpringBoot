@@ -15,13 +15,23 @@ public class SecurityConfig {
         return serverHttpSecurity.csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .authorizeExchange(exchange -> exchange
                         .pathMatchers("/eureka/**").permitAll()
+
+
                         .pathMatchers("/product/**").hasAnyRole("ADMIN","CASHIER","MANAGER")
                         .pathMatchers("/user/**").hasRole("ADMIN")
-                        .pathMatchers("/sale/**").hasRole("CASHIER")
+//                        .pathMatchers("/sale/**").hasRole("CASHIER")
+                        .pathMatchers("/sale/getAll").hasRole("MANAGER")
+                        .pathMatchers("/report/**").hasRole("MANAGER")
+
+                        .pathMatchers("/sale/add/**").hasRole("CASHIER")
+                        .pathMatchers("/sale/update/**").hasRole("CASHIER")
+                        .pathMatchers("/sale/delete/**").hasRole("CASHIER")
+                        .pathMatchers("/sale/getById/**").hasRole("CASHIER")
                         .pathMatchers("/campaign-product/**").hasRole("CASHIER")
                         .pathMatchers("/campaign/**").hasRole("CASHIER")
                         .pathMatchers("/sold-product/**").hasRole("CASHIER")
-                        .pathMatchers("/report/**").hasRole("MANAGER")
+
+
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer((oauth) -> oauth

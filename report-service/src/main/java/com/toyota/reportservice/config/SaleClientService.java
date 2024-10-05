@@ -18,7 +18,7 @@ public class SaleClientService {
 
     private final RestTemplate restTemplate;
 
-//    @Value("${sale.service.url}")
+
     private final String saleServiceUrl = "http://sale-service/sale";
 
     public SaleClientService(RestTemplate restTemplate) {

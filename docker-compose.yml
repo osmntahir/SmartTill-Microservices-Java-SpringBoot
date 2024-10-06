@@ -8,10 +8,8 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - postgres
-      - keycloak
       - discovery-server
-      - user-management-service
+
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -59,6 +57,8 @@ services:
     depends_on:
       - postgres
       - discovery-server
+      - keycloak
+      - api-gateway
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
@@ -71,12 +71,11 @@ services:
     depends_on:
       - postgres
       - discovery-server
-      - keycloak
     environment:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - toyota
-    restart: always
+
 
   keycloak:
     image: quay.io/keycloak/keycloak:22.0.1
@@ -127,4 +126,4 @@ volumes:
 
 networks:
   toyota:
-    driver: bridge
+

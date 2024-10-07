@@ -238,7 +238,7 @@ In this system, a **cash register** logic is implemented where **Cashiers** crea
    - The cashier's name is extracted from the JWT token to associate the sale with the cashier.
 
 2. **Adding Products to the Sale**: 
-   - Once the sale is created, the cashier starts scanning or adding products to the sale by calling the `/sold-product/add/{productId}/{saleId}` endpoint.
+   - Once the sale is created, the cashier starts scanning or adding products to the sale by calling the `/sold-product/add/{saleId}/{productId}` endpoint.
    - The system checks if the product is part of any active campaigns. If a campaign applies, the discount is automatically calculated and deducted from the product’s total price.
 
 3. **Updating the Sale Total**: 

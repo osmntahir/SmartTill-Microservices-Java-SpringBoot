@@ -88,17 +88,25 @@ public class SaleServiceImpl implements SaleService {
         }
 
         double totalPrice = 0.0;
+        double totalDiscountAmount = 0.0;
 
         for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
             if (soldProductDto != null) {
                 double productPrice = soldProductDto.getPrice();
                 int quantity = soldProductDto.getQuantity();
                 totalPrice += productPrice * quantity;
+
+                double discountAmount = soldProductDto.getDiscountAmount() * quantity;
+                totalDiscountAmount += discountAmount;
             } else {
                 logger.warn("Product details are missing for sold product with id: {}", soldProductDto.getId());
             }
         }
 
+        double totalDiscountedPrice = totalPrice - totalDiscountAmount;
+
+        saleDto.setTotalDiscountAmount(totalDiscountAmount);
+        saleDto.setTotalDiscountedPrice(totalDiscountedPrice);
         saleDto.setTotalPrice(totalPrice);
         saleDto.setCashierName(cashierName);
 
@@ -109,6 +117,7 @@ public class SaleServiceImpl implements SaleService {
 
         return mapUtil.convertSaleToSaleDto(saved);
     }
+
 
     @Override
     public SaleDto updateSale(Long id, SaleDto saleDto) {
@@ -124,6 +133,8 @@ public class SaleServiceImpl implements SaleService {
             existingSale.getSoldProducts().clear();
 
             double newTotalPrice = 0.0;
+            double newTotalDiscountAmount = 0.0;
+            double newTotalDiscountedPrice = 0.0;
 
             for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
 
@@ -131,17 +142,25 @@ public class SaleServiceImpl implements SaleService {
                         .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProductDto.getProductId()));
 
                 SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
+
                 soldProduct.setSale(existingSale);
 
                 double productTotal = product.getPrice() * soldProductDto.getQuantity();
                 soldProduct.setTotal(productTotal);
 
+                // Discount amount should be multiplied by quantity
+                double discountAmount = soldProductDto.getDiscountAmount() * soldProductDto.getQuantity();
+                soldProduct.setDiscountAmount(discountAmount);
+                newTotalDiscountAmount += discountAmount;
                 newTotalPrice += productTotal;
 
                 existingSale.getSoldProducts().add(soldProduct);
             }
+            newTotalDiscountedPrice = newTotalPrice - newTotalDiscountAmount;
 
             existingSale.setTotalPrice(newTotalPrice);
+            existingSale.setTotalDiscountAmount(newTotalDiscountAmount);
+            existingSale.setTotalDiscountedPrice(newTotalDiscountedPrice);
         }
 
         Sale updatedSale = saleRepository.save(existingSale);
@@ -149,7 +168,6 @@ public class SaleServiceImpl implements SaleService {
 
         return mapUtil.convertSaleToSaleDto(updatedSale);
     }
-
 
     @Override
     public SaleDto deleteSale(Long id) {
@@ -172,20 +190,17 @@ public class SaleServiceImpl implements SaleService {
         Sale sale = saleRepository.findById(saleId)
                 .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + saleId));
 
-        // Satışa ait tüm SoldProduct'ları al
+        // Retrieve all non-deleted sold products for this sale
         List<SoldProduct> soldProducts = soldProductRepository.findAllBySaleId(saleId);
 
-        // SoldProduct'ları DTO'ya dönüştürürken yinelenen verileri filtrele
+        // Convert SoldProduct to SoldProductDto
         List<SoldProductDto> soldProductDtos = soldProducts.stream()
                 .map(mapUtil::convertSoldProductToSoldProductDto)
-                .distinct()  // Duplicate kayıtlardan kurtulmak için
                 .collect(Collectors.toList());
 
-        // Sale DTO oluştur ve SoldProductDTO'ları ekle
         SaleDto saleDto = mapUtil.convertSaleToSaleDto(sale);
         saleDto.setSoldProducts(soldProductDtos);
 
         return saleDto;
     }
-
 }

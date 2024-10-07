@@ -21,4 +21,6 @@ public interface SoldProductRepository extends JpaRepository<SoldProduct, Long> 
     Optional<SoldProduct> findBySaleIdAndProductId(Long saleId, Long productId);
 
     List<SoldProduct> findAllBySaleId(Long saleId);
+
+    List<SoldProduct> findAllBySaleIdAndDeletedIsFalse(Long saleId);
 }

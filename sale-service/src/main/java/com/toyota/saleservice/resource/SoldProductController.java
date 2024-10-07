@@ -31,10 +31,10 @@ public class SoldProductController {
         return soldProductService.getSoldProducts(page, size, name, minPrice, maxPrice, deleted, sortBy, sortDirection);
     }
 
-    @PostMapping("/add/{productId}/{saleId}")
+    @PostMapping("/add/{saleId}/{productId}")
     public ResponseEntity <SoldProductDto> addSoldProduct(
-            @PathVariable("productId") Long productId ,
             @PathVariable("saleId") Long saleId,
+            @PathVariable("productId") Long productId ,
             @RequestBody @Valid SoldProductDto soldProductDto)
     {
         return ResponseEntity.status(HttpStatus.CREATED).

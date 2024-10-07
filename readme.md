@@ -227,6 +227,29 @@ All requests go through the **API Gateway**, which verifies the roles and permis
 - **Cashiers** can handle sales but cannot view the list of sales.
 - **Managers** can generate sales reports and also view the list of all sales.
 
+
+## Sale Service Overview (Cash Register Logic)
+
+In this system, a **cash register** logic is implemented where **Cashiers** create sales transactions and scan products into the sale. If there is an ongoing campaign for a product, the system automatically applies the discount during the sale. The sold products are added to the sale and necessary calculations such as total price, discount amount, and final price after discounts are automatically handled by the system.
+
+### Process Flow:
+1. **Creating a Sale**: 
+   - A cashier first creates a new sale by sending a request to the `/sale/add` endpoint. 
+   - The cashier's name is extracted from the JWT token to associate the sale with the cashier.
+
+2. **Adding Products to the Sale**: 
+   - Once the sale is created, the cashier starts scanning or adding products to the sale by calling the `/sold-product/add/{productId}/{saleId}` endpoint.
+   - The system checks if the product is part of any active campaigns. If a campaign applies, the discount is automatically calculated and deducted from the product’s total price.
+
+3. **Updating the Sale Total**: 
+   - As products are added, the system recalculates the total sale price.
+   - It also calculates the total discount amount and the final price after discounts for the entire sale.
+
+4. **Finalizing the Sale**:
+   - Once all products have been added to the sale, the total price, discount amount, and the final price after the discount are saved.
+   - This completes the sales transaction, and the sale details are available for viewing or report generation.
+
+
 ## API Documentation
 
 ## Sale Service

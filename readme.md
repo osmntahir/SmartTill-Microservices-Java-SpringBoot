@@ -1,16 +1,12 @@
-# Java Toyota 32 Bit Project
+# Toyota 32 Bit Project
 
 ## Introduction
 
-The **Toyota 32 Bit Project** is a backend system designed using a microservice architecture. This system handles
-various services like user management, product listing, sales, and reporting. The project integrates **API Gateway**
-with **Keycloak** to manage authentication, authorization, and routing requests between the services.
+The **Toyota 32 Bit Project** is a backend system designed using a microservice architecture. This system handles various services like user management, product listing, sales, and reporting. The project integrates **API Gateway** with **Keycloak** to manage authentication, authorization, and routing requests between the services.
 
-The architecture ensures that each service has its responsibility, promoting scalability and maintainability. All
-services are deployed using Docker containers, and the API Gateway acts as a central point of communication between
-them.
+The architecture ensures that each service has its responsibility, promoting scalability and maintainability. All services are deployed using Docker containers, and the API Gateway acts as a central point of communication between them.
 
-### Technologies Used
+## Technologies Used
 
 - **JDK 17**
 - **Spring Boot**
@@ -25,17 +21,17 @@ them.
 
 ## Architecture Overview
 
-The project consists of multiple microservices, each responsible for specific operations. The API Gateway integrates
-with Keycloak for handling authentication and role-based access control (RBAC). It routes requests to the relevant
-microservices, ensuring secure communication between the components.
+The project consists of multiple microservices, each responsible for specific operations. The API Gateway integrates with Keycloak for handling authentication and role-based access control (RBAC). It routes requests to the relevant microservices, ensuring secure communication between the components.
 
-### Key Components:
+### Key Components
 
 1. **API Gateway**:
     - Manages all routing between services.
     - Integrates with Keycloak for token-based authentication and authorization.
-    - Handles role-based access control (RBAC) for all services, ensuring that only users with appropriate roles can
-      access certain services.
+    - Handles role-based access control (RBAC) for all services, ensuring that only users with appropriate roles can access certain services.
+    - **Base URL**: `http://localhost:8085`
+    - Example request to get all products:
+      - `GET http://localhost:8085/product/getAll`
 
 2. **User Management Service**:
     - Handles CRUD operations for users.
@@ -45,13 +41,13 @@ microservices, ensuring secure communication between the components.
 3. **Product Service**:
     - Handles CRUD operations for products.
     - Provides product listings without requiring any specific role for access.
-    - Implements pagination, filtering, and sorting for products data retrieval
+    - Implements pagination, filtering, and sorting for product data retrieval.
 
 4. **Sale Service**:
     - Manages sales transactions, including products sold, total price, and applied campaigns.
-    - Role restrictions apply, allowing only **Cashiers** to create sales.
+    - Only **Cashiers** can create sales.
     - Ensures that the total price of a sale is updated when a product is removed from it.
-    - Implements pagination, filtering, and sorting for sales data retrieval
+    - Implements pagination, filtering, and sorting for sales data retrieval.
 
 5. **Report Service**:
     - Generates reports for sales.
@@ -59,79 +55,86 @@ microservices, ensuring secure communication between the components.
 
 ### Microservices and Docker Integration
 
-Each service is containerized using Docker. The containers register themselves with the API Gateway, which routes
-requests accordingly. The API Gateway ensures that all authorization rules are enforced using Keycloak tokens.
+Each service is containerized using Docker. The containers register themselves with the API Gateway, which routes requests accordingly. The API Gateway ensures that all authorization rules are enforced using Keycloak tokens.
 
 ### Deployment
 
-The project is set up using **Docker Compose**. Each service has its container, and these containers communicate via the
-API Gateway. The database, PostgreSQL, is also containerized or can be set up externally based on your environment.
+The project is set up using **Docker Compose**. Each service has its container, and these containers communicate via the API Gateway. The database, PostgreSQL, is also containerized or can be set up externally based on your environment.
+
+## How to Run the Project
+
+To run the project locally, follow these steps:
+
+1. **Clone the repository**:
+
+    ```bash
+    git clone https://github.com/osmntahir/Java-Toyota-32Bit-Backend.git
+    ```
+
+2. **Navigate to the project directory**:
+
+    ```bash
+    cd Java-Toyota-32Bit-Backend
+    ```
+
+3. **Build the project and create JAR files** (skip the tests during build):
+
+    ```bash
+    mvn clean install -DskipTests
+    ```
+
+4. **Run the Docker Compose setup**:
+
+    ```bash
+    docker-compose up --build
+    ```
+
+This will start all the services including the API Gateway, User Management Service, Product Service, Sale Service, Report Service, PostgreSQL, and Keycloak.
 
 ## Keycloak Integration
 
-### 1. Starting Keycloak
+### OAuth 2.0 Authentication with Keycloak
 
-To run Keycloak on port `9090` using version `22.0.1`, use the following Docker command:
+The project uses Keycloak for OAuth 2.0 authentication. Tokens are generated through Keycloak and then passed to the API Gateway to authorize access to various services.
 
-```bash
-docker run -d --name keycloak -p 9090:8080 -e KEYCLOAK_ADMIN=admin -e KEYCLOAK_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:22.0.1 start-dev
-```
+#### Step-by-step Token Generation via Postman:
 
-This starts Keycloak, which can be accessed through the admin console at `http://localhost:9090`. The credentials for direct access are:
+1. Set the **Auth Type** to **OAuth 2.0**.
+2. Choose the **Password Credentials** grant type.
+3. Configure the token settings as follows (refer to the uploaded image for the configuration details):
 
-- **Username**: `admin`
-- **Password**: `admin`
+    - **Access Token URL**: `http://keycloak:8080/realms/32bit_realm/protocol/openid-connect/token`
+    - **Client ID**: `32bit_client`
+    - **Client Secret**: `jLqPycRhcGsmRsicM7gEb7xgZ357GRrp`
+    - **Username**: manager (for example)
+    - **Password**: manager
+    - **Scope**: `openid offline_access`
 
-### 2. Keycloak Initialization on User Management Service Startup
+4. Click **Get New Access Token**. The token can now be used to access the endpoints.
 
-When the **User Management Service** starts, the following operations are automatically performed by the Keycloak initializer:
+### Initial User Setup with Keycloak
 
-- **Create Realm**: A new realm named `32bit_realm`.
-- **Create Client**: A client called `32bit_client`.
-- **Assign Service Account Roles**: Assign roles (`manage-users`, `view-users`, `manage-realm`) to the client’s service account.
-- **Create System Roles**: Automatically create `CASHIER`, `MANAGER`, and `ADMIN` roles.
-- **Create Admin User**: Add an admin user with the following credentials:
-  - **Username**: `admin`
-  - **Password**: `admin123`
+When Keycloak is initialized, users for all roles are automatically created. These default users can be used to test different roles in the system.
 
-### 3. Keycloak Access via Postman
+- **CASHIER Role**:  
+  - Username: `cashier`  
+  - Password: `cashier`
 
-To connect to Keycloak through Postman and get an access token, configure the following:
+- **MANAGER Role**:  
+  - Username: `manager`  
+  - Password: `manager`
 
-- **Auth Type**: OAuth 2.0
-- **Grant Type**: Password Credentials
-- **Access Token URL**: `http://localhost:9090/realms/32bit_realm/protocol/openid-connect/token`
-- **Client ID**: `32bit_client`
-- **Client Secret**: Available in the `client-secret.txt` file in the project root directory.
-- **Scope**: `openid offline_access`
-- **Client Authentication**: Send as Basic Auth Header
+- **ADMIN Role**:  
+  - Username: `admin`  
+  - Password: `admin`
 
-Once configured, click **Get New Access Token** to retrieve the token.
+These users can access their respective endpoints and perform operations according to their roles.
 
-### 4. Differentiated Password Usage
+### Accessing Keycloak Admin Console
 
-- **Direct Internet Access**: When accessing the Keycloak admin console via the browser, use the credentials:
-  - **Username**: `admin`
-  - **Password**: `admin`
+To manage Keycloak through the admin console, go to:
 
-- **Programmatic Access (via Endpoints)**: When accessing Keycloak through the User Management Service endpoints, the `admin123` password should be used. This is configured in the application’s properties as:
-
-  ```properties
-  keycloak.admin.username=admin
-  keycloak.admin.password=admin123
-  ```
-
-### 5. Using Access Tokens
-
-- After generating the admin token via Postman, you can use it to manage users or assign roles.
-- You can also generate tokens for other roles like `CASHIER` or `MANAGER` by logging in with the corresponding credentials.
-
-### 6. Security Considerations
-
-- Ensure that the `admin` password for direct access and the `admin123` password for programmatic access are securely managed.
-- Use environment variables or a secure secrets management system to store credentials in production environments.
-
----
+http://keycloak:8080/admin/master/console/#/32bit_realm
 
 
 ## Core Functionalities
@@ -214,31 +217,15 @@ large datasets.
 
 - **Endpoints**:
     - `GET /report/sale/{id}` - Generate a PDF receipt for a specific sale.
+    - `GET /report/sales` - Get a list of all sales with pagination, filtering, and sorting.
 
 ## Authorization & Role Management
 
-All requests go through the **API Gateway**, which verifies the roles and permissions using **Keycloak**. Based on the
-role associated with the user, access to different services is granted or denied:
+All requests go through the **API Gateway**, which verifies the roles and permissions using **Keycloak**. Based on the role associated with the user, access to different services is granted or denied:
 
 - **Admins** can manage users and their roles.
-- **Cashiers** can handle sales.
-- **Managers** can generate sales reports.
-
-[//]: # ()
-
-[//]: # (## How to Run Locally)
-
-[//]: # ()
-
-[//]: # (To run the project locally, ensure you have **Docker** installed. Follow the steps below to start the services:)
-
-[//]: # ()
-
-[//]: # (1. Clone the repository.)
-
-[//]: # (   ```bash)
-
-[//]: # (   git clone https://github.com/your-repository-url.git)
+- **Cashiers** can handle sales but cannot view the list of sales.
+- **Managers** can generate sales reports and also view the list of all sales.
 
 ## API Documentation
 

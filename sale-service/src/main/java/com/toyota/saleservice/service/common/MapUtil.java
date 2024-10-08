@@ -32,6 +32,8 @@ public class MapUtil {
         this.productServiceClient = productServiceClient;
     }
 
+    // Mapping Campaign and CampaignProduct
+
     public Campaign convertCampaignDtoToCampaign(CampaignDto campaignDto) {
         return modelMapper.map(campaignDto, Campaign.class);
     }
@@ -53,25 +55,26 @@ public class MapUtil {
         return campaignProduct;
     }
 
+    // Mapping SoldProduct and Sale
+
     public SoldProductDto convertSoldProductToSoldProductDto(SoldProduct soldProduct) {
         SoldProductDto dto = modelMapper.map(soldProduct, SoldProductDto.class);
 
         ProductDTO productDTO = productServiceClient.getProductById(soldProduct.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProduct.getProductId()));
 
-        dto.setProductName(productDTO.getName());
-        dto.setPrice(productDTO.getPrice());
-        dto.setInventory(productDTO.getInventory());
+        dto.setProduct(productDTO); // Setting the entire ProductDTO object
+
         return dto;
     }
 
     public SoldProduct convertSoldProductDtoToSoldProduct(SoldProductDto soldProductDto) {
         SoldProduct soldProduct = modelMapper.map(soldProductDto, SoldProduct.class);
 
-        if (soldProductDto.getProductId() != null) {
-            soldProduct.setProductId(soldProductDto.getProductId());
+        if (soldProductDto.getProduct() != null) {
+            soldProduct.setProductId(soldProductDto.getProduct().getId()); // Extracting productId from ProductDTO
         } else {
-            throw new IllegalArgumentException("ProductId cannot be null when converting SoldProductDto to SoldProduct");
+            throw new IllegalArgumentException("ProductDTO cannot be null when converting SoldProductDto to SoldProduct");
         }
 
         return soldProduct;
@@ -79,7 +82,6 @@ public class MapUtil {
 
     public SaleDto convertSaleToSaleDto(Sale sale) {
         SaleDto saleDto = modelMapper.map(sale, SaleDto.class);
-
 
         List<SoldProductDto> soldProductDtos = sale.getSoldProducts().stream()
                 .map(this::convertSoldProductToSoldProductDto)
@@ -89,7 +91,6 @@ public class MapUtil {
 
         return saleDto;
     }
-
 
     public Sale convertSaleDtoToSale(SaleDto saleDto) {
         return modelMapper.map(saleDto, Sale.class);

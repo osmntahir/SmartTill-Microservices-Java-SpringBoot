@@ -10,10 +10,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class SoldProductDto {
     private Long id;
-    private Long productId;
-    private String productName;
-    private double price;
-    private int inventory;
+//    private Long productId;
+//    private String productName;
+//    private double price;
+//    private int inventory;
+    private ProductDTO product;
+
     private double discount;
     private double discountAmount;
     private double finalPriceAfterDiscount;

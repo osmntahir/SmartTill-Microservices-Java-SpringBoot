@@ -92,7 +92,7 @@ public class SaleServiceImpl implements SaleService {
 
         for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
             if (soldProductDto != null) {
-                double productPrice = soldProductDto.getPrice();
+                double productPrice = soldProductDto.getProduct().getPrice();
                 int quantity = soldProductDto.getQuantity();
                 totalPrice += productPrice * quantity;
 
@@ -138,8 +138,8 @@ public class SaleServiceImpl implements SaleService {
 
             for (SoldProductDto soldProductDto : saleDto.getSoldProducts()) {
 
-                ProductDTO product = productServiceClient.getProductById(soldProductDto.getProductId())
-                        .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProductDto.getProductId()));
+                ProductDTO product = productServiceClient.getProductById(soldProductDto.getProduct().getId())
+                        .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProductDto.getProduct().getId()));
 
                 SoldProduct soldProduct = mapUtil.convertSoldProductDtoToSoldProduct(soldProductDto);
 

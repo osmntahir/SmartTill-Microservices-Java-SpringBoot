@@ -38,7 +38,7 @@ public class MapUtil {
 
         Campaign campaign = modelMapper.map(campaignDto, Campaign.class);
 
-        // products listesinden productIds listesini oluşturuyoruz
+
         if (campaignDto.getProducts() != null) {
             List<Long> productIds = campaignDto.getProducts().stream()
                     .map(ProductDTO::getId)
@@ -46,8 +46,12 @@ public class MapUtil {
             campaign.setProductIds(productIds);
         }
 
+
+
         return campaign;
     }
+
+
 
 
     public CampaignDto convertCampaignToCampaignDto(Campaign campaign) {

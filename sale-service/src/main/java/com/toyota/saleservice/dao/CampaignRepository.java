@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +30,8 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
 
     @Query("SELECT c FROM Campaign c WHERE :productId IN elements(c.productIds) " +
             "AND c.startDate <= :now AND c.endDate >= :now AND c.deleted = false")
-    List<Campaign> findActiveCampaignsByProductId(@Param("productId") Integer productId, @Param("now") LocalDateTime now);
+    List<Campaign> findActiveCampaignsByProductId(@Param("productId") Long productId, @Param("now") LocalDateTime now);
 
     @Query("SELECT c FROM Campaign c WHERE c.startDate <= :now AND c.endDate >= :now AND c.deleted = false")
-    List<Campaign> findActiveCampaigns(@Param("now") LocalDateTime now);
+    List<Campaign> findActiveCampaigns(@Param("now") LocalDate now);
 }

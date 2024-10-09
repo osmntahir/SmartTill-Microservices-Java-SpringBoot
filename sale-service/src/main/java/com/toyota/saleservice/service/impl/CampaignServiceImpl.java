@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,14 +62,19 @@ public class CampaignServiceImpl implements CampaignService {
             throw new CampaignAlreadyExistsException("Campaign with this name already exists! " + campaignDto.getName());
         }
 
-        // CampaignDto'dan Campaign entity'sine dönüştürme
+        // Validate and set default dates if necessary
+        if (campaignDto.getStartDate() == null) {
+            campaignDto.setStartDate(LocalDate.now());
+        }
+        if (campaignDto.getEndDate() == null) {
+            campaignDto.setEndDate(campaignDto.getStartDate().plusMonths(1));
+        }
+
         Campaign campaign = mapUtil.convertCampaignDtoToCampaign(campaignDto);
         Campaign saved = campaignRepository.save(campaign);
         logger.info("Campaign with name {} added successfully.", campaignDto.getName());
 
-        // Campaign entity'sinden CampaignDto'ya dönüştürme
-        CampaignDto responseDto = mapUtil.convertCampaignToCampaignDto(saved);
-        return responseDto;
+        return mapUtil.convertCampaignToCampaignDto(saved);
     }
 
     @Override
@@ -79,15 +85,26 @@ public class CampaignServiceImpl implements CampaignService {
         if (optionalCampaign.isPresent()) {
             Campaign existingCampaign = optionalCampaign.get();
 
-            if (campaignRepository.existsByNameAndIdNot(campaignDto.getName(), id)) {
-                logger.warn("Campaign update failed due to existing campaign with name: {}", campaignDto.getName());
+
+            if (campaignDto.getName() == null) {
+                campaignDto.setName(existingCampaign.getName());
+            } else if (campaignRepository.existsByNameAndIdNot(campaignDto.getName(), id)) {
                 throw new CampaignAlreadyExistsException("Campaign with this name already exists! " + campaignDto.getName());
             }
 
-            // CampaignDto'dan güncellenmiş Campaign entity'sini oluştur
+
+            if (campaignDto.getStartDate() == null) {
+                campaignDto.setStartDate(LocalDate.now());
+            }
+            if (campaignDto.getEndDate() == null) {
+                campaignDto.setEndDate(campaignDto.getStartDate().plusMonths(1));
+            }
+
+
             Campaign updatedCampaign = mapUtil.convertCampaignDtoToCampaign(campaignDto);
-            updatedCampaign.setId(existingCampaign.getId()); // ID'yi koruyoruz
-            updatedCampaign.setDeleted(existingCampaign.isDeleted()); // Deleted durumunu koruyoruz
+            updatedCampaign.setId(existingCampaign.getId());
+            updatedCampaign.setDeleted(existingCampaign.isDeleted());
+            updatedCampaign.setProductIds(existingCampaign.getProductIds());
 
             Campaign savedCampaign = campaignRepository.save(updatedCampaign);
             logger.info("Campaign with id {} updated successfully.", id);
@@ -98,6 +115,8 @@ public class CampaignServiceImpl implements CampaignService {
             throw new CampaignNotFoundException("Campaign not found with id: " + id);
         }
     }
+
+
 
     @Override
     public CampaignDto deleteCampaign(Long id) {
@@ -117,20 +136,15 @@ public class CampaignServiceImpl implements CampaignService {
     public Optional<Long> getDiscountForProduct(Long productId) {
         logger.info("Getting discount for product with ID: {}", productId);
 
-        // productId'yi Integer'a dönüştürüyoruz çünkü Campaign entity'sinde productIds List<Integer> tipinde
-        Integer productIdInt = productId.intValue();
-
-        // Geçerli tarih ve saat
         LocalDateTime now = LocalDateTime.now();
 
-        // Aktif kampanyaları alıyoruz
-        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaignsByProductId(productIdInt, now);
+        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaignsByProductId(productId, now);
 
         if (activeCampaigns.isEmpty()) {
             logger.info("No active campaigns found for product ID: {}", productId);
             return Optional.empty();
         } else {
-            // Eğer birden fazla kampanya varsa, en yüksek indirim yüzdesini alıyoruz
+
             Long maxDiscount = activeCampaigns.stream()
                     .map(Campaign::getDiscountPercentage)
                     .max(Long::compareTo)
@@ -148,11 +162,11 @@ public class CampaignServiceImpl implements CampaignService {
         Campaign campaign = campaignRepository.findById((long) campaignId.intValue())
                 .orElseThrow(() -> new CampaignNotFoundException("Campaign not found with id: " + campaignId));
 
-        // Tüm aktif kampanyaları alarak ürünlerin başka kampanyalarda olup olmadığını kontrol ediyoruz
-        LocalDateTime now = LocalDateTime.now();
+
+        LocalDate now = LocalDate.now();
         List<Campaign> activeCampaigns = campaignRepository.findActiveCampaigns(now);
 
-        // Ürünlerin başka kampanyalarda olup olmadığını kontrol edelim
+
         List<Integer> conflictingProductIds = new ArrayList<>();
         for (Long productId : productIds) {
             for (Campaign activeCampaign : activeCampaigns) {
@@ -252,3 +266,4 @@ public class CampaignServiceImpl implements CampaignService {
     }
 
 }
+

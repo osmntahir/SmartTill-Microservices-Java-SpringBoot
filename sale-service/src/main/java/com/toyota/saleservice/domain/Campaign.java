@@ -1,6 +1,5 @@
 package com.toyota.saleservice.domain;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,10 +7,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
 
 @Entity
 @Table(name = "campaign")
@@ -32,10 +30,10 @@ public class Campaign {
     private Long discountPercentage;
 
     @Column(name = "start_date")
-    private LocalDateTime startDate;
+    private LocalDate startDate;
 
     @Column(name = "end_date")
-    private LocalDateTime endDate;
+    private LocalDate endDate;
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Column(name = "product_ids")
@@ -43,15 +41,13 @@ public class Campaign {
 
     private boolean deleted = false;
 
-    @PrePersist
-    public void prePersist() {
-        if (this.startDate == null) {
-            this.startDate = LocalDateTime.now();
-        }
-        if (this.endDate == null) {
-            this.endDate = this.startDate.plus(1, ChronoUnit.MONTHS);
-        }
-    }
-
+//    @PrePersist
+//    public void prePersist() {
+//        if (this.startDate == null) {
+//            this.startDate = LocalDate.now();
+//        }
+//        if (this.endDate == null) {
+//            this.endDate = this.startDate.plus(1, ChronoUnit.MONTHS);
+//        }
+//    }
 }
-

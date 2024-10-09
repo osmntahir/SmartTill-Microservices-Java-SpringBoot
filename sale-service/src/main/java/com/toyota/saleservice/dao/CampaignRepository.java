@@ -5,13 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
+
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.util.List;
-import java.util.Optional;
+
 
 @Repository
 public interface CampaignRepository extends JpaRepository<Campaign, Long> {
@@ -28,10 +27,9 @@ public interface CampaignRepository extends JpaRepository<Campaign, Long> {
 
     boolean existsByNameAndIdNot(String name, Long id);
 
-    @Query("SELECT c FROM Campaign c WHERE :productId IN elements(c.productIds) " +
-            "AND c.startDate <= :now AND c.endDate >= :now AND c.deleted = false")
-    List<Campaign> findActiveCampaignsByProductId(@Param("productId") Long productId, @Param("now") LocalDateTime now);
+    @Query("SELECT c FROM Campaign c WHERE c.deleted = false")
+    List<Campaign> findActiveCampaigns();
 
-    @Query("SELECT c FROM Campaign c WHERE c.startDate <= :now AND c.endDate >= :now AND c.deleted = false")
-    List<Campaign> findActiveCampaigns(@Param("now") LocalDate now);
+    @Query("SELECT c FROM Campaign c WHERE c.deleted = false AND :productId MEMBER OF c.productIds")
+    List<Campaign> findActiveCampaignsByProductIdNative(Long productId);
 }

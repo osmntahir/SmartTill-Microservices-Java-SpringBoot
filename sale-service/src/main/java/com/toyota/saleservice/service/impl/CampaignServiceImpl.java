@@ -4,7 +4,6 @@ import com.toyota.saleservice.dao.CampaignRepository;
 import com.toyota.saleservice.domain.Campaign;
 import com.toyota.saleservice.dto.CampaignDto;
 import com.toyota.saleservice.dto.PaginationResponse;
-import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.exception.CampaignAlreadyExistsException;
 import com.toyota.saleservice.exception.CampaignNotFoundException;
 import com.toyota.saleservice.exception.ProductAlreadyInCampaignException;
@@ -13,19 +12,14 @@ import com.toyota.saleservice.service.abstracts.CampaignService;
 import com.toyota.saleservice.service.common.MapUtil;
 import com.toyota.saleservice.service.common.SortUtil;
 import lombok.RequiredArgsConstructor;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-
 import org.springframework.stereotype.Service;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -62,14 +56,6 @@ public class CampaignServiceImpl implements CampaignService {
             throw new CampaignAlreadyExistsException("Campaign with this name already exists! " + campaignDto.getName());
         }
 
-        // Validate and set default dates if necessary
-        if (campaignDto.getStartDate() == null) {
-            campaignDto.setStartDate(LocalDate.now());
-        }
-        if (campaignDto.getEndDate() == null) {
-            campaignDto.setEndDate(campaignDto.getStartDate().plusMonths(1));
-        }
-
         Campaign campaign = mapUtil.convertCampaignDtoToCampaign(campaignDto);
         Campaign saved = campaignRepository.save(campaign);
         logger.info("Campaign with name {} added successfully.", campaignDto.getName());
@@ -85,21 +71,11 @@ public class CampaignServiceImpl implements CampaignService {
         if (optionalCampaign.isPresent()) {
             Campaign existingCampaign = optionalCampaign.get();
 
-
             if (campaignDto.getName() == null) {
                 campaignDto.setName(existingCampaign.getName());
             } else if (campaignRepository.existsByNameAndIdNot(campaignDto.getName(), id)) {
                 throw new CampaignAlreadyExistsException("Campaign with this name already exists! " + campaignDto.getName());
             }
-
-
-            if (campaignDto.getStartDate() == null) {
-                campaignDto.setStartDate(LocalDate.now());
-            }
-            if (campaignDto.getEndDate() == null) {
-                campaignDto.setEndDate(campaignDto.getStartDate().plusMonths(1));
-            }
-
 
             Campaign updatedCampaign = mapUtil.convertCampaignDtoToCampaign(campaignDto);
             updatedCampaign.setId(existingCampaign.getId());
@@ -115,8 +91,6 @@ public class CampaignServiceImpl implements CampaignService {
             throw new CampaignNotFoundException("Campaign not found with id: " + id);
         }
     }
-
-
 
     @Override
     public CampaignDto deleteCampaign(Long id) {
@@ -136,15 +110,12 @@ public class CampaignServiceImpl implements CampaignService {
     public Optional<Long> getDiscountForProduct(Long productId) {
         logger.info("Getting discount for product with ID: {}", productId);
 
-        LocalDateTime now = LocalDateTime.now();
-
-        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaignsByProductId(productId, now);
-
+        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaignsByProductIdNative(productId);
+        logger.info("Active campaigns for product ID {}: {}", productId, activeCampaigns);
         if (activeCampaigns.isEmpty()) {
             logger.info("No active campaigns found for product ID: {}", productId);
             return Optional.empty();
         } else {
-
             Long maxDiscount = activeCampaigns.stream()
                     .map(Campaign::getDiscountPercentage)
                     .max(Long::compareTo)
@@ -159,20 +130,21 @@ public class CampaignServiceImpl implements CampaignService {
     public CampaignDto addProductsToCampaign(Long campaignId, List<Long> productIds) {
         logger.info("Adding products to campaign with ID: {}", campaignId);
 
-        Campaign campaign = campaignRepository.findById((long) campaignId.intValue())
+        Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new CampaignNotFoundException("Campaign not found with id: " + campaignId));
 
+        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaigns();
 
-        LocalDate now = LocalDate.now();
-        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaigns(now);
+        List<Long> conflictingProductIds = new ArrayList<>();
 
-
-        List<Integer> conflictingProductIds = new ArrayList<>();
         for (Long productId : productIds) {
-            for (Campaign activeCampaign : activeCampaigns) {
-                if (!activeCampaign.getId().equals(campaign.getId()) && activeCampaign.getProductIds().contains(productId.intValue())) {
-                    conflictingProductIds.add(productId.intValue());
-                }
+            boolean isConflicting = activeCampaigns.stream()
+                    .anyMatch(activeCampaign ->
+                            !activeCampaign.getId().equals(campaign.getId()) &&
+                                    activeCampaign.getProductIds().contains(productId));
+
+            if (isConflicting) {
+                conflictingProductIds.add(productId);
             }
         }
 
@@ -181,22 +153,19 @@ public class CampaignServiceImpl implements CampaignService {
             throw new ProductAlreadyInCampaignException("Products already in another campaign: " + conflictingProductIds);
         }
 
-        // Ürünleri kampanyaya ekleyelim
         List<Long> existingProductIds = campaign.getProductIds();
-        for (Long productId : productIds) {
-            Integer productIdInt = productId.intValue();
-            if (!existingProductIds.contains(productIdInt)) {
-                existingProductIds.add(Long.valueOf(productIdInt));
+        productIds.forEach(productId -> {
+            if (!existingProductIds.contains(productId)) {
+                existingProductIds.add(productId);
             }
-        }
-        campaign.setProductIds(existingProductIds);
+        });
 
+        campaign.setProductIds(existingProductIds);
         Campaign savedCampaign = campaignRepository.save(campaign);
         logger.info("Products added to campaign with ID: {}", campaignId);
 
         return mapUtil.convertCampaignToCampaignDto(savedCampaign);
     }
-
 
     @Override
     public CampaignDto removeProductsFromCampaign(Long campaignId, List<Long> productIds) {
@@ -240,10 +209,8 @@ public class CampaignServiceImpl implements CampaignService {
     public CampaignDto removeAllProductsFromCampaign(Long campaignId) {
         logger.info("Removing all products from campaign with ID: {}", campaignId);
 
-
         Campaign campaign = campaignRepository.findById(campaignId)
                 .orElseThrow(() -> new CampaignNotFoundException("Campaign not found with id: " + campaignId));
-
 
         List<Long> existingProductIds = campaign.getProductIds();
 
@@ -252,18 +219,13 @@ public class CampaignServiceImpl implements CampaignService {
             throw new ProductNotInCampaignException("No products to remove in campaign with id: " + campaignId);
         }
 
-
         existingProductIds.clear();
         campaign.setProductIds(existingProductIds);
-
 
         Campaign savedCampaign = campaignRepository.save(campaign);
 
         logger.info("All products removed from campaign with ID: {}", campaignId);
 
-
         return mapUtil.convertCampaignToCampaignDto(savedCampaign);
     }
-
 }
-

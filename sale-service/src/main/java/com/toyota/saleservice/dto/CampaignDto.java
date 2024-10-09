@@ -24,11 +24,11 @@ public class CampaignDto {
     @Max(value = 100,  message = "Discount must be less than or equal to 100")
     private Long discountPercentage;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate startDate;
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
-    private LocalDate endDate;
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+//    private LocalDate startDate;
+//
+//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
+//    private LocalDate endDate;
 
     private List<ProductDTO> products;
 }

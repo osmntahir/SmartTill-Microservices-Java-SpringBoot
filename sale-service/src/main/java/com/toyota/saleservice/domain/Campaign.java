@@ -29,15 +29,11 @@ public class Campaign {
     @Column(name = "discount_percentage")
     private Long discountPercentage;
 
-    @Column(name = "start_date")
-    private LocalDate startDate;
-
-    @Column(name = "end_date")
-    private LocalDate endDate;
-
     @ElementCollection(fetch = FetchType.EAGER)
-    @Column(name = "product_ids")
+    @CollectionTable(name = "campaign_product_ids", joinColumns = @JoinColumn(name = "campaign_id"))
+    @Column(name = "product_id")
     private List<Long> productIds;
+
 
     private boolean deleted = false;
 

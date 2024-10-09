@@ -20,7 +20,7 @@ public interface CampaignService {
 
     CampaignDto deleteCampaign(Long id);
 
-    public Optional<Long> getDiscountForProduct(Long productId);
+    Optional<Long> getDiscountForProduct(Long productId);
 
     CampaignDto addProductsToCampaign(Long campaignId, List<Long> productIds);
 

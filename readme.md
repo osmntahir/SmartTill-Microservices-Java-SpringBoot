@@ -664,21 +664,23 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Description**: Add a new campaign.
 - **Request**:
     ```json
-    {
-      "name": "Holiday Discount",
-      "discount": 20,
-      "description": "20% off on all items during the holiday season."
+   {
+    "name": "Weekend Special Discount",
+    "discountPercentage": 20,
+    "startDate": "08-10-2024",
+    "endDate": "15-10-2024"
     }
+
     ```
 - **Response**:
     ```json
-    {
-    "id": 7,
-    "name": "Holiday Discount",
-    "description": "20% off on all items during the holiday season.",
-    "discount": 20,
-    "campaignProducts": null,
-    "deleted": false
+  {
+    "id": 16,
+    "name": "Weekend Special Discount",
+    "discountPercentage": 20,
+    "startDate": "08-10-2024",
+    "endDate": "15-10-2024",
+    "products": null
     }
     ```
 
@@ -688,21 +690,22 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Description**: Update a specific campaign.
 - **Request**:
     ```json
-    {
-      "name": "Holiday Discount Updated",
-      "discount": 25,
-      "description": "25% off on all items during the holiday season."
+  {
+   
+    "discountPercentage": 30,
+    "endDate": "20-10-2024"
+
     }
     ```
 - **Response**:
     ```json
     {
-      "id": 7,
-      "name": "Holiday Discount Updated",
-      "description": "25% off on all items during the holiday season.",
-      "discount": 25,
-      "campaignProducts": [],
-      "deleted": false
+    "id": 16,
+    "name": "Weekend Special Discount",
+    "discountPercentage": 30,
+    "startDate": "09-10-2024",
+    "endDate": "20-10-2024",
+    "products": null
     }
     ```
 
@@ -712,106 +715,95 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Description**: Delete a campaign by ID.
 - **Response**:
     ```json
-    {
-      "id": 7,
-      "name": "Holiday Discount Updated",
-      "description": "25% off on all items during the holiday season.",
-      "discount": 25,
-      "campaignProducts": [],
-      "deleted": true
+  {
+      "message": "Campaign with ID deleted successfully.",
+      "status": "DELETED"
     }
     ```
+  ### Add Products to Campaign
 
-## Campaign Product Endpoints
-
-### Get All Campaign Products
-
-- **Endpoint**: `GET /campaign-product/getAll`
-- **Description**: Retrieve all campaign-product associations.
-- **Response**:
-    ```json
-   [
-     {
-        "id": 4,
-        "campaignId": 4,
-        "productId": 1,
-        "deleted": false
-     },
-     {
-        "id": 5,
-        "campaignId": 4,
-        "productId": 2,
-        "deleted": false
-     },
-     {
-        "id": 8,
-        "campaignId": 4,
-        "productId": 4,
-        "deleted": false
-     },
-     {
-        "id": 7,
-        "campaignId": 4,
-        "productId": 9,
-        "deleted": false
-     }
-   ]
-    ```
-
-### Add Campaign Product
-
-- **Endpoint**: `POST /campaign-product/add`
-- **Description**: Associate a campaign with a product.
+- **Endpoint**: `POST /campaign/addProducts/{campaignId}`
+- **Description**: Add products to an existing campaign.
 - **Request**:
     ```json
-    {
-      "campaignId": 4,
-      "productId": 4
-    }
+   [1,2]
     ```
 - **Response**:
     ```json
-    {
-    "id": 10,
-    "campaignId": 4,
-    "productId": 4,
-    "deleted": false
-    }   
-    ```
-
-### Update Campaign Product
-
-- **Endpoint**: `PUT /campaign-product/update/{id}`
-- **Description**: Update the campaign-product association.
-- **Request**:
-    ```json
-    {
-      "campaignId": 4,
-      "productId": 9
-    }
-    ```
-- **Response**:
-    ```json
-    {
-      "id": 10,
-      "campaignId": 4,
-      "productId": 9
-    }
-    ```
-
-### Delete Campaign Product
-
-- **Endpoint**: `DELETE /campaign-product/delete/{id}`
-- **Description**: Remove a campaign-product association.
-- **Response**:
-    ```json
-    {
-    "id": 10,
-    "campaignId": 4,
-    "productId": 9,
-    "deleted": true
-
+   {
+    "id": 18,
+    "name": "Weekend Special Discount",
+    "discountPercentage": 15,
+    "startDate": "12-10-2024",
+    "endDate": "14-10-2024",
+    "products": [
+        {
+            "id": 2,
+            "name": "muz",
+            "description": null,
+            "price": 12.0,
+            "inventory": 29,
+            "active": true
+        },
+        {
+            "id": 1,
+            "name": "kiraz",
+            "description": null,
+            "price": 15.0,
+            "inventory": 17,
+            "active": true
+        }
+    ]
 }
+    ```
+
+### Remove Products from Campaign
+
+- **Endpoint**: `DELETE /campaign/removeProducts/{campaignId}`
+- **Description**: Remove specific products from a campaign.
+- **Request**:
+    ```json
+  [1]
+    ```
+- **Response**:
+    ```json
+     {
+    "id": 18,
+    "name": "Weekend Special Discount",
+    "discountPercentage": 15,
+    "startDate": "12-10-2024",
+    "endDate": "14-10-2024",
+    "products": [
+        {
+            "id": 2,
+            "name": "muz",
+            "description": null,
+            "price": 12.0,
+            "inventory": 29,
+            "active": true
+        }
+    ]
+    }
+    ```
+
+### Remove All Products from Campaign
+
+- **Endpoint**: `DELETE /campaign/removeAllProducts/{campaignId}`
+- **Description**: Remove all products from a campaign.
+- **Response**:
+    ```json
+   {
+    "id": 18,
+    "name": "Weekend Special Discount",
+    "discountPercentage": 15,
+    "startDate": "12-10-2024",
+    "endDate": "14-10-2024",
+    "products": null
+    }
+    ```
+
+
+
 
 ## Product Service
 

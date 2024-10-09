@@ -11,11 +11,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.toyota.saleservice.config.ProductServiceClient;
-import com.toyota.saleservice.dao.CampaignProductRepository;
 import com.toyota.saleservice.dao.CampaignRepository;
 import com.toyota.saleservice.domain.Campaign;
-import com.toyota.saleservice.domain.CampaignProduct;
-import com.toyota.saleservice.dto.CampaignProductDto;
 import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.exception.CampaignNotFoundException;
 import com.toyota.saleservice.exception.CampaignProductNotFoundException;

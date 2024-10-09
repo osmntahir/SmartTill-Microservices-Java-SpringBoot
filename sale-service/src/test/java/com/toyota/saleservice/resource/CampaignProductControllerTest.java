@@ -3,8 +3,6 @@ package com.toyota.saleservice.resource;
 import static org.mockito.Mockito.when;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.toyota.saleservice.dto.CampaignProductDto;
-import com.toyota.saleservice.service.abstracts.CampaignProductService;
 
 import java.util.ArrayList;
 

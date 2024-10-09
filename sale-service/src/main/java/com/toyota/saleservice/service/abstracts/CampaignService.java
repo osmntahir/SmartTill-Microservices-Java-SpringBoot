@@ -5,6 +5,7 @@ import com.toyota.saleservice.dto.CampaignDto;
 import com.toyota.saleservice.dto.PaginationResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CampaignService {
     PaginationResponse<CampaignDto> getCampaignsFiltered(
@@ -18,4 +19,12 @@ public interface CampaignService {
     CampaignDto updateCampaign(Long id ,CampaignDto campaignDto);
 
     CampaignDto deleteCampaign(Long id);
+
+    public Optional<Long> getDiscountForProduct(Long productId);
+
+    CampaignDto addProductsToCampaign(Long campaignId, List<Long> productIds);
+
+    CampaignDto removeProductsFromCampaign(Long campaignId, List<Long> productIds);
+
+    CampaignDto removeAllProductsFromCampaign(Long campaignId);
 }

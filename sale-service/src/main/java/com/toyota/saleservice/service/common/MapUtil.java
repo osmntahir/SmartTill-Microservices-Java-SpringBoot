@@ -2,11 +2,9 @@ package com.toyota.saleservice.service.common;
 
 import com.toyota.saleservice.config.ProductServiceClient;
 import com.toyota.saleservice.domain.Campaign;
-import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.domain.Sale;
 import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.CampaignDto;
-import com.toyota.saleservice.dto.CampaignProductDto;
 import com.toyota.saleservice.dto.ProductDTO;
 import com.toyota.saleservice.dto.SaleDto;
 import com.toyota.saleservice.dto.SoldProductDto;
@@ -32,28 +30,48 @@ public class MapUtil {
         this.productServiceClient = productServiceClient;
     }
 
-    // Mapping Campaign and CampaignProduct
 
     public Campaign convertCampaignDtoToCampaign(CampaignDto campaignDto) {
-        return modelMapper.map(campaignDto, Campaign.class);
+        if (campaignDto == null) {
+            return null;
+        }
+
+        Campaign campaign = modelMapper.map(campaignDto, Campaign.class);
+
+        // products listesinden productIds listesini oluşturuyoruz
+        if (campaignDto.getProducts() != null) {
+            List<Long> productIds = campaignDto.getProducts().stream()
+                    .map(ProductDTO::getId)
+                    .collect(Collectors.toList());
+            campaign.setProductIds(productIds);
+        }
+
+        return campaign;
     }
+
 
     public CampaignDto convertCampaignToCampaignDto(Campaign campaign) {
-        return modelMapper.map(campaign, CampaignDto.class);
+        if (campaign == null) {
+            return null;
+        }
+
+        CampaignDto campaignDto = modelMapper.map(campaign, CampaignDto.class);
+
+
+        if (campaign.getProductIds() != null && !campaign.getProductIds().isEmpty()) {
+            List<Long> productIds = campaign.getProductIds().stream()
+                    .collect(Collectors.toList());
+
+
+            List<ProductDTO> products = productServiceClient.getProductsByIds(productIds);
+            campaignDto.setProducts(products);
+        } else {
+            campaignDto.setProducts(null);
+        }
+
+        return campaignDto;
     }
 
-    public CampaignProductDto convertCampaignProductToCampaignProductDto(CampaignProduct campaignProduct) {
-        CampaignProductDto dto = modelMapper.map(campaignProduct, CampaignProductDto.class);
-        dto.setProductId(campaignProduct.getProductId());
-        dto.setCampaignId(campaignProduct.getCampaign().getId());
-        return dto;
-    }
-
-    public CampaignProduct convertCampaignProductDtoToCampaignProduct(CampaignProductDto campaignProductDto) {
-        CampaignProduct campaignProduct = modelMapper.map(campaignProductDto, CampaignProduct.class);
-        campaignProduct.setProductId(campaignProductDto.getProductId());
-        return campaignProduct;
-    }
 
     // Mapping SoldProduct and Sale
 

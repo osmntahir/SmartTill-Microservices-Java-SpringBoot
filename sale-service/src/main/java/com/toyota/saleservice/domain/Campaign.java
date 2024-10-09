@@ -1,7 +1,6 @@
 package com.toyota.saleservice.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,7 +8,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+
 
 @Entity
 @Table(name = "campaign")
@@ -17,19 +19,39 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Where(clause = "deleted = false") // Hibernate specific annotation
+@Where(clause = "deleted = false")
 public class Campaign {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String name;
-    private long discount;
-    private String description;
-    private boolean deleted;
 
-    @OneToMany(mappedBy = "campaign", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference
-    private List<CampaignProduct> campaignProducts;
+    private String name;
+
+    @Column(name = "discount_percentage")
+    private Long discountPercentage;
+
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Column(name = "product_ids")
+    private List<Long> productIds;
+
+    private boolean deleted = false;
+
+    @PrePersist
+    public void prePersist() {
+        if (this.startDate == null) {
+            this.startDate = LocalDateTime.now();
+        }
+        if (this.endDate == null) {
+            this.endDate = this.startDate.plus(1, ChronoUnit.MONTHS);
+        }
+    }
 
 }
+

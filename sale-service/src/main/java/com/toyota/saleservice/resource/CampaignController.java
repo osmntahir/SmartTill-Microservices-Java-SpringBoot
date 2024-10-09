@@ -68,6 +68,28 @@ public class CampaignController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @PostMapping("/addProducts/{campaignId}")
+    public ResponseEntity<CampaignDto> addProductsToCampaign(
+            @PathVariable Long campaignId,
+            @RequestBody List<Long> productIds) {
+        CampaignDto response = campaignService.addProductsToCampaign(campaignId, productIds);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @DeleteMapping("/removeProducts/{campaignId}")
+    public ResponseEntity<CampaignDto> removeProductsFromCampaign(
+            @PathVariable Long campaignId,
+            @RequestBody List<Long> productIds) {
+        CampaignDto response = campaignService.removeProductsFromCampaign(campaignId, productIds);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/removeAllProducts/{campaignId}")
+    public ResponseEntity<CampaignDto> removeAllProductsFromCampaign(@PathVariable Long campaignId) {
+        CampaignDto response = campaignService.removeAllProductsFromCampaign(campaignId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+
 
 
 

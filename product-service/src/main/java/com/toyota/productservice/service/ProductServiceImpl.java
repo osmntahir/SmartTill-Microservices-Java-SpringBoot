@@ -15,7 +15,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ProductServiceImpl implements ProductService {
@@ -71,6 +73,12 @@ public class ProductServiceImpl implements ProductService {
                 products.getPageable().getPageNumber(), products.getNumberOfElements(), products.getPageable().getSort(),
                 products.getTotalPages(), products.getTotalElements());
         return products.map(ProductMapper::mapToDto);
+    }
+
+    @Override
+    public Iterable<ProductDto> getProductsByIds(List<Long> productIds) {
+        return productRepository.findAllById(productIds).stream().
+                map(ProductMapper::mapToDto).collect(Collectors.toList());
     }
 
     /**

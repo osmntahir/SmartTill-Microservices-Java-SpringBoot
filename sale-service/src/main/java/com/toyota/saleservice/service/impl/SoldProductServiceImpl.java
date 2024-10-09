@@ -1,6 +1,7 @@
 package com.toyota.saleservice.service.impl;
 
 import com.toyota.saleservice.config.ProductServiceClient;
+import com.toyota.saleservice.dao.CampaignRepository;
 import com.toyota.saleservice.dao.SaleRepository;
 import com.toyota.saleservice.dao.SoldProductRepository;
 import com.toyota.saleservice.domain.Sale;
@@ -11,6 +12,7 @@ import com.toyota.saleservice.dto.SoldProductDto;
 import com.toyota.saleservice.exception.ProductNotFoundException;
 import com.toyota.saleservice.exception.ProductQuantityShortageException;
 import com.toyota.saleservice.exception.SaleNotFoundException;
+import com.toyota.saleservice.service.abstracts.CampaignService;
 import com.toyota.saleservice.service.abstracts.SoldProductService;
 import com.toyota.saleservice.service.common.MapUtil;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +38,7 @@ public class SoldProductServiceImpl implements SoldProductService {
     private final MapUtil mapUtil;
     private final Logger logger = LogManager.getLogger(SoldProductService.class);
     private final ProductServiceClient productServiceClient;
-    private final CampaignProductServiceImpl campaignProductService;
+    private final CampaignService campaignService;
     private final SaleRepository saleRepository;
 
     @Override
@@ -130,7 +132,7 @@ public class SoldProductServiceImpl implements SoldProductService {
     }
 
     private void applyDiscountIfNeeded(SoldProduct soldProduct, double totalPrice, Long productId) {
-        Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(productId);
+        Optional<Long> discountOptional = campaignService.getDiscountForProduct(productId);
 
         if (discountOptional.isPresent() && discountOptional.get() > 0) {
             double discount = discountOptional.get();
@@ -196,7 +198,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         existingSoldProduct.setPrice(originalPrice);
         existingSoldProduct.setTotal(originalPrice * existingSoldProduct.getQuantity());
 
-        Optional<Long> discountOptional = campaignProductService.getDiscountForProduct(existingSoldProduct.getProductId());
+        Optional<Long> discountOptional = campaignService.getDiscountForProduct(existingSoldProduct.getProductId());
         if (discountOptional.isPresent() && discountOptional.get() > 0) {
             double discount = discountOptional.get();
             double discountAmount = existingSoldProduct.getTotal() * (discount / 100);

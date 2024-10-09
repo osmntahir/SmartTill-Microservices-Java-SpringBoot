@@ -4,6 +4,7 @@ import com.toyota.saleservice.dto.ProductDTO;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -56,5 +57,9 @@ public class ProductServiceClient {
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete product", e);
         }
+    }
+
+    public List<ProductDTO> getProductsByIds(List<Long> productIds) {
+        return restTemplate.postForObject("http://product-service/product/getByIds", productIds, List.class);
     }
 }

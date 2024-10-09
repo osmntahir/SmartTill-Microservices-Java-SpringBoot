@@ -2,7 +2,6 @@ package com.toyota.saleservice.service.common;
 
 import com.toyota.saleservice.config.ProductServiceClient;
 import com.toyota.saleservice.domain.Campaign;
-import com.toyota.saleservice.domain.CampaignProduct;
 import com.toyota.saleservice.domain.Sale;
 import com.toyota.saleservice.domain.SoldProduct;
 import com.toyota.saleservice.dto.*;
@@ -12,7 +11,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;

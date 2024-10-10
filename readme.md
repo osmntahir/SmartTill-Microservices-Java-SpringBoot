@@ -324,7 +324,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
                     "id": 13,
                     "product": {
                         "id": 1,
-                        "name": "kiraz",
+                        "name": "cherry",
                         "price": 15.0,
                         "description": null,
                         "inventory": 37
@@ -340,7 +340,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
                     "id": 14,
                     "product": {
                         "id": 2,
-                        "name": "muz",
+                        "name": "banana",
                         "price": 12.0,
                         "description": null,
                         "inventory": 29
@@ -367,7 +367,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
                     "id": 15,
                     "product": {
                         "id": 2,
-                        "name": "muz",
+                        "name": "banana",
                         "price": 12.0,
                         "description": null,
                         "inventory": 29
@@ -383,7 +383,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
                     "id": 16,
                     "product": {
                         "id": 1,
-                        "name": "kiraz",
+                        "name": "cherry",
                         "price": 15.0,
                         "description": null,
                         "inventory": 37
@@ -426,7 +426,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "id": 14,
             "product": {
                 "id": 2,
-                "name": "muz",
+                "name": "banana",
                 "price": 12.0,
                 "description": null,
                 "inventory": 29
@@ -442,7 +442,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "id": 13,
             "product": {
                 "id": 1,
-                "name": "kiraz",
+                "name": "cherry",
                 "price": 15.0,
                 "description": null,
                 "inventory": 37
@@ -485,7 +485,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "id": 14,
             "product": {
                 "id": 2,
-                "name": "muz",
+                "name": "banana",
                 "price": 12.0,
                 "description": null,
                 "inventory": 29
@@ -501,7 +501,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "id": 13,
             "product": {
                 "id": 1,
-                "name": "kiraz",
+                "name": "cherry",
                 "price": 15.0,
                 "description": null,
                 "inventory": 37
@@ -655,7 +655,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 17,
     "product": {
         "id": 1,
-        "name": "kiraz",
+        "name": "cherry",
         "price": 15.0,
         "description": null,
         "inventory": 25
@@ -685,7 +685,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 17,
     "product": {
         "id": 1,
-        "name": "kiraz",
+        "name": "cherry",
         "price": 15.0,
         "description": null,
         "inventory": 21
@@ -742,8 +742,8 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "products": [
                 {
                     "id": 1,
-                    "name": "karpuz",
-                    "description": "karpuz",
+                    "name": "watermelon",
+                    "description": "watermelon",
                     "price": 30.0,
                     "inventory": 64,
                     "active": true
@@ -757,8 +757,8 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "products": [
                 {
                     "id": 2,
-                    "name": "kiraz",
-                    "description": "kiraz",
+                    "name": "cherry",
+                    "description": "cherry",
                     "price": 18.0,
                     "inventory": 100,
                     "active": true
@@ -846,7 +846,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "products": [
         {
             "id": 2,
-            "name": "muz",
+            "name": "banana",
             "description": null,
             "price": 12.0,
             "inventory": 29,
@@ -854,7 +854,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
         },
         {
             "id": 1,
-            "name": "kiraz",
+            "name": "cherry",
             "description": null,
             "price": 15.0,
             "inventory": 17,
@@ -881,7 +881,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "products": [
         {
             "id": 2,
-            "name": "muz",
+            "name": "banana",
             "description": null,
             "price": 12.0,
             "inventory": 29,
@@ -957,7 +957,7 @@ The **Product Service** manages all the product-related operations within the sy
         },
         {
             "id": 4,
-            "name": "karpuz",
+            "name": "watermelon",
             "description": null,
             "price": 5.0,
             "inventory": 15,
@@ -965,7 +965,7 @@ The **Product Service** manages all the product-related operations within the sy
         },
         {
             "id": 6,
-            "name": "kayisi",
+            "name": "apricot",
             "description": null,
             "price": 7.0,
             "inventory": 26,
@@ -1005,8 +1005,8 @@ The **Product Service** manages all the product-related operations within the sy
 - **Request**:
     ```json
     {
-    "name": "muz",
-    "description": "muz",
+    "name": "banana",
+    "description": "banana",
     "price": 10.0,
     "inventory": 10
     }
@@ -1015,8 +1015,8 @@ The **Product Service** manages all the product-related operations within the sy
     ```json
     {
     "id": 10,
-    "name": "muz",
-    "description": "muz",
+    "name": "banana",
+    "description": "banana",
     "price": 10.0,
     "inventory": 10,
     "active": true
@@ -1215,117 +1215,117 @@ The **User Management Service** is responsible for managing users and their role
 
 ```json
 {
-    "content": [
+  "content": [
+    {
+      "id": 1,
+      "date": "2024-10-09T13:59:48.731203",
+      "paymentType": "CREDIT_CARD",
+      "totalPrice": 60.0,
+      "totalDiscountAmount": 0.0,
+      "totalDiscountedPrice": 60.0,
+      "cashierName": "Osman  Tahir  Ozdemir",
+      "soldProducts": [
         {
+          "id": 1,
+          "product": {
             "id": 1,
-            "date": "2024-10-09T13:59:48.731203",
-            "paymentType": "CREDIT_CARD",
-            "totalPrice": 60.0,
-            "totalDiscountAmount": 0.0,
-            "totalDiscountedPrice": 60.0,
-            "cashierName": "Osman  Tahir  Ozdemir",
-            "soldProducts": [
-                {
-                    "id": 1,
-                    "product": {
-                        "id": 1,
-                        "name": "karpuz",
-                        "price": 30.0,
-                        "inventory": 64
-                    },
-                    "discount": 0.0,
-                    "discountAmount": 0.0,
-                    "finalPriceAfterDiscount": 60.0,
-                    "total": 60.0,
-                    "quantity": 2,
-                    "deleted": false
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "date": "2024-10-09T14:16:17.862191",
-            "paymentType": "CREDIT_CARD",
-            "totalPrice": 240.0,
-            "totalDiscountAmount": 0.0,
-            "totalDiscountedPrice": 240.0,
-            "cashierName": "Osman  Tahir  Ozdemir",
-            "soldProducts": [
-                {
-                    "id": 2,
-                    "product": {
-                        "id": 1,
-                        "name": "karpuz",
-                        "price": 30.0,
-                        "inventory": 64
-                    },
-                    "discount": 0.0,
-                    "discountAmount": 0.0,
-                    "finalPriceAfterDiscount": 240.0,
-                    "total": 240.0,
-                    "quantity": 8,
-                    "deleted": false
-                }
-            ]
-        },
-        {
-            "id": 3,
-            "date": "2024-10-09T14:31:20.877169",
-            "paymentType": "CREDIT_CARD",
-            "totalPrice": 240.0,
-            "totalDiscountAmount": 0.0,
-            "totalDiscountedPrice": 240.0,
-            "cashierName": "Osman  Tahir  Ozdemir",
-            "soldProducts": [
-                {
-                    "id": 3,
-                    "product": {
-                        "id": 1,
-                        "name": "karpuz",
-                        "price": 30.0,
-                        "inventory": 64
-                    },
-                    "discount": 0.0,
-                    "discountAmount": 0.0,
-                    "finalPriceAfterDiscount": 240.0,
-                    "total": 240.0,
-                    "quantity": 8,
-                    "deleted": false
-                }
-            ]
-        },
-        {
-            "id": 4,
-            "date": "2024-10-09T14:53:48.327226",
-            "paymentType": "CREDIT_CARD",
-            "totalPrice": 540.0,
-            "totalDiscountAmount": 81.0,
-            "totalDiscountedPrice": 459.0,
-            "cashierName": "Osman  Tahir  Ozdemir",
-            "soldProducts": [
-                {
-                    "id": 4,
-                    "product": {
-                        "id": 1,
-                        "name": "karpuz",
-                        "price": 30.0,
-                        "inventory": 64
-                    },
-                    "discount": 15.0,
-                    "discountAmount": 81.0,
-                    "finalPriceAfterDiscount": 459.0,
-                    "total": 540.0,
-                    "quantity": 18,
-                    "deleted": false
-                }
-            ]
+            "name": "watermelon",
+            "price": 30.0,
+            "inventory": 64
+          },
+          "discount": 0.0,
+          "discountAmount": 0.0,
+          "finalPriceAfterDiscount": 60.0,
+          "total": 60.0,
+          "quantity": 2,
+          "deleted": false
         }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 5,
-        "totalPages": 1,
-        "totalElements": 4
+      ]
+    },
+    {
+      "id": 2,
+      "date": "2024-10-09T14:16:17.862191",
+      "paymentType": "CREDIT_CARD",
+      "totalPrice": 240.0,
+      "totalDiscountAmount": 0.0,
+      "totalDiscountedPrice": 240.0,
+      "cashierName": "Osman  Tahir  Ozdemir",
+      "soldProducts": [
+        {
+          "id": 2,
+          "product": {
+            "id": 1,
+            "name": "watermelon",
+            "price": 30.0,
+            "inventory": 64
+          },
+          "discount": 0.0,
+          "discountAmount": 0.0,
+          "finalPriceAfterDiscount": 240.0,
+          "total": 240.0,
+          "quantity": 8,
+          "deleted": false
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "date": "2024-10-09T14:31:20.877169",
+      "paymentType": "CREDIT_CARD",
+      "totalPrice": 240.0,
+      "totalDiscountAmount": 0.0,
+      "totalDiscountedPrice": 240.0,
+      "cashierName": "Osman  Tahir  Ozdemir",
+      "soldProducts": [
+        {
+          "id": 3,
+          "product": {
+            "id": 1,
+            "name": "watermelon",
+            "price": 30.0,
+            "inventory": 64
+          },
+          "discount": 0.0,
+          "discountAmount": 0.0,
+          "finalPriceAfterDiscount": 240.0,
+          "total": 240.0,
+          "quantity": 8,
+          "deleted": false
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "date": "2024-10-09T14:53:48.327226",
+      "paymentType": "CREDIT_CARD",
+      "totalPrice": 540.0,
+      "totalDiscountAmount": 81.0,
+      "totalDiscountedPrice": 459.0,
+      "cashierName": "Osman  Tahir  Ozdemir",
+      "soldProducts": [
+        {
+          "id": 4,
+          "product": {
+            "id": 1,
+            "name": "watermelon",
+            "price": 30.0,
+            "inventory": 64
+          },
+          "discount": 15.0,
+          "discountAmount": 81.0,
+          "finalPriceAfterDiscount": 459.0,
+          "total": 540.0,
+          "quantity": 18,
+          "deleted": false
+        }
+      ]
     }
+  ],
+  "pageable": {
+    "pageNumber": 0,
+    "pageSize": 5,
+    "totalPages": 1,
+    "totalElements": 4
+  }
 }
 ```

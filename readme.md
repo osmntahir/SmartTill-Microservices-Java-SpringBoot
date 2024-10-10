@@ -288,17 +288,18 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 #### Request Parameters:
 
-| Parameter           | Type                 | Description                                           |
-|---------------------|----------------------|-------------------------------------------------------|
-| page                | Integer              | Page number                                           |
-| size                | Integer              | Page size                                             |
-| minTotalPrice       | Double               | Filter for minimum total price                        |
-| maxTotalPrice       | Double               | Filter for maximum total price                        |
-| startDate           | DateTime (ISO Format) | Filter for sales from this date                       |
-| endDate             | DateTime (ISO Format) | Filter for sales up to this date                      |
-| paymentType         | String               | Filter for payment type                               |
-| sortBy              | List<String>         | Sort by field                                         |
-| sortOrder           | String               | Sort direction (ASC/DESC)                             |
+| Parameter         | Type                      | Required | Default Value                    | Description                                                                                             |
+|-------------------|---------------------------|----------|----------------------------------|---------------------------------------------------------------------------------------------------------|
+| **page**          | integer                   | No       | `0`                              | The page number to retrieve.                                                                            |
+| **size**          | integer                   | No       | `5`                              | The number of items per page.                                                                           |
+| **minTotalPrice** | double                    | No       | `0.0`                            | Filter sales with a minimum total price.                                                                |
+| **maxTotalPrice** | double                    | No       | `Double.MAX_VALUE`               | Filter sales with a maximum total price.                                                                |
+| **startDate**     | LocalDateTime (ISO 8601)  | No       | `"2023-01-01T00:00:00"`          | Start date for the sales filter. Use ISO 8601 format (e.g., `2023-01-01T00:00:00`).                     |
+| **endDate**       | LocalDateTime (ISO 8601)  | No       | `Current DateTime`               | End date for the sales filter. Defaults to the current date and time if not provided.                   |
+| **paymentType**   | string                    | No       | `""`                             | Filter by payment type (`DEBIT_CARD`, `CREDIT_CARD`, `CASH`). If empty, includes all payment types.              |
+| **deleted**       | boolean                   | No       | `false`                          | Include deleted sales if `true`.                                                                        |
+| **sortBy**        | List of strings           | No       | `[]`                             | Fields to sort the results by. Accepts multiple field names (e.g., `["totalPrice", "paymentType"]`).     |
+| **sortOrder**     | string                    | No       | `"ASC"`                          | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order. |
 
 - **Response**:
     ```json
@@ -614,48 +615,62 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Endpoint**: `GET /campaign/getAll`
 - **Description**: Retrieve all campaigns.
+  
+#### Request Parameters:
+| Parameter                 | Type            | Required | Default Value | Description                                                                                                                                |
+|---------------------------|-----------------|----------|---------------|--------------------------------------------------------------------------------------------------------------------------------------------|
+| **page**                  | integer         | No       | `0`           | The page number to retrieve.                                                                                                               |
+| **size**                  | integer         | No       | `10`          | The number of items per page.                                                                                                              |
+| **name**                  | string          | No       | `""`          | Filter campaigns by name. Returns campaigns containing this string in their name.                                                          |
+| **minDiscountPercentage** | double          | No       | `0`           | Filter campaigns with a minimum discount percentage.                                                                                       |
+| **maxDiscountPercentage** | double          | No       | `100`         | Filter campaigns with a maximum discount percentage.                                                                                       |
+| **deleted**               | boolean         | No       | `false`       | Include deleted campaigns in the results if `true`.                                                                                        |
+| **sortBy**                | List of strings | No       | `[]`          | Fields to sort the results by. Accepts multiple field names.                                                                               |
+| **sortDirection**         | string          | No       | `"ASC"`       | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order.                                   |
+
+
 - **Response**:
     ```json
-   {
+  {
     "content": [
         {
-            "id": 4,
-            "name": "Winter sale",
-            "description": "Up to 50% off on all summer items",
-            "discount": 12,
-            "campaignProducts": [
+            "id": 1,
+            "name": "Limited Time Offer",
+            "discountPercentage": 30,
+            "products": [
                 {
-                    "id": 4,
-                    "productId": 1,
-                    "deleted": false
-                },
-                {
-                    "id": 5,
-                    "productId": 2,
-                    "deleted": false
-                },
-                {
-                    "id": 8,
-                    "productId": 4,
-                    "deleted": false
-                },
-                {
-                    "id": 7,
-                    "productId": 9,
-                    "deleted": false
+                    "id": 1,
+                    "name": "karpuz",
+                    "description": "karpuz",
+                    "price": 30.0,
+                    "inventory": 64,
+                    "active": true
                 }
-            ],
-            "deleted": false
+            ]
+        },
+        {
+            "id": 2,
+            "name": "Weekend Offer",
+            "discountPercentage": 15,
+            "products": [
+                {
+                    "id": 2,
+                    "name": "kiraz",
+                    "description": "kiraz",
+                    "price": 18.0,
+                    "inventory": 100,
+                    "active": true
+                }
+            ]
         }
     ],
     "pageable": {
         "pageNumber": 0,
         "pageSize": 10,
         "totalPages": 1,
-        "totalElements": 1
-      }
+        "totalElements": 2
     }
-
+    }
     ```
 
 ### Add Campaign
@@ -812,6 +827,18 @@ The **Product Service** manages all the product-related operations within the sy
 ### Get All Products
 - **Endpoint**: `GET /product/getAll`
 - **Description**: Retrieve a list of all products with pagination, filtering, and sorting.
+
+  #### Request Parameters:
+| Parameter         | Type    | Required | Default Value     | Description                                                           |
+|-------------------|---------|----------|-------------------|-----------------------------------------------------------------------|
+| **page**          | integer | No       | `0`               | The page number to retrieve.                                          |
+| **size**          | integer | No       | `5`               | The number of items per page.                                         |
+| **name**          | string  | No       | `""`              | Filter products by name. Returns products containing this string.     |
+| **minPrice**      | double  | No       | `0`               | Filter products with a minimum price.                                 |
+| **maxPrice**      | double  | No       | `Double.MAX_VALUE`| Filter products with a maximum price.                                 |
+| **sortBy**        | string  | No       | `"name"`          | Field to sort the results by.                                         |
+| **sortDirection** | string  | No       | `"ASC"`           | The direction to sort the results. Can be either `"ASC"` or `"DESC"`. |
+
 - **Response**:
     ```json
     {
@@ -1063,9 +1090,148 @@ The **User Management Service** is responsible for managing users and their role
     }
     ```
 ## Report Service
+### Get sale by id to generate
 - **Endpoint**: `GET /report/sale/{id}`
 - **Description**: Generate a PDF receipt for a specific sale.
 - **Response**: PDF file
 
   [sale_report_43.pdf](reports%2Fsale_report_43.pdf)
 
+### Get sales report
+
+- **Endpoint**: `GET /report/sales`
+- **Description**: Retrieve a sales report with optional filtering, sorting, and pagination options.
+
+#### Request Parameters:
+
+| Parameter         | Type                      | Required | Default Value                    | Description                                                                                             |
+|-------------------|---------------------------|----------|----------------------------------|---------------------------------------------------------------------------------------------------------|
+| **page**          | integer                   | No       | `0`                              | The page number to retrieve.                                                                            |
+| **size**          | integer                   | No       | `5`                              | The number of items per page.                                                                           |
+| **minTotalPrice** | double                    | No       | `0.0`                            | Filter sales with a minimum total price.                                                                |
+| **maxTotalPrice** | double                    | No       | `Double.MAX_VALUE`               | Filter sales with a maximum total price.                                                                |
+| **startDate**     | LocalDateTime (ISO 8601)  | No       | `"2023-01-01T00:00:00"`          | Start date for the sales report. Use ISO 8601 format (e.g., `2023-01-01T00:00:00`).                      |
+| **endDate**       | LocalDateTime (ISO 8601)  | No       | `Current DateTime`               | End date for the sales report. Defaults to the current date and time if not provided.                   |
+| **paymentType**   | string                    | No       | `""`                             | Filter by payment type (e.g., `CREDIT_CARD`, `CASH`). If empty, includes all payment types.              |
+| **deleted**       | boolean                   | No       | `false`                          | Include deleted sales if `true`.                                                                        |
+| **sortBy**        | List of strings           | No       | `[]`                             | Fields to sort the results by. Accepts multiple field names (e.g., `["totalPrice", "paymentType"]`).     |
+| **sortOrder**     | string                    | No       | `"ASC"`                          | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order. |
+
+#### Response:
+
+```json
+{
+    "content": [
+        {
+            "id": 1,
+            "date": "2024-10-09T13:59:48.731203",
+            "paymentType": "CREDIT_CARD",
+            "totalPrice": 60.0,
+            "totalDiscountAmount": 0.0,
+            "totalDiscountedPrice": 60.0,
+            "cashierName": "Osman  Tahir  Ozdemir",
+            "soldProducts": [
+                {
+                    "id": 1,
+                    "product": {
+                        "id": 1,
+                        "name": "karpuz",
+                        "price": 30.0,
+                        "inventory": 64
+                    },
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 60.0,
+                    "total": 60.0,
+                    "quantity": 2,
+                    "deleted": false
+                }
+            ]
+        },
+        {
+            "id": 2,
+            "date": "2024-10-09T14:16:17.862191",
+            "paymentType": "CREDIT_CARD",
+            "totalPrice": 240.0,
+            "totalDiscountAmount": 0.0,
+            "totalDiscountedPrice": 240.0,
+            "cashierName": "Osman  Tahir  Ozdemir",
+            "soldProducts": [
+                {
+                    "id": 2,
+                    "product": {
+                        "id": 1,
+                        "name": "karpuz",
+                        "price": 30.0,
+                        "inventory": 64
+                    },
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 240.0,
+                    "total": 240.0,
+                    "quantity": 8,
+                    "deleted": false
+                }
+            ]
+        },
+        {
+            "id": 3,
+            "date": "2024-10-09T14:31:20.877169",
+            "paymentType": "CREDIT_CARD",
+            "totalPrice": 240.0,
+            "totalDiscountAmount": 0.0,
+            "totalDiscountedPrice": 240.0,
+            "cashierName": "Osman  Tahir  Ozdemir",
+            "soldProducts": [
+                {
+                    "id": 3,
+                    "product": {
+                        "id": 1,
+                        "name": "karpuz",
+                        "price": 30.0,
+                        "inventory": 64
+                    },
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 240.0,
+                    "total": 240.0,
+                    "quantity": 8,
+                    "deleted": false
+                }
+            ]
+        },
+        {
+            "id": 4,
+            "date": "2024-10-09T14:53:48.327226",
+            "paymentType": "CREDIT_CARD",
+            "totalPrice": 540.0,
+            "totalDiscountAmount": 81.0,
+            "totalDiscountedPrice": 459.0,
+            "cashierName": "Osman  Tahir  Ozdemir",
+            "soldProducts": [
+                {
+                    "id": 4,
+                    "product": {
+                        "id": 1,
+                        "name": "karpuz",
+                        "price": 30.0,
+                        "inventory": 64
+                    },
+                    "discount": 15.0,
+                    "discountAmount": 81.0,
+                    "finalPriceAfterDiscount": 459.0,
+                    "total": 540.0,
+                    "quantity": 18,
+                    "deleted": false
+                }
+            ]
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "totalPages": 1,
+        "totalElements": 4
+    }
+}
+```

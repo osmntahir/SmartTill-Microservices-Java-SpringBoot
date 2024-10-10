@@ -1095,7 +1095,7 @@ The **User Management Service** is responsible for managing users and their role
 - **Description**: Generate a PDF receipt for a specific sale.
 - **Response**: PDF file
 
-  [sale_report_43.pdf](reports%2Fsale_report_43.pdf)
+  [sale_report_4.pdf](reports%2Fsale_report_4.pdf)
 
 ### Get sales report
 

@@ -173,15 +173,29 @@ public class SaleServiceImpl implements SaleService {
     public SaleDto deleteSale(Long id) {
         logger.info("Deleting sale with id: {}", id);
 
+
         Sale existingSale = saleRepository.findById(id)
                 .orElseThrow(() -> new SaleNotFoundException("Sale not found with id: " + id));
 
+
         existingSale.setDeleted(true);
+
+
+        List<SoldProduct> soldProducts = soldProductRepository.findAllBySaleId(id);
+        for (SoldProduct soldProduct : soldProducts) {
+            soldProduct.setDeleted(true);
+            soldProductRepository.save(soldProduct);
+        }
+
+        // Save the updated sale entity
         Sale savedSale = saleRepository.save(existingSale);
 
-        logger.info("Sale with id {} is deleted", id);
+        logger.info("Sale with id {} is deleted, along with its sold products", id);
+
+        // Convert and return the updated sale DTO
         return mapUtil.convertSaleToSaleDto(savedSale);
     }
+
 
     @Override
     public SaleDto getSale(Long saleId) {

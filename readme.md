@@ -933,7 +933,7 @@ The **Product Service** manages all the product-related operations within the sy
     "content": [
         {
             "id": 9,
-            "name": "elma",
+            "name": "apple",
             "description": null,
             "price": 15.0,
             "inventory": 44,
@@ -941,7 +941,7 @@ The **Product Service** manages all the product-related operations within the sy
         },
         {
             "id": 8,
-            "name": "erik",
+            "name": "plum",
             "description": null,
             "price": 12.0,
             "inventory": 43,
@@ -949,7 +949,7 @@ The **Product Service** manages all the product-related operations within the sy
         },
         {
             "id": 1,
-            "name": "incir",
+            "name": "fig",
             "description": null,
             "price": 10.0,
             "inventory": 83,

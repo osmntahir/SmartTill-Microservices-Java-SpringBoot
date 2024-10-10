@@ -37,6 +37,8 @@ services:
       - SPRING_PROFILES_ACTIVE=docker
     networks:
       - toyota
+    volumes:
+      - ./reports:/app/reports
 
   sale-service:
     build:

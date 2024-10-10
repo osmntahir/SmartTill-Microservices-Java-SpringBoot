@@ -46,15 +46,21 @@ public class SaleServiceImpl implements SaleService {
                                                         String sortOrder,
                                                         double minTotalPrice,
                                                         double maxTotalPrice,
+                                                        double minTotalDiscountAmount,
+                                                        double maxTotalDiscountAmount,
+                                                        double minTotalDiscountedPrice,
+                                                        double maxTotalDiscountedPrice,
                                                         LocalDateTime startDate,
                                                         LocalDateTime endDate,
                                                         String paymentTypeStr,
+                                                        String cashierName,
                                                         boolean deleted) {
 
         logger.info("Getting sales with filters");
 
         Pageable pageable = PageRequest.of(page, size, Sort.by(SortUtil.createSortOrder(sortBy, sortOrder)));
 
+        // Handle PaymentType filtering
         PaymentType paymentType = null;
         if (paymentTypeStr != null && !paymentTypeStr.isEmpty()) {
             try {
@@ -64,7 +70,11 @@ public class SaleServiceImpl implements SaleService {
             }
         }
 
-        Page<Sale> pageResponse = saleRepository.getSalesFiltered(minTotalPrice, maxTotalPrice, startDate, endDate, paymentType, deleted, pageable);
+        // Call the repository method with the additional filters
+        Page<Sale> pageResponse = saleRepository.getSalesFiltered(minTotalPrice, maxTotalPrice,
+                minTotalDiscountAmount, maxTotalDiscountAmount,
+                minTotalDiscountedPrice, maxTotalDiscountedPrice,
+                startDate, endDate, paymentType, cashierName, deleted, pageable);
 
         logger.debug("Retrieved {} sales.", pageResponse.getContent().size());
 
@@ -76,6 +86,7 @@ public class SaleServiceImpl implements SaleService {
 
         return new PaginationResponse<>(saleDtos, pageResponse);
     }
+
 
     @Override
     public SaleDto addSale(SaleDto saleDto, String cashierName) {

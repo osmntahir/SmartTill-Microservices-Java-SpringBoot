@@ -10,5 +10,17 @@ public interface SoldProductService {
 
     SoldProductDto updateSoldProduct(Long id, SoldProductDto soldProductDto);
 
-    PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection);
+    PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name,
+                                                       Double minPrice, Double maxPrice,
+                                                       Integer minQuantity, Integer maxQuantity,
+                                                       Double minDiscountPercentage,
+                                                       Double maxDiscountPercentage,
+                                                       Double minDiscountAmount,
+                                                       Double maxDiscountAmount,
+                                                       Double minFinalPriceAfterDiscount,
+                                                       Double maxFinalPriceAfterDiscount,
+                                                       Double minTotalPrice,
+                                                       Double maxTotalPrice,
+                                                       boolean deleted, String sortBy,
+                                                       String sortDirection);
 }

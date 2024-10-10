@@ -26,18 +26,28 @@ public class SaleController {
 
 
     @GetMapping("/getAll")
-    public PaginationResponse<SaleDto> getAllSales(@RequestParam(defaultValue = "0") int page,
-                                                   @RequestParam(defaultValue = "5") int size,
-                                                   @RequestParam(defaultValue = "0.0") Double minTotalPrice,
-                                                   @RequestParam(defaultValue = "" + Double.MAX_VALUE) Double maxTotalPrice,
-                                                   @RequestParam(defaultValue = "2023-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
-                                                   @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().toString()}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
-                                                   @RequestParam(defaultValue = "") String paymentType,
-                                                   @RequestParam(defaultValue = "false") boolean deleted,
-                                                   @RequestParam(defaultValue = "") List<String> sortBy,
-                                                   @RequestParam(defaultValue = "ASC") String sortOrder) {
-        return saleService.getSalesFiltered(page, size, sortBy, sortOrder, minTotalPrice, maxTotalPrice, startDate, endDate, paymentType, deleted);
+    public PaginationResponse<SaleDto> getAllSales(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size,
+            @RequestParam(defaultValue = "0.0") Double minTotalPrice,
+            @RequestParam(defaultValue = "" + Double.MAX_VALUE) Double maxTotalPrice,
+            @RequestParam(defaultValue = "0.0") Double minTotalDiscountAmount,
+            @RequestParam(defaultValue = "" + Double.MAX_VALUE) Double maxTotalDiscountAmount,
+            @RequestParam(defaultValue = "0.0") Double minTotalDiscountedPrice,
+            @RequestParam(defaultValue = "" + Double.MAX_VALUE) Double maxTotalDiscountedPrice,
+            @RequestParam(defaultValue = "2023-01-01T00:00:00") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime startDate,
+            @RequestParam(defaultValue = "#{T(java.time.LocalDateTime).now().toString()}") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime endDate,
+            @RequestParam(defaultValue = "") String paymentType,
+            @RequestParam(defaultValue = "") String cashierName,
+            @RequestParam(defaultValue = "false") boolean deleted,
+            @RequestParam(defaultValue = "") List<String> sortBy,
+            @RequestParam(defaultValue = "ASC") String sortOrder) {
+
+        return saleService.getSalesFiltered(page, size, sortBy, sortOrder, minTotalPrice, maxTotalPrice,
+                minTotalDiscountAmount, maxTotalDiscountAmount, minTotalDiscountedPrice, maxTotalDiscountedPrice,
+                startDate, endDate, paymentType, cashierName, deleted);
     }
+
 
     @GetMapping("/get/{id}")
     public ResponseEntity <SaleDto> getSale(@PathVariable Long id){

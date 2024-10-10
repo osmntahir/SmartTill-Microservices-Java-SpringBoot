@@ -42,17 +42,41 @@ public class SoldProductServiceImpl implements SoldProductService {
     private final SaleRepository saleRepository;
 
     @Override
-    public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean deleted, String sortBy, String sortDirection) {
+    public PaginationResponse<SoldProductDto> getSoldProducts(int page, int size, String name,
+                                                              Double minPrice, Double maxPrice,
+                                                              Integer minQuantity, Integer maxQuantity,
+                                                              Double minDiscountPercentage, Double maxDiscountPercentage,
+                                                              Double minDiscountAmount, Double maxDiscountAmount,
+                                                              Double minFinalPriceAfterDiscount, Double maxFinalPriceAfterDiscount,
+                                                              Double minTotalPrice, Double maxTotalPrice,
+                                                              boolean deleted, String sortBy, String sortDirection) {
         logger.info("Getting sold products with filters");
-        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
-        Page<SoldProduct> pageResponse = soldProductRepository.getSoldProductsFiltered(name, minPrice, maxPrice, deleted, pageable);
-        logger.debug("Retrieved {} sold products.", pageResponse.getContent().size());
-        List<SoldProductDto> soldProductDtos = pageResponse.stream().map(
-                mapUtil::convertSoldProductToSoldProductDto).toList();
-        logger.info("Retrieved and converted {} sold products to dto.", soldProductDtos.size());
 
+        // Create Pageable object with sorting direction and sort field
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(sortDirection), sortBy));
+
+        // Call repository method to get filtered and paginated results
+        Page<SoldProduct> pageResponse = soldProductRepository.getSoldProductsFiltered(
+                name, minPrice, maxPrice, minQuantity, maxQuantity,
+                minDiscountPercentage, maxDiscountPercentage,
+                minDiscountAmount, maxDiscountAmount,
+                minFinalPriceAfterDiscount, maxFinalPriceAfterDiscount,
+                minTotalPrice, maxTotalPrice,
+                deleted, pageable);
+
+        logger.debug("Retrieved {} sold products.", pageResponse.getContent().size());
+
+        // Convert entities to DTOs
+        List<SoldProductDto> soldProductDtos = pageResponse.stream()
+                .map(mapUtil::convertSoldProductToSoldProductDto)
+                .toList();
+
+        logger.info("Retrieved and converted {} sold products to DTO.", soldProductDtos.size());
+
+        // Return a paginated response
         return new PaginationResponse<>(soldProductDtos, pageResponse);
     }
+
 
     @Override
     public SoldProductDto addSoldProduct(Long productId, Long saleId, @NotNull SoldProductDto soldProductDto) {

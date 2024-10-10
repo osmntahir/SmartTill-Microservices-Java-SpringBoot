@@ -14,10 +14,16 @@ public interface SaleService {
                                                  String sortOrder,
                                                  double minTotalPrice,
                                                  double maxTotalPrice,
+                                                 double minTotalDiscountAmount,
+                                                 double maxTotalDiscountAmount,
+                                                 double minTotalDiscountedPrice,
+                                                 double maxTotalDiscountedPrice,
                                                  LocalDateTime startDate,
                                                  LocalDateTime endDate,
                                                  String paymentType,
+                                                 String cashierName,
                                                  boolean deleted);
+
 
     SaleDto addSale(SaleDto saleDto, String cashierName);
 

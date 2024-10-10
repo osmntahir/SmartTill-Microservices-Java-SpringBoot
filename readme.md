@@ -783,9 +783,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     ```json
    {
     "name": "Weekend Special Discount",
-    "discountPercentage": 20,
-    "startDate": "08-10-2024",
-    "endDate": "15-10-2024"
+    "discountPercentage": 20
     }
 
     ```
@@ -795,8 +793,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 16,
     "name": "Weekend Special Discount",
     "discountPercentage": 20,
-    "startDate": "08-10-2024",
-    "endDate": "15-10-2024",
     "products": null
     }
     ```
@@ -810,8 +806,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
   {
    
     "discountPercentage": 30,
-    "endDate": "20-10-2024"
-
     }
     ```
 - **Response**:
@@ -820,8 +814,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 16,
     "name": "Weekend Special Discount",
     "discountPercentage": 30,
-    "startDate": "09-10-2024",
-    "endDate": "20-10-2024",
     "products": null
     }
     ```
@@ -851,8 +843,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 18,
     "name": "Weekend Special Discount",
     "discountPercentage": 15,
-    "startDate": "12-10-2024",
-    "endDate": "14-10-2024",
     "products": [
         {
             "id": 2,
@@ -888,8 +878,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 18,
     "name": "Weekend Special Discount",
     "discountPercentage": 15,
-    "startDate": "12-10-2024",
-    "endDate": "14-10-2024",
     "products": [
         {
             "id": 2,
@@ -913,8 +901,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
     "id": 18,
     "name": "Weekend Special Discount",
     "discountPercentage": 15,
-    "startDate": "12-10-2024",
-    "endDate": "14-10-2024",
     "products": null
     }
     ```

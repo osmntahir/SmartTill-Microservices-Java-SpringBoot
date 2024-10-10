@@ -7,6 +7,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.properties.TextAlignment;
 import com.toyota.reportservice.dto.SaleDto;
 import com.toyota.reportservice.dto.SoldProductDto;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
@@ -16,6 +17,13 @@ import java.util.List;
 
 @Component
 public class PdfGenerator {
+
+    @Value("${report.path}")
+    private final String reportPath;
+
+    public PdfGenerator(@Value("${report.path}") String reportPath) {
+        this.reportPath = reportPath;
+    }
 
     public byte[] generatePDF(SaleDto saleDto) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -44,7 +52,7 @@ public class PdfGenerator {
     }
 
     void savePDFToFile(byte[] pdfContent, Long saleId) throws IOException {
-        String directoryPath = "reports";
+        String directoryPath = reportPath;
         File directory = new File(directoryPath);
         if (!directory.exists()) {
             directory.mkdirs();
@@ -80,13 +88,13 @@ public class PdfGenerator {
         String formattedDate = saleDto.getDate().format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
         String formattedTime = saleDto.getDate().format(DateTimeFormatter.ofPattern("HH:mm"));
 
-        Paragraph saleDetails = new Paragraph("TARIH: " + formattedDate + "    SAAT: " + formattedTime)
+        Paragraph saleDetails = new Paragraph("DATE: " + formattedDate + "    TIME: " + formattedTime)
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10)
                 .setMarginBottom(2);
         document.add(saleDetails);
 
-        Paragraph saleInfo = new Paragraph("SATIS NO: " + saleDto.getId() + "    KASIYER: " + saleDto.getCashierName())
+        Paragraph saleInfo = new Paragraph("SALE NO: " + saleDto.getId() + "    CASHIER: " + saleDto.getCashierName())
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10)
                 .setMarginBottom(2);
@@ -100,7 +108,7 @@ public class PdfGenerator {
     private void addSoldProductsDetails(Document document, List<SoldProductDto> soldProducts) {
         for (SoldProductDto product : soldProducts) {
             // Product name, quantity, and unit price
-            String productInfo = product.getProductName() + " (" + product.getQuantity() + " ADET x " + String.format("%.2f", product.getPrice()) + " TL)";
+            String productInfo = product.getProduct().getName() + " (" + product.getQuantity() + " PCS x " + String.format("%.2f", product.getProduct().getPrice()) + " USD)";
             Paragraph productParagraph = new Paragraph(productInfo)
                     .setFontSize(10)
                     .setTextAlignment(TextAlignment.CENTER)
@@ -108,9 +116,9 @@ public class PdfGenerator {
             document.add(productParagraph);
 
             // Total price and discounted price with proper spacing
-            String totalInfo = "Toplam Fiyat: " + String.format("%.2f", product.getQuantity() * product.getPrice()) + " TL";
-            String discountInfo = "Indirim: " + String.format("%.2f", product.getDiscountAmount()) + " TL";
-            String finalPriceInfo = "Indirimli Fiyat: " + String.format("%.2f", product.getFinalPriceAfterDiscount()) + " TL";
+            String totalInfo = "Total Price: " + String.format("%.2f", product.getQuantity() * product.getProduct().getPrice()) + " USD";
+            String discountInfo = "Discount: " + String.format("%.2f", product.getDiscountAmount()) + " USD";
+            String finalPriceInfo = "Discounted Price: " + String.format("%.2f", product.getFinalPriceAfterDiscount()) + " USD";
 
             Paragraph pricesParagraph = new Paragraph(totalInfo + "    " + discountInfo + "    " + finalPriceInfo)
                     .setFontSize(10)
@@ -126,7 +134,7 @@ public class PdfGenerator {
     }
 
     private void addTotalInfo(Document document, SaleDto saleDto) {
-        Paragraph totalPrice = new Paragraph("GENEL TOPLAM: " + String.format("%.2f", saleDto.getTotalPrice()) + " TL")
+        Paragraph totalPrice = new Paragraph("TOTAL PRICE: " + String.format("%.2f", saleDto.getTotalPrice()) + " USD")
                 .setBold()
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10)
@@ -134,7 +142,7 @@ public class PdfGenerator {
         document.add(totalPrice);
 
         if (saleDto.getTotalDiscountAmount() > 0) {
-            Paragraph discountedTotal = new Paragraph("INDIRIMLI TOPLAM: " + String.format("%.2f", saleDto.getTotalDiscountedPrice()) + " TL")
+            Paragraph discountedTotal = new Paragraph("DISCOUNTED TOTAL: " + String.format("%.2f", saleDto.getTotalDiscountedPrice()) + " USD")
                     .setBold()
                     .setTextAlignment(TextAlignment.CENTER)
                     .setFontSize(10)
@@ -146,7 +154,7 @@ public class PdfGenerator {
                 .setTextAlignment(TextAlignment.CENTER)
                 .setMarginBottom(2));
 
-        document.add(new Paragraph("KDV FISI DEGILDIR")
+        document.add(new Paragraph("NOT A TAX INVOICE")
                 .setBold()
                 .setTextAlignment(TextAlignment.CENTER)
                 .setFontSize(10)

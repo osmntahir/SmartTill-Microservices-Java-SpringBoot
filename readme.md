@@ -288,18 +288,24 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 #### Request Parameters:
 
-| Parameter         | Type                      | Required | Default Value                    | Description                                                                                             |
-|-------------------|---------------------------|----------|----------------------------------|---------------------------------------------------------------------------------------------------------|
-| **page**          | integer                   | No       | `0`                              | The page number to retrieve.                                                                            |
-| **size**          | integer                   | No       | `5`                              | The number of items per page.                                                                           |
-| **minTotalPrice** | double                    | No       | `0.0`                            | Filter sales with a minimum total price.                                                                |
-| **maxTotalPrice** | double                    | No       | `Double.MAX_VALUE`               | Filter sales with a maximum total price.                                                                |
-| **startDate**     | LocalDateTime (ISO 8601)  | No       | `"2023-01-01T00:00:00"`          | Start date for the sales filter. Use ISO 8601 format (e.g., `2023-01-01T00:00:00`).                     |
-| **endDate**       | LocalDateTime (ISO 8601)  | No       | `Current DateTime`               | End date for the sales filter. Defaults to the current date and time if not provided.                   |
-| **paymentType**   | string                    | No       | `""`                             | Filter by payment type (`DEBIT_CARD`, `CREDIT_CARD`, `CASH`). If empty, includes all payment types.              |
-| **deleted**       | boolean                   | No       | `false`                          | Include deleted sales if `true`.                                                                        |
-| **sortBy**        | List of strings           | No       | `[]`                             | Fields to sort the results by. Accepts multiple field names (e.g., `["totalPrice", "paymentType"]`).     |
-| **sortOrder**     | string                    | No       | `"ASC"`                          | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order. |
+| Parameter                        | Type         | Required | Default Value               | Description                                                                                             |
+|-----------------------------------|--------------|----------|-----------------------------|---------------------------------------------------------------------------------------------------------|
+| **page**                          | integer      | No       | `0`                         | The page number to retrieve.                                                                            |
+| **size**                          | integer      | No       | `5`                         | The number of items per page.                                                                           |
+| **minTotalPrice**                 | double       | No       | `0.0`                       | Minimum total price for the sale.                                                                       |
+| **maxTotalPrice**                 | double       | No       | `Double.MAX_VALUE`          | Maximum total price for the sale.                                                                       |
+| **minTotalDiscountAmount**        | double       | No       | `0.0`                       | Minimum total discount amount for the sale.                                                             |
+| **maxTotalDiscountAmount**        | double       | No       | `Double.MAX_VALUE`          | Maximum total discount amount for the sale.                                                             |
+| **minTotalDiscountedPrice**       | double       | No       | `0.0`                       | Minimum total discounted price for the sale.                                                            |
+| **maxTotalDiscountedPrice**       | double       | No       | `Double.MAX_VALUE`          | Maximum total discounted price for the sale.                                                            |
+| **startDate**                     | datetime     | No       | `2023-01-01T00:00:00`       | Start date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                          |
+| **endDate**                       | datetime     | No       | `Now`                       | End date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                            |
+| **paymentType**                   | string       | No       | `""`                        | Filter by payment type (e.g., `CASH`, `CREDIT_CARD`, `DEBIT_CARD`).                                      |
+| **cashierName**                   | string       | No       | `""`                        | Filter by cashier's name.                                                                                |
+| **deleted**                       | boolean      | No       | `false`                     | Include deleted sales if `true`.                                                                        |
+| **sortBy**                        | List<string> | No       | `"name"`                    | Field(s) to sort the results by. Example values could be `"totalPrice"`, `"date"`, `"cashierName"`, etc. |
+| **sortOrder**                     | string       | No       | `"ASC"`                     | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
+
 
 - **Response**:
     ```json
@@ -530,11 +536,107 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Endpoint**: `GET /sold-product/getAll`
 - **Description**: Retrieve all sold products.
+- 
+ #### Request Parameters:
+
+ | Parameter                        | Type     | Required | Default Value               | Description                                                                                             |
+|-----------------------------------|----------|----------|-----------------------------|---------------------------------------------------------------------------------------------------------|
+| **page**                          | integer  | No       | `0`                         | The page number to retrieve.                                                                            |
+| **size**                          | integer  | No       | `5`                         | The number of items per page.                                                                           |
+| **name**                          | string   | No       | `""`                        | Filter sold products by name. Returns sold products containing this string.                             |
+| **minPrice**                      | double   | No       | `0.0`                       | Minimum price for sold products.                                                                        |
+| **maxPrice**                      | double   | No       | `Double.MAX_VALUE`          | Maximum price for sold products.                                                                        |
+| **minQuantity**                   | integer  | No       | `0`                         | Minimum quantity for sold products.                                                                     |
+| **maxQuantity**                   | integer  | No       | `Integer.MAX_VALUE`         | Maximum quantity for sold products.                                                                     |
+| **minDiscountPercentage**         | double   | No       | `0.0`                       | Minimum discount percentage for sold products.                                                          |
+| **maxDiscountPercentage**         | double   | No       | `Double.MAX_VALUE`          | Maximum discount percentage for sold products.                                                          |
+| **minDiscountAmount**             | double   | No       | `0.0`                       | Minimum discount amount for sold products.                                                              |
+| **maxDiscountAmount**             | double   | No       | `Double.MAX_VALUE`          | Maximum discount amount for sold products.                                                              |
+| **minFinalPriceAfterDiscount**    | double   | No       | `0.0`                       | Minimum final price after discount for sold products.                                                   |
+| **maxFinalPriceAfterDiscount**    | double   | No       | `Double.MAX_VALUE`          | Maximum final price after discount for sold products.                                                   |
+| **minTotalPrice**                 | double   | No       | `0.0`                       | Minimum total price for sold products.                                                                  |
+| **maxTotalPrice**                 | double   | No       | `Double.MAX_VALUE`          | Maximum total price for sold products.                                                                  |
+| **deleted**                       | boolean  | No       | `false`                     | Include deleted sold products if `true`.                                                                |
+| **sortBy**                        | string   | No       | `"name"`                    | Field to sort the results by. Example values could be `"name"`, `"price"`, `"quantity"`, etc.            |
+| **sortDirection**                 | string   | No       | `"ASC"`                     | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
+
+ 
 - **Response**:
     ```json
-    [
-      
-    ]
+  {
+    "content": [
+        {
+            "id": 12,
+            "product": {
+                "id": 4,
+                "name": "apricot",
+                "price": 60.0,
+                "description": "apricot",
+                "inventory": 82
+            },
+            "discount": 15.0,
+            "discountAmount": 54.0,
+            "finalPriceAfterDiscount": 306.0,
+            "total": 360.0,
+            "quantity": 6,
+            "deleted": false
+        },
+        {
+            "id": 13,
+            "product": {
+                "id": 3,
+                "name": "banana",
+                "price": 22.0,
+                "description": "banana",
+                "inventory": 88
+            },
+            "discount": 0.0,
+            "discountAmount": 0.0,
+            "finalPriceAfterDiscount": 88.0,
+            "total": 88.0,
+            "quantity": 4,
+            "deleted": false
+        },
+        {
+            "id": 15,
+            "product": {
+                "id": 2,
+                "name": "cherry",
+                "price": 18.0,
+                "description": "cherry",
+                "inventory": 86
+            },
+            "discount": 15.0,
+            "discountAmount": 16.2,
+            "finalPriceAfterDiscount": 91.8,
+            "total": 108.0,
+            "quantity": 6,
+            "deleted": false
+        },
+        {
+            "id": 14,
+            "product": {
+                "id": 1,
+                "name": "watermelon",
+                "price": 30.0,
+                "description": "watermelon",
+                "inventory": 58
+            },
+            "discount": 30.0,
+            "discountAmount": 18.0,
+            "finalPriceAfterDiscount": 42.0,
+            "total": 60.0,
+            "quantity": 2,
+            "deleted": false
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "totalPages": 1,
+        "totalElements": 4
+    }
+    }
     ```
 
 ### Add Sold Product
@@ -1104,18 +1206,24 @@ The **User Management Service** is responsible for managing users and their role
 
 #### Request Parameters:
 
-| Parameter         | Type                      | Required | Default Value                    | Description                                                                                             |
-|-------------------|---------------------------|----------|----------------------------------|---------------------------------------------------------------------------------------------------------|
-| **page**          | integer                   | No       | `0`                              | The page number to retrieve.                                                                            |
-| **size**          | integer                   | No       | `5`                              | The number of items per page.                                                                           |
-| **minTotalPrice** | double                    | No       | `0.0`                            | Filter sales with a minimum total price.                                                                |
-| **maxTotalPrice** | double                    | No       | `Double.MAX_VALUE`               | Filter sales with a maximum total price.                                                                |
-| **startDate**     | LocalDateTime (ISO 8601)  | No       | `"2023-01-01T00:00:00"`          | Start date for the sales report. Use ISO 8601 format (e.g., `2023-01-01T00:00:00`).                      |
-| **endDate**       | LocalDateTime (ISO 8601)  | No       | `Current DateTime`               | End date for the sales report. Defaults to the current date and time if not provided.                   |
-| **paymentType**   | string                    | No       | `""`                             | Filter by payment type (e.g., `CREDIT_CARD`, `CASH`). If empty, includes all payment types.              |
-| **deleted**       | boolean                   | No       | `false`                          | Include deleted sales if `true`.                                                                        |
-| **sortBy**        | List of strings           | No       | `[]`                             | Fields to sort the results by. Accepts multiple field names (e.g., `["totalPrice", "paymentType"]`).     |
-| **sortOrder**     | string                    | No       | `"ASC"`                          | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order. |
+| Parameter                        | Type         | Required | Default Value               | Description                                                                                             |
+|-----------------------------------|--------------|----------|-----------------------------|---------------------------------------------------------------------------------------------------------|
+| **page**                          | integer      | No       | `0`                         | The page number to retrieve.                                                                            |
+| **size**                          | integer      | No       | `5`                         | The number of items per page.                                                                           |
+| **minTotalPrice**                 | double       | No       | `0.0`                       | Minimum total price for the sale.                                                                       |
+| **maxTotalPrice**                 | double       | No       | `Double.MAX_VALUE`          | Maximum total price for the sale.                                                                       |
+| **minTotalDiscountAmount**        | double       | No       | `0.0`                       | Minimum total discount amount for the sale.                                                             |
+| **maxTotalDiscountAmount**        | double       | No       | `Double.MAX_VALUE`          | Maximum total discount amount for the sale.                                                             |
+| **minTotalDiscountedPrice**       | double       | No       | `0.0`                       | Minimum total discounted price for the sale.                                                            |
+| **maxTotalDiscountedPrice**       | double       | No       | `Double.MAX_VALUE`          | Maximum total discounted price for the sale.                                                            |
+| **startDate**                     | datetime     | No       | `2023-01-01T00:00:00`       | Start date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                          |
+| **endDate**                       | datetime     | No       | `Now`                       | End date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                            |
+| **paymentType**                   | string       | No       | `""`                        | Filter by payment type (e.g., `CASH`, `CREDIT_CARD`, `DEBIT_CARD`).                                      |
+| **cashierName**                   | string       | No       | `""`                        | Filter by cashier's name.                                                                                |
+| **deleted**                       | boolean      | No       | `false`                     | Include deleted sales if `true`.                                                                        |
+| **sortBy**                        | List<string> | No       | `"name"`                    | Field(s) to sort the results by. Example values could be `"totalPrice"`, `"date"`, `"cashierName"`, etc. |
+| **sortOrder**                     | string       | No       | `"ASC"`                     | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
+
 
 #### Response:
 

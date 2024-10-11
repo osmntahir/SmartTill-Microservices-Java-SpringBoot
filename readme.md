@@ -150,20 +150,6 @@ http://keycloak:8080/admin/master/console/#/32bit_realm
 
 ## Core Functionalities
 
-### **User Management Service**
-
-Handles the management of users and their roles. This service connects to Keycloak to ensure that any changes are
-reflected in Keycloak.
-
-- **Roles**: CASHIER, MANAGER, ADMIN (each user must have at least one role).
-- **Endpoints**:
-    - `POST /user` - Add a new user with roles.
-    - `PUT /user/{id}` - Update user details (only predefined roles like CASHIER, MANAGER, ADMIN can be updated).
-    - `DELETE /user/{id}` - Soft delete a user (removes the user but keeps the record for future purposes).
-    - `GET /user/{id}` - Retrieve user details.
-    - `POST /assign-role/{id}` - Assign a role to a user.
-    - `POST /unassign-role/{id}` - Remove a role from a user.
-
 ### **Product Service**
 
 Manages the CRUD operations for products in the system.
@@ -210,16 +196,9 @@ These endpoints manage sales campaigns and their relationships with specific pro
     - `POST /campaign/add` - Add a new campaign to the system.
     - `PUT /campaign/update/{id}` - Update details of a campaign by ID.
     - `DELETE /campaign/delete/{id}` - Remove a campaign by ID.
-
-#### **Campaign Product Endpoints**
-
-These endpoints manage the association of campaigns with products in sales:
-
-- **Endpoints**:
-    - `GET /campaign-product/getAll` - Retrieve all campaign-product associations.
-    - `POST /campaign-product/add` - Add a new campaign-product association.
-    - `PUT /campaign-product/update/{id}` - Update details of a campaign-product association by ID.
-    - `DELETE /campaign-product/delete/{id}` - Remove a campaign-product association by ID.
+    - `POST /campaign/addProducts/{campaignId}` - Add products to a campaign.
+    - `DELETE /campaign/removeProducts/{campaignId}` - Remove products from a campaign.
+    - `DELETE /campaign/removeAllProducts/{campaignId}` - Remove all products from a campaign.
 
 ### **Report Service**
 
@@ -229,6 +208,21 @@ large datasets.
 - **Endpoints**:
     - `GET /report/sale/{id}` - Generate a PDF receipt for a specific sale.
     - `GET /report/sales` - Get a list of all sales with pagination, filtering, and sorting.
+
+### **User Management Service**
+
+Handles the management of users and their roles. This service connects to Keycloak to ensure that any changes are
+reflected in Keycloak.
+
+- **Roles**: CASHIER, MANAGER, ADMIN (each user must have at least one role).
+- **Endpoints**:
+    - `POST /user` - Add a new user with roles.
+    - `PUT /user/{id}` - Update user details (only predefined roles like CASHIER, MANAGER, ADMIN can be updated).
+    - `DELETE /user/{id}` - Soft delete a user (removes the user but keeps the record for future purposes).
+    - `GET /user/{id}` - Retrieve user details.
+    - `POST /assign-role/{id}` - Assign a role to a user.
+    - `POST /unassign-role/{id}` - Remove a role from a user.
+
 
 ## Authorization & Role Management
 

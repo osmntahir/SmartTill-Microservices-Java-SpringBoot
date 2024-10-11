@@ -1078,7 +1078,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Description**: Generate a PDF receipt for a specific sale.
 - **Response**: PDF file
 
-  [sale_report_4.pdf](reports%2Fsale_report_4.pdf)
+  [sale_report_1.pdf](reports%2Fsale_report_1.pdf)
 
 ### Get sales report
 

@@ -2,9 +2,13 @@
 
 ## Introduction
 
-The **Toyota 32 Bit Project** is a backend system designed using a microservice architecture. This system handles various services like user management, product listing, sales, and reporting. The project integrates **API Gateway** with **Keycloak** to manage authentication, authorization, and routing requests between the services.
+The **Toyota 32 Bit Project** is a backend system designed using a microservice architecture. This system handles
+various services like user management, product listing, sales, and reporting. The project integrates **API Gateway**
+with **Keycloak** to manage authentication, authorization, and routing requests between the services.
 
-The architecture ensures that each service has its responsibility, promoting scalability and maintainability. All services are deployed using Docker containers, and the API Gateway acts as a central point of communication between them.
+The architecture ensures that each service has its responsibility, promoting scalability and maintainability. All
+services are deployed using Docker containers, and the API Gateway acts as a central point of communication between
+them.
 
 ## Technologies Used
 
@@ -21,17 +25,20 @@ The architecture ensures that each service has its responsibility, promoting sca
 
 ## Architecture Overview
 
-The project consists of multiple microservices, each responsible for specific operations. The API Gateway integrates with Keycloak for handling authentication and role-based access control (RBAC). It routes requests to the relevant microservices, ensuring secure communication between the components.
+The project consists of multiple microservices, each responsible for specific operations. The API Gateway integrates
+with Keycloak for handling authentication and role-based access control (RBAC). It routes requests to the relevant
+microservices, ensuring secure communication between the components.
 
 ### Key Components
 
 1. **API Gateway**:
     - Manages all routing between services.
     - Integrates with Keycloak for token-based authentication and authorization.
-    - Handles role-based access control (RBAC) for all services, ensuring that only users with appropriate roles can access certain services.
+    - Handles role-based access control (RBAC) for all services, ensuring that only users with appropriate roles can
+      access certain services.
     - **Base URL**: `http://localhost:8085`
     - Example request to get all products:
-      - `GET http://localhost:8085/product/getAll`
+        - `GET http://localhost:8085/product/getAll`
 
 2. **User Management Service**:
     - Handles CRUD operations for users.
@@ -55,11 +62,13 @@ The project consists of multiple microservices, each responsible for specific op
 
 ### Microservices and Docker Integration
 
-Each service is containerized using Docker. The containers register themselves with the API Gateway, which routes requests accordingly. The API Gateway ensures that all authorization rules are enforced using Keycloak tokens.
+Each service is containerized using Docker. The containers register themselves with the API Gateway, which routes
+requests accordingly. The API Gateway ensures that all authorization rules are enforced using Keycloak tokens.
 
 ### Deployment
 
-The project is set up using **Docker Compose**. Each service has its container, and these containers communicate via the API Gateway. The database, PostgreSQL, is also containerized or can be set up externally based on your environment.
+The project is set up using **Docker Compose**. Each service has its container, and these containers communicate via the
+API Gateway. The database, PostgreSQL, is also containerized or can be set up externally based on your environment.
 
 ## How to Run the Project
 
@@ -89,13 +98,15 @@ To run the project locally, follow these steps:
     docker-compose up --build
     ```
 
-This will start all the services including the API Gateway, User Management Service, Product Service, Sale Service, Report Service, PostgreSQL, and Keycloak.
+This will start all the services including the API Gateway, User Management Service, Product Service, Sale Service,
+Report Service, PostgreSQL, and Keycloak.
 
 ## Keycloak Integration
 
 ### OAuth 2.0 Authentication with Keycloak
 
-The project uses Keycloak for OAuth 2.0 authentication. Tokens are generated through Keycloak and then passed to the API Gateway to authorize access to various services.
+The project uses Keycloak for OAuth 2.0 authentication. Tokens are generated through Keycloak and then passed to the API
+Gateway to authorize access to various services.
 
 #### Step-by-step Token Generation via Postman:
 
@@ -114,19 +125,20 @@ The project uses Keycloak for OAuth 2.0 authentication. Tokens are generated thr
 
 ### Initial User Setup with Keycloak
 
-When Keycloak is initialized, users for all roles are automatically created. These default users can be used to test different roles in the system.
+When Keycloak is initialized, users for all roles are automatically created. These default users can be used to test
+different roles in the system.
 
-- **CASHIER Role**:  
-  - Username: `cashier`  
-  - Password: `cashier`
+- **CASHIER Role**:
+    - Username: `cashier`
+    - Password: `cashier`
 
-- **MANAGER Role**:  
-  - Username: `manager`  
-  - Password: `manager`
+- **MANAGER Role**:
+    - Username: `manager`
+    - Password: `manager`
 
-- **ADMIN Role**:  
-  - Username: `admin`  
-  - Password: `admin`
+- **ADMIN Role**:
+    - Username: `admin`
+    - Password: `admin`
 
 These users can access their respective endpoints and perform operations according to their roles.
 
@@ -135,7 +147,6 @@ These users can access their respective endpoints and perform operations accordi
 To manage Keycloak through the admin console, go to:
 
 http://keycloak:8080/admin/master/console/#/32bit_realm
-
 
 ## Core Functionalities
 
@@ -221,36 +232,198 @@ large datasets.
 
 ## Authorization & Role Management
 
-All requests go through the **API Gateway**, which verifies the roles and permissions using **Keycloak**. Based on the role associated with the user, access to different services is granted or denied:
+All requests go through the **API Gateway**, which verifies the roles and permissions using **Keycloak**. Based on the
+role associated with the user, access to different services is granted or denied:
 
 - **Admins** can manage users and their roles.
 - **Cashiers** can handle sales but cannot view the list of sales.
 - **Managers** can generate sales reports and also view the list of all sales.
 
-
 ## Sale Service Overview (Cash Register Logic)
 
-In this system, a **cash register** logic is implemented where **Cashiers** create sales transactions and scan products into the sale. If there is an ongoing campaign for a product, the system automatically applies the discount during the sale. The sold products are added to the sale and necessary calculations such as total price, discount amount, and final price after discounts are automatically handled by the system.
+In this system, a **cash register** logic is implemented where **Cashiers** create sales transactions and scan products
+into the sale. If there is an ongoing campaign for a product, the system automatically applies the discount during the
+sale. The sold products are added to the sale and necessary calculations such as total price, discount amount, and final
+price after discounts are automatically handled by the system.
 
 ### Process Flow:
-1. **Creating a Sale**: 
-   - A cashier first creates a new sale by sending a request to the `/sale/add` endpoint. 
-   - The cashier's name is extracted from the JWT token to associate the sale with the cashier.
 
-2. **Adding Products to the Sale**: 
-   - Once the sale is created, the cashier starts scanning or adding products to the sale by calling the `/sold-product/add/{saleId}/{productId}` endpoint.
-   - The system checks if the product is part of any active campaigns. If a campaign applies, the discount is automatically calculated and deducted from the product’s total price.
+1. **Creating a Sale**:
+    - A cashier first creates a new sale by sending a request to the `/sale/add` endpoint.
+    - The cashier's name is extracted from the JWT token to associate the sale with the cashier.
 
-3. **Updating the Sale Total**: 
-   - As products are added, the system recalculates the total sale price.
-   - It also calculates the total discount amount and the final price after discounts for the entire sale.
+2. **Adding Products to the Sale**:
+    - Once the sale is created, the cashier starts scanning or adding products to the sale by calling
+      the `/sold-product/add/{saleId}/{productId}` endpoint.
+    - The system checks if the product is part of any active campaigns. If a campaign applies, the discount is
+      automatically calculated and deducted from the product’s total price.
+
+3. **Updating the Sale Total**:
+    - As products are added, the system recalculates the total sale price.
+    - It also calculates the total discount amount and the final price after discounts for the entire sale.
 
 4. **Finalizing the Sale**:
-   - Once all products have been added to the sale, the total price, discount amount, and the final price after the discount are saved.
-   - This completes the sales transaction, and the sale details are available for viewing or report generation.
-
+    - Once all products have been added to the sale, the total price, discount amount, and the final price after the
+      discount are saved.
+    - This completes the sales transaction, and the sale details are available for viewing or report generation.
 
 ## API Documentation
+
+## Product Service
+
+The **Product Service** manages all the product-related operations within the system. Below is a list of available
+endpoints and their usage.
+
+### Get All Products
+
+- **Endpoint**: `GET /product/getAll`
+- **Description**: Retrieve a list of all products with pagination, filtering, and sorting.
+
+  #### Request Parameters:
+
+| Parameter         | Type    | Required | Default Value      | Description                                                           |
+|-------------------|---------|----------|--------------------|-----------------------------------------------------------------------|
+| **page**          | integer | No       | `0`                | The page number to retrieve.                                          |
+| **size**          | integer | No       | `5`                | The number of items per page.                                         |
+| **name**          | string  | No       | `""`               | Filter products by name. Returns products containing this string.     |
+| **minPrice**      | double  | No       | `0`                | Filter products with a minimum price.                                 |
+| **maxPrice**      | double  | No       | `Double.MAX_VALUE` | Filter products with a maximum price.                                 |
+| **sortBy**        | string  | No       | `"name"`           | Field to sort the results by.                                         |
+| **sortDirection** | string  | No       | `"ASC"`            | The direction to sort the results. Can be either `"ASC"` or `"DESC"`. |
+
+- **Response**:
+    ```json
+    {
+    "content": [
+        {
+            "id": 9,
+            "name": "apple",
+            "description": null,
+            "price": 15.0,
+            "inventory": 44,
+            "active": true
+        },
+        {
+            "id": 8,
+            "name": "plum",
+            "description": null,
+            "price": 12.0,
+            "inventory": 43,
+            "active": true
+        },
+        {
+            "id": 1,
+            "name": "fig",
+            "description": null,
+            "price": 10.0,
+            "inventory": 83,
+            "active": true
+        },
+        {
+            "id": 4,
+            "name": "watermelon",
+            "description": null,
+            "price": 5.0,
+            "inventory": 15,
+            "active": true
+        },
+        {
+            "id": 6,
+            "name": "apricot",
+            "description": null,
+            "price": 7.0,
+            "inventory": 26,
+            "active": true
+        }
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "sort": {
+            "empty": false,
+            "sorted": true,
+            "unsorted": false
+        },
+        "offset": 0,
+        "unpaged": false,
+        "paged": true
+    },
+    "last": false,
+    "totalPages": 2,
+    "totalElements": 9,
+    "first": true,
+    "size": 5,
+    "number": 0,
+    "sort": {
+        "empty": false,
+        "sorted": true,
+        "unsorted": false
+    },
+    "numberOfElements": 5,
+    "empty": false
+    }
+    ```
+
+### Create Product
+
+- **Endpoint**: `POST /product/add`
+- **Description**: Create a new product.
+- **Request**:
+    ```json
+    {
+    "name": "banana",
+    "description": "banana",
+    "price": 10.0,
+    "inventory": 10
+    }
+    ```
+- **Response**:
+    ```json
+    {
+    "id": 10,
+    "name": "banana",
+    "description": "banana",
+    "price": 10.0,
+    "inventory": 10,
+    "active": true
+    }
+    ```
+
+### Update Product
+
+- **Endpoint**: `PUT /product/update/{id}`
+- **Description**: Update the details of a product.
+- **Request**:
+    ```json
+    {
+    "name": "Updated Product Namee",
+    "price": 199.99,
+    "inventory": 50
+    }
+    ```
+- **Response**:
+    ```json
+    {
+    "id": 11,
+    "name": "Updated Product Namee",
+    "description": null,
+    "price": 199.99,
+    "inventory": 50,
+    "active": true
+    }
+    ```
+
+### Delete Product
+
+- **Endpoint**: `DELETE /product/delete/{id}`
+- **Description**: Delete a product by its ID.
+- **Response**:
+    ```json
+    {
+      "status": 204,
+      "message": "No content."
+    }
+    ```
 
 ## Sale Service
 
@@ -288,24 +461,23 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 #### Request Parameters:
 
-| Parameter                        | Type         | Required | Default Value               | Description                                                                                             |
-|-----------------------------------|--------------|----------|-----------------------------|---------------------------------------------------------------------------------------------------------|
-| **page**                          | integer      | No       | `0`                         | The page number to retrieve.                                                                            |
-| **size**                          | integer      | No       | `5`                         | The number of items per page.                                                                           |
-| **minTotalPrice**                 | double       | No       | `0.0`                       | Minimum total price for the sale.                                                                       |
-| **maxTotalPrice**                 | double       | No       | `Double.MAX_VALUE`          | Maximum total price for the sale.                                                                       |
-| **minTotalDiscountAmount**        | double       | No       | `0.0`                       | Minimum total discount amount for the sale.                                                             |
-| **maxTotalDiscountAmount**        | double       | No       | `Double.MAX_VALUE`          | Maximum total discount amount for the sale.                                                             |
-| **minTotalDiscountedPrice**       | double       | No       | `0.0`                       | Minimum total discounted price for the sale.                                                            |
-| **maxTotalDiscountedPrice**       | double       | No       | `Double.MAX_VALUE`          | Maximum total discounted price for the sale.                                                            |
-| **startDate**                     | datetime     | No       | `2023-01-01T00:00:00`       | Start date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                          |
-| **endDate**                       | datetime     | No       | `Now`                       | End date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                            |
-| **paymentType**                   | string       | No       | `""`                        | Filter by payment type (e.g., `CASH`, `CREDIT_CARD`, `DEBIT_CARD`).                                      |
-| **cashierName**                   | string       | No       | `""`                        | Filter by cashier's name.                                                                                |
-| **deleted**                       | boolean      | No       | `false`                     | Include deleted sales if `true`.                                                                        |
-| **sortBy**                        | List<string> | No       | `"name"`                    | Field(s) to sort the results by. Example values could be `"totalPrice"`, `"date"`, `"cashierName"`, etc. |
-| **sortOrder**                     | string       | No       | `"ASC"`                     | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
-
+| Parameter                   | Type         | Required | Default Value         | Description                                                                                              |
+|-----------------------------|--------------|----------|-----------------------|----------------------------------------------------------------------------------------------------------|
+| **page**                    | integer      | No       | `0`                   | The page number to retrieve.                                                                             |
+| **size**                    | integer      | No       | `5`                   | The number of items per page.                                                                            |
+| **minTotalPrice**           | double       | No       | `0.0`                 | Minimum total price for the sale.                                                                        |
+| **maxTotalPrice**           | double       | No       | `Double.MAX_VALUE`    | Maximum total price for the sale.                                                                        |
+| **minTotalDiscountAmount**  | double       | No       | `0.0`                 | Minimum total discount amount for the sale.                                                              |
+| **maxTotalDiscountAmount**  | double       | No       | `Double.MAX_VALUE`    | Maximum total discount amount for the sale.                                                              |
+| **minTotalDiscountedPrice** | double       | No       | `0.0`                 | Minimum total discounted price for the sale.                                                             |
+| **maxTotalDiscountedPrice** | double       | No       | `Double.MAX_VALUE`    | Maximum total discounted price for the sale.                                                             |
+| **startDate**               | datetime     | No       | `2023-01-01T00:00:00` | Start date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                          |
+| **endDate**                 | datetime     | No       | `Now`                 | End date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                            |
+| **paymentType**             | string       | No       | `""`                  | Filter by payment type (e.g., `CASH`, `CREDIT_CARD`, `DEBIT_CARD`).                                      |
+| **cashierName**             | string       | No       | `""`                  | Filter by cashier's name.                                                                                |
+| **deleted**                 | boolean      | No       | `false`               | Include deleted sales if `true`.                                                                         |
+| **sortBy**                  | List<string> | No       | `"name"`              | Field(s) to sort the results by. Example values could be `"totalPrice"`, `"date"`, `"cashierName"`, etc. |
+| **sortOrder**               | string       | No       | `"ASC"`               | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
 
 - **Response**:
     ```json
@@ -515,7 +687,6 @@ This service manages sales, including creating, updating, deleting, and retrievi
         }
     ]
     }
-  
     ```
 
 ### Delete Sale
@@ -536,31 +707,31 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Endpoint**: `GET /sold-product/getAll`
 - **Description**: Retrieve all sold products.
-- 
- #### Request Parameters:
+-
 
- | Parameter                        | Type     | Required | Default Value               | Description                                                                                             |
-|-----------------------------------|----------|----------|-----------------------------|---------------------------------------------------------------------------------------------------------|
-| **page**                          | integer  | No       | `0`                         | The page number to retrieve.                                                                            |
-| **size**                          | integer  | No       | `5`                         | The number of items per page.                                                                           |
-| **name**                          | string   | No       | `""`                        | Filter sold products by name. Returns sold products containing this string.                             |
-| **minPrice**                      | double   | No       | `0.0`                       | Minimum price for sold products.                                                                        |
-| **maxPrice**                      | double   | No       | `Double.MAX_VALUE`          | Maximum price for sold products.                                                                        |
-| **minQuantity**                   | integer  | No       | `0`                         | Minimum quantity for sold products.                                                                     |
-| **maxQuantity**                   | integer  | No       | `Integer.MAX_VALUE`         | Maximum quantity for sold products.                                                                     |
-| **minDiscountPercentage**         | double   | No       | `0.0`                       | Minimum discount percentage for sold products.                                                          |
-| **maxDiscountPercentage**         | double   | No       | `Double.MAX_VALUE`          | Maximum discount percentage for sold products.                                                          |
-| **minDiscountAmount**             | double   | No       | `0.0`                       | Minimum discount amount for sold products.                                                              |
-| **maxDiscountAmount**             | double   | No       | `Double.MAX_VALUE`          | Maximum discount amount for sold products.                                                              |
-| **minFinalPriceAfterDiscount**    | double   | No       | `0.0`                       | Minimum final price after discount for sold products.                                                   |
-| **maxFinalPriceAfterDiscount**    | double   | No       | `Double.MAX_VALUE`          | Maximum final price after discount for sold products.                                                   |
-| **minTotalPrice**                 | double   | No       | `0.0`                       | Minimum total price for sold products.                                                                  |
-| **maxTotalPrice**                 | double   | No       | `Double.MAX_VALUE`          | Maximum total price for sold products.                                                                  |
-| **deleted**                       | boolean  | No       | `false`                     | Include deleted sold products if `true`.                                                                |
-| **sortBy**                        | string   | No       | `"name"`                    | Field to sort the results by. Example values could be `"name"`, `"price"`, `"quantity"`, etc.            |
-| **sortDirection**                 | string   | No       | `"ASC"`                     | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
+#### Request Parameters:
 
- 
+| Parameter                      | Type    | Required | Default Value       | Description                                                                                       |
+|--------------------------------|---------|----------|---------------------|---------------------------------------------------------------------------------------------------|
+| **page**                       | integer | No       | `0`                 | The page number to retrieve.                                                                      |
+| **size**                       | integer | No       | `5`                 | The number of items per page.                                                                     |
+| **name**                       | string  | No       | `""`                | Filter sold products by name. Returns sold products containing this string.                       |
+| **minPrice**                   | double  | No       | `0.0`               | Minimum price for sold products.                                                                  |
+| **maxPrice**                   | double  | No       | `Double.MAX_VALUE`  | Maximum price for sold products.                                                                  |
+| **minQuantity**                | integer | No       | `0`                 | Minimum quantity for sold products.                                                               |
+| **maxQuantity**                | integer | No       | `Integer.MAX_VALUE` | Maximum quantity for sold products.                                                               |
+| **minDiscountPercentage**      | double  | No       | `0.0`               | Minimum discount percentage for sold products.                                                    |
+| **maxDiscountPercentage**      | double  | No       | `Double.MAX_VALUE`  | Maximum discount percentage for sold products.                                                    |
+| **minDiscountAmount**          | double  | No       | `0.0`               | Minimum discount amount for sold products.                                                        |
+| **maxDiscountAmount**          | double  | No       | `Double.MAX_VALUE`  | Maximum discount amount for sold products.                                                        |
+| **minFinalPriceAfterDiscount** | double  | No       | `0.0`               | Minimum final price after discount for sold products.                                             |
+| **maxFinalPriceAfterDiscount** | double  | No       | `Double.MAX_VALUE`  | Maximum final price after discount for sold products.                                             |
+| **minTotalPrice**              | double  | No       | `0.0`               | Minimum total price for sold products.                                                            |
+| **maxTotalPrice**              | double  | No       | `Double.MAX_VALUE`  | Maximum total price for sold products.                                                            |
+| **deleted**                    | boolean | No       | `false`             | Include deleted sold products if `true`.                                                          |
+| **sortBy**                     | string  | No       | `"name"`            | Field to sort the results by. Example values could be `"name"`, `"price"`, `"quantity"`, etc.     |
+| **sortDirection**              | string  | No       | `"ASC"`             | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order. |
+
 - **Response**:
     ```json
   {
@@ -643,31 +814,31 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Endpoint**: `POST /sold-product/add/{saleId}/{productId}`
 - **Description**: Add a product to a specific sale.
-  - **Request**:
+    - **Request**:
+        ```json
+        {
+          "quantity": 4
+        }
+        ```
+    - **Response**:
       ```json
-      {
-        "quantity": 4
+         {
+      "id": 17,
+      "product": {
+          "id": 1,
+          "name": "cherry",
+          "price": 15.0,
+          "description": null,
+          "inventory": 25
+      },
+      "discount": 20.0,
+      "discountAmount": 12.0,
+      "finalPriceAfterDiscount": 48.0,
+      "total": 60.0,
+      "quantity": 4,
+      "deleted": false
       }
       ```
-  - **Response**:
-    ```json
-       {
-    "id": 17,
-    "product": {
-        "id": 1,
-        "name": "cherry",
-        "price": 15.0,
-        "description": null,
-        "inventory": 25
-    },
-    "discount": 20.0,
-    "discountAmount": 12.0,
-    "finalPriceAfterDiscount": 48.0,
-    "total": 60.0,
-    "quantity": 4,
-    "deleted": false
-    }
-    ```
 
 ### Update Sold Product
 
@@ -717,19 +888,19 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Endpoint**: `GET /campaign/getAll`
 - **Description**: Retrieve all campaigns.
-  
-#### Request Parameters:
-| Parameter                 | Type            | Required | Default Value | Description                                                                                                                                |
-|---------------------------|-----------------|----------|---------------|--------------------------------------------------------------------------------------------------------------------------------------------|
-| **page**                  | integer         | No       | `0`           | The page number to retrieve.                                                                                                               |
-| **size**                  | integer         | No       | `10`          | The number of items per page.                                                                                                              |
-| **name**                  | string          | No       | `""`          | Filter campaigns by name. Returns campaigns containing this string in their name.                                                          |
-| **minDiscountPercentage** | double          | No       | `0`           | Filter campaigns with a minimum discount percentage.                                                                                       |
-| **maxDiscountPercentage** | double          | No       | `100`         | Filter campaigns with a maximum discount percentage.                                                                                       |
-| **deleted**               | boolean         | No       | `false`       | Include deleted campaigns in the results if `true`.                                                                                        |
-| **sortBy**                | List of strings | No       | `[]`          | Fields to sort the results by. Accepts multiple field names.                                                                               |
-| **sortDirection**         | string          | No       | `"ASC"`       | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order.                                   |
 
+#### Request Parameters:
+
+| Parameter                 | Type            | Required | Default Value | Description                                                                                              |
+|---------------------------|-----------------|----------|---------------|----------------------------------------------------------------------------------------------------------|
+| **page**                  | integer         | No       | `0`           | The page number to retrieve.                                                                             |
+| **size**                  | integer         | No       | `10`          | The number of items per page.                                                                            |
+| **name**                  | string          | No       | `""`          | Filter campaigns by name. Returns campaigns containing this string in their name.                        |
+| **minDiscountPercentage** | double          | No       | `0`           | Filter campaigns with a minimum discount percentage.                                                     |
+| **maxDiscountPercentage** | double          | No       | `100`         | Filter campaigns with a maximum discount percentage.                                                     |
+| **deleted**               | boolean         | No       | `false`       | Include deleted campaigns in the results if `true`.                                                      |
+| **sortBy**                | List of strings | No       | `[]`          | Fields to sort the results by. Accepts multiple field names.                                             |
+| **sortDirection**         | string          | No       | `"ASC"`       | The direction to sort the results. Can be either `"ASC"` for ascending or `"DESC"` for descending order. |
 
 - **Response**:
     ```json
@@ -805,7 +976,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     ```json
   {
    
-    "discountPercentage": 30,
+    "discountPercentage": 30
     }
     ```
 - **Response**:
@@ -861,7 +1032,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
             "active": true
         }
     ]
-}
+    }
     ```
 
 ### Remove Products from Campaign
@@ -905,280 +1076,10 @@ This service manages sales, including creating, updating, deleting, and retrievi
     }
     ```
 
-
-
-
-## Product Service
-
-The **Product Service** manages all the product-related operations within the system. Below is a list of available endpoints and their usage.
-
-### Get All Products
-- **Endpoint**: `GET /product/getAll`
-- **Description**: Retrieve a list of all products with pagination, filtering, and sorting.
-
-  #### Request Parameters:
-| Parameter         | Type    | Required | Default Value     | Description                                                           |
-|-------------------|---------|----------|-------------------|-----------------------------------------------------------------------|
-| **page**          | integer | No       | `0`               | The page number to retrieve.                                          |
-| **size**          | integer | No       | `5`               | The number of items per page.                                         |
-| **name**          | string  | No       | `""`              | Filter products by name. Returns products containing this string.     |
-| **minPrice**      | double  | No       | `0`               | Filter products with a minimum price.                                 |
-| **maxPrice**      | double  | No       | `Double.MAX_VALUE`| Filter products with a maximum price.                                 |
-| **sortBy**        | string  | No       | `"name"`          | Field to sort the results by.                                         |
-| **sortDirection** | string  | No       | `"ASC"`           | The direction to sort the results. Can be either `"ASC"` or `"DESC"`. |
-
-- **Response**:
-    ```json
-    {
-    "content": [
-        {
-            "id": 9,
-            "name": "apple",
-            "description": null,
-            "price": 15.0,
-            "inventory": 44,
-            "active": true
-        },
-        {
-            "id": 8,
-            "name": "plum",
-            "description": null,
-            "price": 12.0,
-            "inventory": 43,
-            "active": true
-        },
-        {
-            "id": 1,
-            "name": "fig",
-            "description": null,
-            "price": 10.0,
-            "inventory": 83,
-            "active": true
-        },
-        {
-            "id": 4,
-            "name": "watermelon",
-            "description": null,
-            "price": 5.0,
-            "inventory": 15,
-            "active": true
-        },
-        {
-            "id": 6,
-            "name": "apricot",
-            "description": null,
-            "price": 7.0,
-            "inventory": 26,
-            "active": true
-        }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 5,
-        "sort": {
-            "empty": false,
-            "sorted": true,
-            "unsorted": false
-        },
-        "offset": 0,
-        "unpaged": false,
-        "paged": true
-    },
-    "last": false,
-    "totalPages": 2,
-    "totalElements": 9,
-    "first": true,
-    "size": 5,
-    "number": 0,
-    "sort": {
-        "empty": false,
-        "sorted": true,
-        "unsorted": false
-    },
-    "numberOfElements": 5,
-    "empty": false
-    }
-    ```
-### Create Product
-- **Endpoint**: `POST /product/add`
-- **Description**: Create a new product.
-- **Request**:
-    ```json
-    {
-    "name": "banana",
-    "description": "banana",
-    "price": 10.0,
-    "inventory": 10
-    }
-    ```
-- **Response**: 
-    ```json
-    {
-    "id": 10,
-    "name": "banana",
-    "description": "banana",
-    "price": 10.0,
-    "inventory": 10,
-    "active": true
-    }
-    ```
-### Update Product
-- **Endpoint**: `PUT /product/update/{id}`
-- **Description**: Update the details of a product.
-- **Request**:
-    ```json
-    {
-    "name": "Updated Product Namee",
-    "price": 199.99,
-    "inventory": 50
-    }
-    ```
-- **Response**:
-    ```json
-    {
-    "id": 11,
-    "name": "Updated Product Namee",
-    "description": null,
-    "price": 199.99,
-    "inventory": 50,
-    "active": true
-    }
-    ```
-### Delete Product
-- **Endpoint**: `DELETE /product/delete/{id}`
-- **Description**: Delete a product by its ID.
-- **Response**:
-    ```json
-    {
-      "status": 204,
-      "message": "No content."
-    }
-    ```
-## User Management Service
-
-The **User Management Service** is responsible for managing users and their roles within the system. Below is a list of available endpoints and their usage.
-
-### Get User
-- **Endpoint**: `GET /user`
-- **Description**: Retrieve a list of all users.
-- **Response**:
-    ```json
-    [
-    {
-        "id": "1550629f-c91d-4ac3-8617-7747b503ccd2",
-        "username": "superuser",
-        "firstName": "osman tahir ",
-        "lastName": "ozdemir",
-        "email": "superuser@gmail.com",
-        "password": null,
-        "roles": [
-            "default-roles-32bit-realm",
-            "ADMIN"
-        ]
-    },
-  {
-        "id": "a23c6b13-481f-446b-a190-60bd26b862fe",
-        "username": "user4",
-        "firstName": "osman tahir ",
-        "lastName": "ozdemir",
-        "email": "user4@32bit.com",
-        "password": null,
-        "roles": [
-            "default-roles-32bit-realm",
-            "MANAGER"
-        ]
-    },
-    {
-        "id": "34eb3ff5-d56f-49f6-906c-464895cc1d4c",
-        "username": "user6",
-        "firstName": "UpdatedFirstName",
-        "lastName": "UpdatedLastName",
-        "email": "user6@example.com",
-        "password": null,
-        "roles": [
-            "CASHIER",
-            "default-roles-32bit-realm"
-        ]
-    }
-    ]
-    ```
-### Create User
-- **Endpoint**: `POST /user`
-- **Description**: Create a new user with roles.
-- **Request**:
-    ```json
-   {
-   "firstName": "mahmut",
-  "lastName": "mahmut",
-  "email": "mahmut.ersoy@example.com",
-  "username": "mahmut",
-  "roles": ["MANAGER"],
-  "password": "123"
-   }
-    ```
-- **Response**:
-    ```json
-    {
-    "message": "User created and roles assigned successfully",
-  }
-    ```
-### Update User
-- **Endpoint**: `PUT /user/{id}`
-- **Description**: Update user details.
-- **Request**:
-    ```json
-    {
-    "firstName": "UpdatedFirstName",
-  "lastName": "UpdatedLastName"
-    }
-    ```
-- **Response**:
-    ```json
-    {
-    "message": "User updated successfully"
-    }
-    ```
-- **Request**:
-    ```json
-    {
-    "roles": ["CASHIER"]
-     }
-    ```
-- **Response**:
-    ```json
-    {
-    "message": "User updated successfully with role adjustments."
-    }
-    ```
-### Delete User
-- **Endpoint**: `DELETE /user/{id}`
-- **Description**: Soft delete a user by ID.
-- **Response**:
-    ```json
-    {
-    "message": "User disabled successfully",
-    }
-    ```
-### Assign Role
-- **Endpoint**: `POST /assign-role/{id}?roleName={roleName}`
-- **Description**: Assign a role to a user.
-- **Response**:
-    ```json
-    {
-    "message": "Role assigned successfully"
-    }
-    ```
-### Unassign Role
-- **Endpoint**: `POST /unassign-role/{id}?roleName={roleName}`
-- **Description**: Remove a role from a user.
-- **Response**:
-    ```json
-    {
-    "message": "Role unassigned successfully"
-    }
-    ```
 ## Report Service
+
 ### Get sale by id to generate
+
 - **Endpoint**: `GET /report/sale/{id}`
 - **Description**: Generate a PDF receipt for a specific sale.
 - **Response**: PDF file
@@ -1192,24 +1093,23 @@ The **User Management Service** is responsible for managing users and their role
 
 #### Request Parameters:
 
-| Parameter                        | Type         | Required | Default Value               | Description                                                                                             |
-|-----------------------------------|--------------|----------|-----------------------------|---------------------------------------------------------------------------------------------------------|
-| **page**                          | integer      | No       | `0`                         | The page number to retrieve.                                                                            |
-| **size**                          | integer      | No       | `5`                         | The number of items per page.                                                                           |
-| **minTotalPrice**                 | double       | No       | `0.0`                       | Minimum total price for the sale.                                                                       |
-| **maxTotalPrice**                 | double       | No       | `Double.MAX_VALUE`          | Maximum total price for the sale.                                                                       |
-| **minTotalDiscountAmount**        | double       | No       | `0.0`                       | Minimum total discount amount for the sale.                                                             |
-| **maxTotalDiscountAmount**        | double       | No       | `Double.MAX_VALUE`          | Maximum total discount amount for the sale.                                                             |
-| **minTotalDiscountedPrice**       | double       | No       | `0.0`                       | Minimum total discounted price for the sale.                                                            |
-| **maxTotalDiscountedPrice**       | double       | No       | `Double.MAX_VALUE`          | Maximum total discounted price for the sale.                                                            |
-| **startDate**                     | datetime     | No       | `2023-01-01T00:00:00`       | Start date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                          |
-| **endDate**                       | datetime     | No       | `Now`                       | End date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                            |
-| **paymentType**                   | string       | No       | `""`                        | Filter by payment type (e.g., `CASH`, `CREDIT_CARD`, `DEBIT_CARD`).                                      |
-| **cashierName**                   | string       | No       | `""`                        | Filter by cashier's name.                                                                                |
-| **deleted**                       | boolean      | No       | `false`                     | Include deleted sales if `true`.                                                                        |
-| **sortBy**                        | List<string> | No       | `"name"`                    | Field(s) to sort the results by. Example values could be `"totalPrice"`, `"date"`, `"cashierName"`, etc. |
-| **sortOrder**                     | string       | No       | `"ASC"`                     | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
-
+| Parameter                   | Type         | Required | Default Value         | Description                                                                                              |
+|-----------------------------|--------------|----------|-----------------------|----------------------------------------------------------------------------------------------------------|
+| **page**                    | integer      | No       | `0`                   | The page number to retrieve.                                                                             |
+| **size**                    | integer      | No       | `5`                   | The number of items per page.                                                                            |
+| **minTotalPrice**           | double       | No       | `0.0`                 | Minimum total price for the sale.                                                                        |
+| **maxTotalPrice**           | double       | No       | `Double.MAX_VALUE`    | Maximum total price for the sale.                                                                        |
+| **minTotalDiscountAmount**  | double       | No       | `0.0`                 | Minimum total discount amount for the sale.                                                              |
+| **maxTotalDiscountAmount**  | double       | No       | `Double.MAX_VALUE`    | Maximum total discount amount for the sale.                                                              |
+| **minTotalDiscountedPrice** | double       | No       | `0.0`                 | Minimum total discounted price for the sale.                                                             |
+| **maxTotalDiscountedPrice** | double       | No       | `Double.MAX_VALUE`    | Maximum total discounted price for the sale.                                                             |
+| **startDate**               | datetime     | No       | `2023-01-01T00:00:00` | Start date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                          |
+| **endDate**                 | datetime     | No       | `Now`                 | End date for filtering sales (format: `YYYY-MM-DDTHH:MM:SS`).                                            |
+| **paymentType**             | string       | No       | `""`                  | Filter by payment type (e.g., `CASH`, `CREDIT_CARD`, `DEBIT_CARD`).                                      |
+| **cashierName**             | string       | No       | `""`                  | Filter by cashier's name.                                                                                |
+| **deleted**                 | boolean      | No       | `false`               | Include deleted sales if `true`.                                                                         |
+| **sortBy**                  | List<string> | No       | `"name"`              | Field(s) to sort the results by. Example values could be `"totalPrice"`, `"date"`, `"cashierName"`, etc. |
+| **sortOrder**               | string       | No       | `"ASC"`               | The direction to sort the results. Can be `"ASC"` for ascending or `"DESC"` for descending order.        |
 
 #### Response:
 
@@ -1329,3 +1229,140 @@ The **User Management Service** is responsible for managing users and their role
   }
 }
 ```
+
+## User Management Service
+
+The **User Management Service** is responsible for managing users and their roles within the system. Below is a list of
+available endpoints and their usage.
+
+### Get User
+
+- **Endpoint**: `GET /user`
+- **Description**: Retrieve a list of all users.
+- **Response**:
+    ```json
+    [
+    {
+        "id": "1550629f-c91d-4ac3-8617-7747b503ccd2",
+        "username": "superuser",
+        "firstName": "osman tahir ",
+        "lastName": "ozdemir",
+        "email": "superuser@gmail.com",
+        "password": null,
+        "roles": [
+            "default-roles-32bit-realm",
+            "ADMIN"
+        ]
+    },
+  {
+        "id": "a23c6b13-481f-446b-a190-60bd26b862fe",
+        "username": "user4",
+        "firstName": "osman tahir ",
+        "lastName": "ozdemir",
+        "email": "user4@32bit.com",
+        "password": null,
+        "roles": [
+            "default-roles-32bit-realm",
+            "MANAGER"
+        ]
+    },
+    {
+        "id": "34eb3ff5-d56f-49f6-906c-464895cc1d4c",
+        "username": "user6",
+        "firstName": "UpdatedFirstName",
+        "lastName": "UpdatedLastName",
+        "email": "user6@example.com",
+        "password": null,
+        "roles": [
+            "CASHIER",
+            "default-roles-32bit-realm"
+        ]
+    }
+    ]
+    ```
+
+### Create User
+
+- **Endpoint**: `POST /user`
+- **Description**: Create a new user with roles.
+- **Request**:
+    ```json
+   {
+   "firstName": "mahmut",
+  "lastName": "mahmut",
+  "email": "mahmut.ersoy@example.com",
+  "username": "mahmut",
+  "roles": ["MANAGER"],
+  "password": "123"
+   }
+    ```
+- **Response**:
+    ```json
+    {
+    "message": "User created and roles assigned successfully"
+  }
+    ```
+
+### Update User
+
+- **Endpoint**: `PUT /user/{id}`
+- **Description**: Update user details.
+- **Request**:
+    ```json
+    {
+    "firstName": "UpdatedFirstName",
+  "lastName": "UpdatedLastName"
+    }
+    ```
+- **Response**:
+    ```json
+    {
+    "message": "User updated successfully"
+    }
+    ```
+- **Request**:
+    ```json
+    {
+    "roles": ["CASHIER"]
+     }
+    ```
+- **Response**:
+    ```json
+    {
+    "message": "User updated successfully with role adjustments."
+    }
+    ```
+
+### Delete User
+
+- **Endpoint**: `DELETE /user/{id}`
+- **Description**: Soft delete a user by ID.
+- **Response**:
+    ```json
+    {
+    "message": "User disabled successfully"
+    }
+    ```
+
+### Assign Role
+
+- **Endpoint**: `POST /assign-role/{id}?roleName={roleName}`
+- **Description**: Assign a role to a user.
+- **Response**:
+    ```json
+    {
+    "message": "Role assigned successfully"
+    }
+    ```
+
+### Unassign Role
+
+- **Endpoint**: `POST /unassign-role/{id}?roleName={roleName}`
+- **Description**: Remove a role from a user.
+- **Response**:
+    ```json
+    {
+    "message": "Role unassigned successfully"
+    }
+    ```
+

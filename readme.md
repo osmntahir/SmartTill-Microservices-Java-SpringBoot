@@ -146,7 +146,11 @@ These users can access their respective endpoints and perform operations accordi
 
 To manage Keycloak through the admin console, go to:
 
-http://keycloak:8080/admin/master/console/#/32bit_realm
+- **Username**: `admin`
+- **Password**: `admin`
+
+[http://keycloak:8080/admin/master/console/#/32bit_realm](http://keycloak:8080/admin/master/console/#/32bit_realm)
+
 
 ## Core Functionalities
 

@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/product")
 public class ProductController {
@@ -92,5 +94,11 @@ public class ProductController {
     public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
         productService.softDeleteProduct(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/getByIds")
+    public ResponseEntity<Iterable<ProductDto>> getProductsByIds(@RequestBody List<Long> productIds) {
+        Iterable<ProductDto> products = productService.getProductsByIds(productIds);
+        return ResponseEntity.ok(products);
     }
 }

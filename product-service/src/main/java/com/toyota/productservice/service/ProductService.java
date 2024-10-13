@@ -1,9 +1,7 @@
 package com.toyota.productservice.service;
 
-import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -17,4 +15,6 @@ public interface ProductService {
     void softDeleteProduct(Long id);
 
     Page<ProductDto> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection);
+
+    Iterable<ProductDto> getProductsByIds(List<Long> productIds);
 }

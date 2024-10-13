@@ -1,37 +1,43 @@
 package com.toyota.usermanagementservice.dto;
 
-
-import com.toyota.usermanagementservice.domain.Role;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.util.Set;
+import java.util.List;
 
 /**
- * DTO class representing a user in the system.
+ * Data Transfer Object (DTO) for user data.
+ * This class is used to transfer user-related information between layers in the application.
  */
-
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class UserDto {
-    private Long id;
-    @NotBlank(message = "Username must not be blank")
+
+    /**
+     * The unique identifier of the user.
+     */
+    private String id;
+
     private String username;
-    @NotBlank(message = "First name must not be blank")
+
+
     private String firstName;
-    @NotBlank(message = "Last name must not be blank")
+
+
     private String lastName;
-    @Email(message = "Email must be valid")
-    @NotBlank(message = "Email must not be blank")
+
+
     private String email;
-    @Size(min=1, message = "User must have at least one role")
-    private Set<Role> roles;
+
+
+    private String password;
+
+    /**
+     * A list of roles assigned to the user.
+     * Each role defines a set of permissions that the user is granted.
+     */
+    private List<String> roles;
+
 }

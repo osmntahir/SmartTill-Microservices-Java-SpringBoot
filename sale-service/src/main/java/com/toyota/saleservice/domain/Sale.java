@@ -23,6 +23,8 @@ public class Sale {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private double totalPrice;
+    private double totalDiscountAmount;
+    private double totalDiscountedPrice;
     private LocalDateTime date;
 
     @Enumerated(EnumType.STRING)
@@ -30,7 +32,8 @@ public class Sale {
     private PaymentType paymentType;
     private boolean deleted = Boolean.FALSE;
 
-
+    @Column(name = "cashier_name")
+    private String cashierName;
     @OneToMany(mappedBy = "sale", cascade = CascadeType.ALL)
     private List<SoldProduct> soldProducts;
 

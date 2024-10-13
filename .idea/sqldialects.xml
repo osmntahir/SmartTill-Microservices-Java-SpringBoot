@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SqlDialectMappings">
+    <file url="file://$APPLICATION_CONFIG_DIR$/consoles/db/5585f301-cea9-4e10-b8f1-12833c539acd/console_1.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/init.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/sale-service/src/main/java/com/toyota/saleservice/dao/CampaignRepository.java" dialect="PostgreSQL" />
+  </component>
+</project>

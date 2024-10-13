@@ -4,7 +4,6 @@ package com.toyota.saleservice.resource;
 import com.toyota.saleservice.dto.CampaignDto;
 import com.toyota.saleservice.dto.PaginationResponse;
 import com.toyota.saleservice.service.abstracts.CampaignService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -26,12 +25,12 @@ public class CampaignController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "") String name,
-            @RequestParam(required = false, defaultValue = "0") Double minDiscount,
-            @RequestParam(required = false, defaultValue = 100 + "") Double maxDiscount,
+            @RequestParam(required = false, defaultValue = "0") Double minDiscountPercentage,
+            @RequestParam(required = false, defaultValue = 100 + "") Double maxDiscountPercentage,
             @RequestParam(defaultValue = "false") boolean deleted,
             @RequestParam(defaultValue = "") List<String> sortBy,
             @RequestParam(defaultValue = "ASC") String sortDirection) {
-        return campaignService.getCampaignsFiltered(page, size, name, minDiscount, maxDiscount, deleted, sortBy, sortDirection);
+        return campaignService.getCampaignsFiltered(page, size, name, minDiscountPercentage, maxDiscountPercentage, deleted, sortBy, sortDirection);
     }
 
     @PostMapping("/add")
@@ -67,6 +66,28 @@ public class CampaignController {
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @PostMapping("/addProducts/{campaignId}")
+    public ResponseEntity<CampaignDto> addProductsToCampaign(
+            @PathVariable Long campaignId,
+            @RequestBody List<Long> productIds) {
+        CampaignDto response = campaignService.addProductsToCampaign(campaignId, productIds);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+    @DeleteMapping("/removeProducts/{campaignId}")
+    public ResponseEntity<CampaignDto> removeProductsFromCampaign(
+            @PathVariable Long campaignId,
+            @RequestBody List<Long> productIds) {
+        CampaignDto response = campaignService.removeProductsFromCampaign(campaignId, productIds);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/removeAllProducts/{campaignId}")
+    public ResponseEntity<CampaignDto> removeAllProductsFromCampaign(@PathVariable Long campaignId) {
+        CampaignDto response = campaignService.removeAllProductsFromCampaign(campaignId);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
 
 
 

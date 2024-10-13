@@ -1,6 +1,5 @@
 package com.toyota.productservice.service;
 
-import com.toyota.productservice.Mapper.ProductMapper;
 import com.toyota.productservice.dao.ProductRepository;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
@@ -13,7 +12,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.data.domain.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/api-gateway-keycloak/api-gateway-keycloak.iml" filepath="$PROJECT_DIR$/api-gateway-keycloak/api-gateway-keycloak.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sale-service/sale-service.iml" filepath="$PROJECT_DIR$/sale-service/sale-service.iml" />
     </modules>
   </component>
 </project>

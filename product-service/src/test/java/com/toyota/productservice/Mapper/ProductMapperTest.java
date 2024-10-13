@@ -1,6 +1,5 @@
 package com.toyota.productservice.Mapper;
 
-import com.toyota.productservice.Mapper.ProductMapper;
 import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
 import org.junit.jupiter.api.Test;

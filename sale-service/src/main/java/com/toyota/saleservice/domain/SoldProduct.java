@@ -1,6 +1,5 @@
 package com.toyota.saleservice.domain;
 
-import com.toyota.productservice.domain.Product;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Where;
@@ -22,15 +21,17 @@ public class SoldProduct {
     @JoinColumn(name = "sale_id")
     private Sale sale;
 
-    @ManyToOne
-    @JoinColumn(name = "product_id")
-    private Product product; // Product tipinde
+
+    @Column(name = "product_id")
+    private Long productId;
 
     private String name;
     private double price;
     private int quantity;
     private double total;
     private long discount;
+    private double discountAmount;
+    private double finalPriceAfterDiscount;
 
     private boolean deleted = Boolean.FALSE;
 }

@@ -1,6 +1,5 @@
 package com.toyota.productservice.resource;
 
-import com.toyota.productservice.domain.Product;
 import com.toyota.productservice.dto.ProductDto;
 import com.toyota.productservice.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -8,10 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-
-import java.util.Collections;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;

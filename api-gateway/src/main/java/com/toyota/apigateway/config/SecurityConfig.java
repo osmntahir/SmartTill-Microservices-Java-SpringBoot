@@ -33,5 +33,5 @@ public class SecurityConfig {
                                 .jwtAuthenticationConverter(new CustomJwtAuthenticationConverter())) // Custom converter for roles
                 )
                 .build();
-    }
+
 }

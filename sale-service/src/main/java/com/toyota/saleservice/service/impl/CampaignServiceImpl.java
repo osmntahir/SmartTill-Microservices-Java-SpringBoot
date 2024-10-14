@@ -228,4 +228,20 @@ public class CampaignServiceImpl implements CampaignService {
 
         return mapUtil.convertCampaignToCampaignDto(savedCampaign);
     }
+
+    @Override
+    public String getCampaignNameForProduct(Long productId) {
+        logger.info("Getting campaign name for product with ID: {}", productId);
+
+        List<Campaign> activeCampaigns = campaignRepository.findActiveCampaignsByProductIdNative(productId);
+
+        if (activeCampaigns.isEmpty()) {
+            logger.info("No active campaigns found for product ID: {}", productId);
+            return null;
+        } else {
+            String campaignName = activeCampaigns.get(0).getName();
+            logger.info("Campaign name for product ID {} is {}", productId, campaignName);
+            return campaignName;
+        }
+    }
 }

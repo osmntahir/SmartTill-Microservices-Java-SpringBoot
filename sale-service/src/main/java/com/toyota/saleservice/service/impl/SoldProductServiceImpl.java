@@ -161,6 +161,7 @@ public class SoldProductServiceImpl implements SoldProductService {
             soldProduct.setDiscount((long) discount);
             soldProduct.setDiscountAmount(discountAmount);
             soldProduct.setFinalPriceAfterDiscount(totalPrice - discountAmount);
+            soldProduct.setCampaignName(campaignService.getCampaignNameForProduct(productId));
             soldProduct.setTotal(totalPrice);
         } else {
 
@@ -169,6 +170,7 @@ public class SoldProductServiceImpl implements SoldProductService {
             soldProduct.setFinalPriceAfterDiscount(totalPrice);
             soldProduct.setTotal(totalPrice);
         }
+
     }
 
     void checkAndUpdateInventory(ProductDTO product, int quantity) {
@@ -219,6 +221,7 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         Optional<Long> discountOptional = campaignService.getDiscountForProduct(existingSoldProduct.getProductId());
         if (discountOptional.isPresent() && discountOptional.get() > 0) {
+            existingSoldProduct.setCampaignName(campaignService.getCampaignNameForProduct(existingSoldProduct.getProductId()));
             double discount = discountOptional.get();
             double discountAmount = existingSoldProduct.getTotal() * (discount / 100);
             existingSoldProduct.setDiscount((long) discount);

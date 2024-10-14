@@ -21,6 +21,8 @@ public class SoldProductDto {
     private double finalPriceAfterDiscount;
     private double total;
 
+    private String campaignName;
+
     @Min(value = 1, message = "Quantity must be greater than or equal to 1")
     private int quantity;
 

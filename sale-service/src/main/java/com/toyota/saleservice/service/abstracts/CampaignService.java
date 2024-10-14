@@ -27,4 +27,6 @@ public interface CampaignService {
     CampaignDto removeProductsFromCampaign(Long campaignId, List<Long> productIds);
 
     CampaignDto removeAllProductsFromCampaign(Long campaignId);
+
+    String getCampaignNameForProduct(Long productId);
 }

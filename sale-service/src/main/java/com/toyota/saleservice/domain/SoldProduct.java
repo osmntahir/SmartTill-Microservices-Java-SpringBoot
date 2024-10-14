@@ -33,5 +33,7 @@ public class SoldProduct {
     private double discountAmount;
     private double finalPriceAfterDiscount;
 
+    private String campaignName;
+
     private boolean deleted = Boolean.FALSE;
 }

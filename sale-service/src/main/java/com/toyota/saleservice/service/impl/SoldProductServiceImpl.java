@@ -1,7 +1,6 @@
 package com.toyota.saleservice.service.impl;
 
 import com.toyota.saleservice.config.ProductServiceClient;
-import com.toyota.saleservice.dao.CampaignRepository;
 import com.toyota.saleservice.dao.SaleRepository;
 import com.toyota.saleservice.dao.SoldProductRepository;
 import com.toyota.saleservice.domain.Sale;
@@ -28,7 +27,6 @@ import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -107,6 +105,10 @@ public class SoldProductServiceImpl implements SoldProductService {
         return productServiceClient.getProductById(productId)
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
     }
+    private ProductDTO getProductByIdIncludeInactive(Long productId) {
+        return productServiceClient.getProductByIdIncludeInactive(productId)
+                .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + productId));
+    }
 
     private Sale getSaleById(Long saleId) {
         return saleRepository.findById(saleId)
@@ -137,6 +139,7 @@ public class SoldProductServiceImpl implements SoldProductService {
         soldProduct.setName(product.getName());
         soldProduct.setPrice(product.getPrice());
         soldProduct.setQuantity(soldProductDto.getQuantity());
+
 
         checkAndUpdateInventory(product, soldProductDto.getQuantity());
 
@@ -189,7 +192,7 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         if (optionalSoldProduct.isPresent()) {
             SoldProduct existingSoldProduct = optionalSoldProduct.get();
-            ProductDTO product = getProductById(existingSoldProduct.getProductId());
+            ProductDTO product = getProductByIdIncludeInactive(existingSoldProduct.getProductId());
 
             // Restore the previous inventory first
             product.setInventory(product.getInventory() + existingSoldProduct.getQuantity());
@@ -242,11 +245,13 @@ public class SoldProductServiceImpl implements SoldProductService {
 
         if (optionalSoldProduct.isPresent()) {
             SoldProduct soldProduct = optionalSoldProduct.get();
-            ProductDTO product = getProductById(soldProduct.getProductId());
+            ProductDTO product = getProductByIdIncludeInactive(soldProduct.getProductId());
 
-            // Restore the inventory when a sold product is deleted
-            product.setInventory(product.getInventory() + soldProduct.getQuantity());
-            productServiceClient.updateProductInventory(product);
+            if (product != null) {
+                // Restore the inventory when a sold product is deleted
+                product.setInventory(product.getInventory() + soldProduct.getQuantity());
+                productServiceClient.updateProductInventory(product);
+            }
 
             soldProduct.setDeleted(true);
             SoldProduct saved = soldProductRepository.save(soldProduct);

@@ -9,5 +9,6 @@ public class ProductDTO {
     private String name;
     private double price;
     private int inventory;
+    private boolean isActive;
 
 }

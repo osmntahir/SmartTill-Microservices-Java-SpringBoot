@@ -9,7 +9,9 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
@@ -34,4 +36,16 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("maxPrice") Double maxPrice,
             @Param("isActive") Boolean isActive,
             Pageable pageable);
+
+
+    @Query("SELECT p FROM Product p WHERE p.active = true AND p.id = :id")
+    Optional<Product> findActiveProductById(Long id);
+
+
+
+    Optional<Product> findProductById(@Param("id") Long id);
+
+
+    @Query("SELECT p FROM Product p WHERE p.id IN :productIds")
+    Collection<Product> findAllActiveProductsById(List<Long> productIds);
 }

@@ -77,8 +77,35 @@ public class ProductServiceImpl implements ProductService {
 
     @Override
     public Iterable<ProductDto> getProductsByIds(List<Long> productIds) {
-        return productRepository.findAllById(productIds).stream().
+        return productRepository.findAllActiveProductsById(productIds).stream().
                 map(ProductMapper::mapToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public ProductDto getProductByIdIncludeInactive(Long id) {
+        Optional<Product> optionalProduct = productRepository.findProductById(id);
+        if (optionalProduct.isPresent()) {
+            ProductDto productDto = ProductMapper.mapToDto(optionalProduct.get());
+            logger.info("Retrieved product with id: {}", id);
+            return productDto;
+        } else {
+            logger.error("Product not found with id: {}", id);
+            throw new EntityNotFoundException("Product not found with id: " + id);
+        }
+    }
+
+    @Override
+    public ProductDto updateProductInventory(Long id, ProductDto productDto) {
+        Optional<Product> optionalProduct = productRepository.findProductById(id);
+        if (optionalProduct.isPresent()) {
+            Product existingProduct = optionalProduct.get();
+            existingProduct.setInventory(productDto.getInventory());
+            logger.info("Product with id {} inventory updated", id);
+            return ProductMapper.mapToDto(productRepository.save(existingProduct));
+        } else {
+            logger.error("Product not found with id: {}", id);
+            throw new EntityNotFoundException("Product not found with id: " + id);
+        }
     }
 
     /**
@@ -104,7 +131,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductDto getProductById(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
         if (optionalProduct.isPresent()) {
             ProductDto productDto = ProductMapper.mapToDto(optionalProduct.get());
             logger.info("Retrieved product with id: {}", id);
@@ -128,7 +155,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public ProductDto updateProduct(Long id, ProductDto productDto) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
         if (optionalProduct.isPresent()) {
             Product existingProduct = optionalProduct.get();
             if (productDto.isActive()) {
@@ -155,7 +182,7 @@ public class ProductServiceImpl implements ProductService {
      */
     @Override
     public void softDeleteProduct(Long id) {
-        Optional<Product> optionalProduct = productRepository.findById(id);
+        Optional<Product> optionalProduct = productRepository.findActiveProductById(id);
         if (optionalProduct.isPresent()) {
             Product product = optionalProduct.get();
             product.setActive(false); // Soft delete

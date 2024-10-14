@@ -17,4 +17,8 @@ public interface ProductService {
     Page<ProductDto> getProducts(int page, int size, String name, Double minPrice, Double maxPrice, boolean isActive, String sortBy, String sortDirection);
 
     Iterable<ProductDto> getProductsByIds(List<Long> productIds);
+
+    ProductDto getProductByIdIncludeInactive(Long id);
+
+    ProductDto updateProductInventory(Long id, ProductDto productDto);
 }

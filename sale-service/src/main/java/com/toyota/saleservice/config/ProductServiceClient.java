@@ -37,11 +37,32 @@ public class ProductServiceClient {
         }
     }
 
+    public Optional<ProductDTO> getProductByIdIncludeInactive(Long productId) {
+        try {
+            System.out.println("Fetching product with ID: " + productId);
+
+            ProductDTO product = restTemplate.getForObject(
+                    "http://product-service/product/getByIdIncludeInactive/" + productId, ProductDTO.class);
+
+            if (product == null) {
+                System.out.println("Product not found for ID: " + productId);
+            } else {
+                System.out.println("Product found: " + product);
+            }
+
+            return Optional.ofNullable(product);
+        } catch (Exception e) {
+            System.out.println("Exception occurred while fetching product: " + e.getMessage());
+            e.printStackTrace();
+            return Optional.empty();
+        }
+    }
+
 
 
     public void updateProductInventory(ProductDTO productDTO) {
         try {
-            restTemplate.put("http://product-service/product/update/" + productDTO.getId(), productDTO);
+            restTemplate.put("http://product-service/product/updateInventory/" + productDTO.getId(), productDTO);
         } catch (Exception e) {
             throw new RuntimeException("Failed to update product inventory", e);
         }

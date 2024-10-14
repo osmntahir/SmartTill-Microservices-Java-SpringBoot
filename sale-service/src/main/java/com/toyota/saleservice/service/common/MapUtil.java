@@ -82,7 +82,7 @@ public class MapUtil {
     public SoldProductDto convertSoldProductToSoldProductDto(SoldProduct soldProduct) {
         SoldProductDto dto = modelMapper.map(soldProduct, SoldProductDto.class);
 
-        ProductDTO productDTO = productServiceClient.getProductById(soldProduct.getProductId())
+        ProductDTO productDTO = productServiceClient.getProductByIdIncludeInactive(soldProduct.getProductId())
                 .orElseThrow(() -> new ProductNotFoundException("Product not found with id: " + soldProduct.getProductId()));
 
         dto.setProduct(productDTO); // Setting the entire ProductDTO object

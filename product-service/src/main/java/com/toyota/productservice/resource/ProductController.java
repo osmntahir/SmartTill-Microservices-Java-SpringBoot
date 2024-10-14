@@ -101,4 +101,16 @@ public class ProductController {
         Iterable<ProductDto> products = productService.getProductsByIds(productIds);
         return ResponseEntity.ok(products);
     }
+
+    @GetMapping("/getByIdIncludeInactive/{id}")
+    public ResponseEntity<ProductDto> getProductByIdIncludeInactive(@PathVariable Long id) {
+        ProductDto product = productService.getProductByIdIncludeInactive(id);
+        return ResponseEntity.ok(product);
+    }
+
+    @PutMapping("/updateInventory/{id}")
+    public ResponseEntity<ProductDto> updateProductInventory(@PathVariable Long id, @RequestBody ProductDto productDto) {
+        ProductDto updatedProduct = productService.updateProductInventory(id, productDto);
+        return ResponseEntity.ok(updatedProduct);
+    }
 }

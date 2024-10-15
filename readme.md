@@ -1077,7 +1077,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
   {
-    "id": 16,
+    "id": 1,
     "name": "Weekend Offer",
     "discountPercentage": 30,
     "products": null
@@ -1098,7 +1098,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
     {
-    "id": 16,
+    "id": 1,
     "name": "Weekend Offer",
     "discountPercentage": 30,
     "products": null
@@ -1185,7 +1185,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
    {
-    "id": 18,
+    "id": 1,
     "name": "Weekend Offer",
     "discountPercentage": 30,
     "products": null

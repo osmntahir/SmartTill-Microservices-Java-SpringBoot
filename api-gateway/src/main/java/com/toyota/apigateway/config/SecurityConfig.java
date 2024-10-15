@@ -22,7 +22,7 @@ public class SecurityConfig {
                         .pathMatchers("/sale/add/**").hasRole("CASHIER")
                         .pathMatchers("/sale/update/**").hasRole("CASHIER")
                         .pathMatchers("/sale/delete/**").hasRole("CASHIER")
-                        .pathMatchers("/sale/getById/**").hasRole("MANAGER")
+                        .pathMatchers("/sale/get/**").hasRole("MANAGER")
                         .pathMatchers("/campaign-product/**").hasRole("CASHIER")
                         .pathMatchers("/campaign/**").hasRole("CASHIER")
                         .pathMatchers("/sold-product/**").hasRole("CASHIER")

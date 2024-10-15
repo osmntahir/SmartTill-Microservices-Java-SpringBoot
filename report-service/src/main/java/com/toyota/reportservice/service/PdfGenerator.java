@@ -176,6 +176,7 @@ public class PdfGenerator {
                 .setMarginBottom(10);
         document.add(title);
 
+        addStoreInfo(document);
 
         for (SaleDto saleDto : saleDtos) {
             addSaleDetails(document, saleDto);

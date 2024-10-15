@@ -211,6 +211,7 @@ large datasets.
 
 - **Endpoints**:
     - `GET /report/sale/{id}` - Generate a PDF receipt for a specific sale.
+    - `GET /report/all-sales` - Generate a PDF receipt for all sales
     - `GET /report/sales` - Get a list of all sales with pagination, filtering, and sorting.
 
 ### **User Management Service**
@@ -1198,9 +1199,17 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Endpoint**: `GET /report/sale/{id}`
 - **Description**: Generate a PDF receipt for a specific sale.
-- **Response**: PDF file
+- **Response**: PDF file as a byte array
 
   [sale_report_1.pdf](reports%2Fsale_report_1.pdf)
+
+### Get all sales to generate
+
+- **Endpoint**: `GET /report/all-sales`
+- **Description**: Generate a PDF file containing details of all sales.
+- **Response**: PDF file as a byte array, listing all sales with their respective details such as sale ID, cashier name, sold products, total price, and discounts.
+
+  [all_sales_report.pdf](reports%2Fall_sales_report.pdf)
 
 ### Get sales report
 

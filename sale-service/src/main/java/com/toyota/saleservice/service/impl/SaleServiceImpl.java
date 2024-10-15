@@ -228,4 +228,14 @@ public class SaleServiceImpl implements SaleService {
 
         return saleDto;
     }
+
+    @Override
+    public List<SaleDto> getAllSalesForGeneratePdf() {
+        List<Sale> sales = saleRepository.findAll();
+
+        return sales.stream()
+                .map(mapUtil::convertSaleToSaleDto)
+                .collect(Collectors.toList());
+    }
+
 }

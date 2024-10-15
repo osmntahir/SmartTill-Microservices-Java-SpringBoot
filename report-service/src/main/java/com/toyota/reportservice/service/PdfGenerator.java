@@ -160,4 +160,56 @@ public class PdfGenerator {
                 .setFontSize(10)
                 .setMarginBottom(2));
     }
+
+    public byte[] generateAllSalesPDF(List<SaleDto> saleDtos) throws IOException {
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PdfWriter writer = new PdfWriter(outputStream);
+        PdfDocument pdfDocument = new PdfDocument(writer);
+        Document document = new Document(pdfDocument);
+
+
+        Paragraph title = new Paragraph("ALL SALES REPORT")
+                .setBold()
+                .setTextAlignment(TextAlignment.CENTER)
+                .setFontSize(14)
+                .setMarginBottom(10);
+        document.add(title);
+
+
+        for (SaleDto saleDto : saleDtos) {
+            addSaleDetails(document, saleDto);
+            addSoldProductsDetails(document, saleDto.getSoldProducts());
+            addTotalInfo(document, saleDto);
+
+            document.add(new Paragraph("\n").setMarginBottom(10));
+        }
+
+
+        document.close();
+
+
+        saveAllSalesPDFToFile(outputStream.toByteArray(), "all_sales_report");
+        return outputStream.toByteArray();
+    }
+
+    private void saveAllSalesPDFToFile(byte[] pdfContent, String fileName) throws IOException {
+
+        String directoryPath = reportPath;
+        File directory = new File(directoryPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+
+
+        String filePath = directoryPath + "/" + fileName + ".pdf";
+        try (FileOutputStream fos = new FileOutputStream(filePath)) {
+            fos.write(pdfContent);
+            fos.flush();
+        }
+
+        System.out.println("PDF saved at: " + filePath);
+    }
+
+
 }

@@ -12,6 +12,7 @@ import org.springframework.web.client.RestTemplate;
 
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 public class PDFController {
@@ -42,4 +43,23 @@ public class PDFController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
+
+    @GetMapping("/report/all-sales")
+    public ResponseEntity<byte[]> generateAllSalesPDF() {
+        try {
+
+            SaleDto[] saleDtos = restTemplate.getForObject("http://sale-service/sale/getAllForGeneratePdf", SaleDto[].class);
+
+
+            byte[] pdfContent = pdfGenerator.generateAllSalesPDF(List.of(saleDtos));
+
+            return ResponseEntity.ok().header("Content-Disposition", "attachment; filename=all_sales_report.pdf")
+                    .body(pdfContent);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
+        }
+    }
+
+
 }

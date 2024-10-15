@@ -48,6 +48,18 @@ public class SaleController {
                 startDate, endDate, paymentType, cashierName, deleted);
     }
 
+    @GetMapping("/getAllForGeneratePdf")
+    public ResponseEntity<List<SaleDto>> getAllSalesForGeneratePdf() {
+        List<SaleDto> saleDtos = saleService.getAllSalesForGeneratePdf();
+
+        if (saleDtos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return ResponseEntity.ok(saleDtos);
+    }
+
+
 
     @GetMapping("/get/{id}")
     public ResponseEntity <SaleDto> getSale(@PathVariable Long id){

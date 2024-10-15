@@ -32,4 +32,6 @@ public interface SaleService {
     SaleDto deleteSale(Long id);
 
     SaleDto getSale(Long id);
+
+    List<SaleDto> getAllSalesForGeneratePdf();
 }

@@ -294,43 +294,35 @@ endpoints and their usage.
     {
     "content": [
         {
-            "id": 9,
-            "name": "apple",
-            "description": null,
-            "price": 15.0,
-            "inventory": 44,
-            "active": true
-        },
-        {
-            "id": 8,
-            "name": "plum",
-            "description": null,
-            "price": 12.0,
-            "inventory": 43,
+            "id": 4,
+            "name": "apricot",
+            "description": "apricot",
+            "price": 5.0,
+            "inventory": 100,
             "active": true
         },
         {
             "id": 1,
-            "name": "fig",
-            "description": null,
-            "price": 10.0,
-            "inventory": 83,
+            "name": "banana",
+            "description": "banana",
+            "price": 4.0,
+            "inventory": 80,
             "active": true
         },
         {
-            "id": 4,
+            "id": 2,
+            "name": "cherry",
+            "description": "cherry",
+            "price": 2.0,
+            "inventory": 96,
+            "active": true
+        },
+        {
+            "id": 3,
             "name": "watermelon",
-            "description": null,
-            "price": 5.0,
-            "inventory": 15,
-            "active": true
-        },
-        {
-            "id": 6,
-            "name": "apricot",
-            "description": null,
-            "price": 7.0,
-            "inventory": 26,
+            "description": "watermelon",
+            "price": 6.0,
+            "inventory": 92,
             "active": true
         }
     ],
@@ -338,26 +330,26 @@ endpoints and their usage.
         "pageNumber": 0,
         "pageSize": 5,
         "sort": {
-            "empty": false,
             "sorted": true,
+            "empty": false,
             "unsorted": false
         },
         "offset": 0,
-        "unpaged": false,
-        "paged": true
+        "paged": true,
+        "unpaged": false
     },
-    "last": false,
-    "totalPages": 2,
-    "totalElements": 9,
-    "first": true,
+    "totalPages": 1,
+    "totalElements": 4,
+    "last": true,
     "size": 5,
     "number": 0,
     "sort": {
-        "empty": false,
         "sorted": true,
+        "empty": false,
         "unsorted": false
     },
-    "numberOfElements": 5,
+    "numberOfElements": 4,
+    "first": true,
     "empty": false
     }
     ```
@@ -378,11 +370,11 @@ endpoints and their usage.
 - **Response**:
     ```json
     {
-    "id": 10,
+    "id": 1,
     "name": "banana",
     "description": "banana",
-    "price": 10.0,
-    "inventory": 10,
+    "price": 4.0,
+    "inventory": 100,
     "active": true
     }
     ```
@@ -482,87 +474,113 @@ This service manages sales, including creating, updating, deleting, and retrievi
    {
     "content": [
         {
-            "id": 7,
-            "date": "2024-10-07T16:16:53.591297",
+            "id": 1,
+            "date": "2024-10-15T07:49:52.556131",
             "paymentType": "CREDIT_CARD",
-            "totalPrice": 99.0,
-            "totalDiscountAmount": 3.0,
-            "totalDiscountedPrice": 96.0,
+            "totalPrice": 144.0,
+            "totalDiscountAmount": 21.599999999999998,
+            "totalDiscountedPrice": 122.4,
             "cashierName": "Osman  Tahir  Ozdemir",
             "soldProducts": [
                 {
-                    "id": 13,
+                    "id": 1,
                     "product": {
                         "id": 1,
-                        "name": "cherry",
-                        "price": 15.0,
-                        "description": null,
-                        "inventory": 37
+                        "name": "banana",
+                        "price": 4.0,
+                        "description": "banana",
+                        "inventory": 88,
+                        "active": true
                     },
-                    "discount": 20.0,
-                    "discountAmount": 3.0,
-                    "finalPriceAfterDiscount": 12.0,
-                    "total": 15.0,
-                    "quantity": 1,
+                    "discount": 30.0,
+                    "discountAmount": 14.399999999999999,
+                    "finalPriceAfterDiscount": 33.6,
+                    "total": 48.0,
+                    "campaignName": "Weekend Offer",
+                    "quantity": 12,
                     "deleted": false
                 },
                 {
-                    "id": 14,
+                    "id": 2,
                     "product": {
                         "id": 2,
-                        "name": "banana",
-                        "price": 12.0,
-                        "description": null,
-                        "inventory": 29
+                        "name": "cherry",
+                        "price": 2.0,
+                        "description": "cherry",
+                        "inventory": 96,
+                        "active": true
+                    },
+                    "discount": 30.0,
+                    "discountAmount": 2.4,
+                    "finalPriceAfterDiscount": 5.6,
+                    "total": 8.0,
+                    "campaignName": "Weekend Offer",
+                    "quantity": 4,
+                    "deleted": false
+                },
+                {
+                    "id": 3,
+                    "product": {
+                        "id": 3,
+                        "name": "watermelon",
+                        "price": 6.0,
+                        "description": "watermelon",
+                        "inventory": 77,
+                        "active": true
                     },
                     "discount": 0.0,
                     "discountAmount": 0.0,
-                    "finalPriceAfterDiscount": 84.0,
-                    "total": 84.0,
-                    "quantity": 7,
+                    "finalPriceAfterDiscount": 48.0,
+                    "total": 48.0,
+                    "campaignName": null,
+                    "quantity": 8,
+                    "deleted": false
+                },
+                {
+                    "id": 4,
+                    "product": {
+                        "id": 4,
+                        "name": "apricot",
+                        "price": 5.0,
+                        "description": "apricot",
+                        "inventory": 92,
+                        "active": true
+                    },
+                    "discount": 12.0,
+                    "discountAmount": 4.8,
+                    "finalPriceAfterDiscount": 35.2,
+                    "total": 40.0,
+                    "campaignName": "Limited Time Offer",
+                    "quantity": 8,
                     "deleted": false
                 }
             ]
         },
         {
-            "id": 8,
-            "date": "2024-10-08T10:39:18.347029",
-            "paymentType": "CREDIT_CARD",
-            "totalPrice": 264.0,
-            "totalDiscountAmount": 24.0,
-            "totalDiscountedPrice": 240.0,
+            "id": 2,
+            "date": "2024-10-15T07:51:21.620015",
+            "paymentType": "DEBIT_CARD",
+            "totalPrice": 90.0,
+            "totalDiscountAmount": 0.0,
+            "totalDiscountedPrice": 90.0,
             "cashierName": "Osman  Tahir  Ozdemir",
             "soldProducts": [
                 {
-                    "id": 15,
+                    "id": 5,
                     "product": {
-                        "id": 2,
-                        "name": "banana",
-                        "price": 12.0,
-                        "description": null,
-                        "inventory": 29
+                        "id": 3,
+                        "name": "watermelon",
+                        "price": 6.0,
+                        "description": "watermelon",
+                        "inventory": 77,
+                        "active": true
                     },
                     "discount": 0.0,
                     "discountAmount": 0.0,
-                    "finalPriceAfterDiscount": 144.0,
-                    "total": 144.0,
-                    "quantity": 12,
-                    "deleted": false
-                },
-                {
-                    "id": 16,
-                    "product": {
-                        "id": 1,
-                        "name": "cherry",
-                        "price": 15.0,
-                        "description": null,
-                        "inventory": 37
-                    },
-                    "discount": 20.0,
-                    "discountAmount": 24.0,
-                    "finalPriceAfterDiscount": 96.0,
-                    "total": 120.0,
-                    "quantity": 8,
+                    "finalPriceAfterDiscount": 90.0,
+                    "total": 90.0,
+                    "campaignName": null,
+                    "quantity": 15,
                     "deleted": false
                 }
             ]
@@ -584,44 +602,84 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
     {
-    "id": 7,
-    "date": "2024-10-07T16:16:53.591297",
+    "id": 1,
+    "date": "2024-10-15T07:49:52.556131",
     "paymentType": "CREDIT_CARD",
-    "totalPrice": 99.0,
-    "totalDiscountAmount": 3.0,
-    "totalDiscountedPrice": 96.0,
+    "totalPrice": 144.0,
+    "totalDiscountAmount": 21.599999999999998,
+    "totalDiscountedPrice": 122.4,
     "cashierName": "Osman  Tahir  Ozdemir",
     "soldProducts": [
         {
-            "id": 14,
+            "id": 1,
             "product": {
-                "id": 2,
+                "id": 1,
                 "name": "banana",
-                "price": 12.0,
-                "description": null,
-                "inventory": 29
+                "price": 4.0,
+                "description": "banana",
+                "inventory": 88,
+                "active": true
             },
-            "discount": 0.0,
-            "discountAmount": 0.0,
-            "finalPriceAfterDiscount": 84.0,
-            "total": 84.0,
-            "quantity": 7,
+            "discount": 30.0,
+            "discountAmount": 14.399999999999999,
+            "finalPriceAfterDiscount": 33.6,
+            "total": 48.0,
+            "campaignName": "Weekend Offer",
+            "quantity": 12,
             "deleted": false
         },
         {
-            "id": 13,
+            "id": 2,
             "product": {
-                "id": 1,
+                "id": 2,
                 "name": "cherry",
-                "price": 15.0,
-                "description": null,
-                "inventory": 37
+                "price": 2.0,
+                "description": "cherry",
+                "inventory": 96,
+                "active": true
             },
-            "discount": 20.0,
-            "discountAmount": 3.0,
-            "finalPriceAfterDiscount": 12.0,
-            "total": 15.0,
-            "quantity": 1,
+            "discount": 30.0,
+            "discountAmount": 2.4,
+            "finalPriceAfterDiscount": 5.6,
+            "total": 8.0,
+            "campaignName": "Weekend Offer",
+            "quantity": 4,
+            "deleted": false
+        },
+        {
+            "id": 3,
+            "product": {
+                "id": 3,
+                "name": "watermelon",
+                "price": 6.0,
+                "description": "watermelon",
+                "inventory": 77,
+                "active": true
+            },
+            "discount": 0.0,
+            "discountAmount": 0.0,
+            "finalPriceAfterDiscount": 48.0,
+            "total": 48.0,
+            "campaignName": null,
+            "quantity": 8,
+            "deleted": false
+        },
+        {
+            "id": 4,
+            "product": {
+                "id": 4,
+                "name": "apricot",
+                "price": 5.0,
+                "description": "apricot",
+                "inventory": 92,
+                "active": true
+            },
+            "discount": 12.0,
+            "discountAmount": 4.8,
+            "finalPriceAfterDiscount": 35.2,
+            "total": 40.0,
+            "campaignName": "Limited Time Offer",
+            "quantity": 8,
             "deleted": false
         }
     ]
@@ -643,44 +701,84 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
    {
-    "id": 7,
-    "date": "2024-10-07T16:16:53.591297",
+    "id": 1,
+    "date": "2024-10-15T07:49:52.556131",
     "paymentType": "DEBIT_CARD",
-    "totalPrice": 99.0,
-    "totalDiscountAmount": 3.0,
-    "totalDiscountedPrice": 96.0,
+    "totalPrice": 144.0,
+    "totalDiscountAmount": 21.599999999999998,
+    "totalDiscountedPrice": 122.4,
     "cashierName": "Osman  Tahir  Ozdemir",
     "soldProducts": [
         {
-            "id": 14,
+            "id": 1,
             "product": {
-                "id": 2,
+                "id": 1,
                 "name": "banana",
-                "price": 12.0,
-                "description": null,
-                "inventory": 29
+                "price": 4.0,
+                "description": "banana",
+                "inventory": 88,
+                "active": true
             },
-            "discount": 0.0,
-            "discountAmount": 0.0,
-            "finalPriceAfterDiscount": 84.0,
-            "total": 84.0,
-            "quantity": 7,
+            "discount": 30.0,
+            "discountAmount": 14.399999999999999,
+            "finalPriceAfterDiscount": 33.6,
+            "total": 48.0,
+            "campaignName": "Weekend Offer",
+            "quantity": 12,
             "deleted": false
         },
         {
-            "id": 13,
+            "id": 2,
             "product": {
-                "id": 1,
+                "id": 2,
                 "name": "cherry",
-                "price": 15.0,
-                "description": null,
-                "inventory": 37
+                "price": 2.0,
+                "description": "cherry",
+                "inventory": 96,
+                "active": true
             },
-            "discount": 20.0,
-            "discountAmount": 3.0,
-            "finalPriceAfterDiscount": 12.0,
-            "total": 15.0,
-            "quantity": 1,
+            "discount": 30.0,
+            "discountAmount": 2.4,
+            "finalPriceAfterDiscount": 5.6,
+            "total": 8.0,
+            "campaignName": "Weekend Offer",
+            "quantity": 4,
+            "deleted": false
+        },
+        {
+            "id": 3,
+            "product": {
+                "id": 3,
+                "name": "watermelon",
+                "price": 6.0,
+                "description": "watermelon",
+                "inventory": 77,
+                "active": true
+            },
+            "discount": 0.0,
+            "discountAmount": 0.0,
+            "finalPriceAfterDiscount": 48.0,
+            "total": 48.0,
+            "campaignName": null,
+            "quantity": 8,
+            "deleted": false
+        },
+        {
+            "id": 4,
+            "product": {
+                "id": 4,
+                "name": "apricot",
+                "price": 5.0,
+                "description": "apricot",
+                "inventory": 92,
+                "active": true
+            },
+            "discount": 12.0,
+            "discountAmount": 4.8,
+            "finalPriceAfterDiscount": 35.2,
+            "total": 40.0,
+            "campaignName": "Limited Time Offer",
+            "quantity": 8,
             "deleted": false
         }
     ]
@@ -732,70 +830,78 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Response**:
     ```json
-  {
+     {
     "content": [
         {
-            "id": 12,
+            "id": 4,
             "product": {
                 "id": 4,
                 "name": "apricot",
-                "price": 60.0,
+                "price": 5.0,
                 "description": "apricot",
-                "inventory": 82
+                "inventory": 92,
+                "active": true
             },
-            "discount": 15.0,
-            "discountAmount": 54.0,
-            "finalPriceAfterDiscount": 306.0,
-            "total": 360.0,
-            "quantity": 6,
+            "discount": 12.0,
+            "discountAmount": 4.8,
+            "finalPriceAfterDiscount": 35.2,
+            "total": 40.0,
+            "campaignName": "Limited Time Offer",
+            "quantity": 8,
             "deleted": false
         },
         {
-            "id": 13,
+            "id": 1,
             "product": {
-                "id": 3,
+                "id": 1,
                 "name": "banana",
-                "price": 22.0,
+                "price": 4.0,
                 "description": "banana",
-                "inventory": 88
+                "inventory": 88,
+                "active": true
             },
-            "discount": 0.0,
-            "discountAmount": 0.0,
-            "finalPriceAfterDiscount": 88.0,
-            "total": 88.0,
+            "discount": 30.0,
+            "discountAmount": 14.399999999999999,
+            "finalPriceAfterDiscount": 33.6,
+            "total": 48.0,
+            "campaignName": "Weekend Offer",
+            "quantity": 12,
+            "deleted": false
+        },
+        {
+            "id": 2,
+            "product": {
+                "id": 2,
+                "name": "cherry",
+                "price": 2.0,
+                "description": "cherry",
+                "inventory": 96,
+                "active": true
+            },
+            "discount": 30.0,
+            "discountAmount": 2.4,
+            "finalPriceAfterDiscount": 5.6,
+            "total": 8.0,
+            "campaignName": "Weekend Offer",
             "quantity": 4,
             "deleted": false
         },
         {
-            "id": 15,
+            "id": 3,
             "product": {
-                "id": 2,
-                "name": "cherry",
-                "price": 18.0,
-                "description": "cherry",
-                "inventory": 86
-            },
-            "discount": 15.0,
-            "discountAmount": 16.2,
-            "finalPriceAfterDiscount": 91.8,
-            "total": 108.0,
-            "quantity": 6,
-            "deleted": false
-        },
-        {
-            "id": 14,
-            "product": {
-                "id": 1,
+                "id": 3,
                 "name": "watermelon",
-                "price": 30.0,
+                "price": 6.0,
                 "description": "watermelon",
-                "inventory": 58
+                "inventory": 92,
+                "active": false
             },
-            "discount": 30.0,
-            "discountAmount": 18.0,
-            "finalPriceAfterDiscount": 42.0,
-            "total": 60.0,
-            "quantity": 2,
+            "discount": 0.0,
+            "discountAmount": 0.0,
+            "finalPriceAfterDiscount": 48.0,
+            "total": 48.0,
+            "campaignName": null,
+            "quantity": 8,
             "deleted": false
         }
     ],
@@ -820,22 +926,24 @@ This service manages sales, including creating, updating, deleting, and retrievi
         ```
     - **Response**:
       ```json
-         {
-      "id": 17,
-      "product": {
-          "id": 1,
-          "name": "cherry",
-          "price": 15.0,
-          "description": null,
-          "inventory": 25
-      },
-      "discount": 20.0,
-      "discountAmount": 12.0,
-      "finalPriceAfterDiscount": 48.0,
-      "total": 60.0,
-      "quantity": 4,
-      "deleted": false
-      }
+       {
+        "id": 7,
+        "product": {
+            "id": 1,
+            "name": "banana",
+            "price": 4.0,
+            "description": "banana",
+            "inventory": 84,
+            "active": true
+        },
+        "discount": 30.0,
+        "discountAmount": 4.8,
+        "finalPriceAfterDiscount": 11.2,
+        "total": 16.0,
+        "campaignName": "Weekend Offer",
+        "quantity": 4,
+        "deleted": false
+        }
       ```
 
 ### Update Sold Product
@@ -851,18 +959,20 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
   {
-    "id": 17,
+    "id": 7,
     "product": {
         "id": 1,
-        "name": "cherry",
-        "price": 15.0,
-        "description": null,
-        "inventory": 21
+        "name": "banana",
+        "price": 4.0,
+        "description": "banana",
+        "inventory": 80,
+        "active": true
     },
-    "discount": 20.0,
-    "discountAmount": 24.0,
-    "finalPriceAfterDiscount": 96.0,
-    "total": 120.0,
+    "discount": 30.0,
+    "discountAmount": 9.6,
+    "finalPriceAfterDiscount": 22.4,
+    "total": 32.0,
+    "campaignName": "Weekend Offer",
     "quantity": 8,
     "deleted": false
     }
@@ -902,45 +1012,53 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 - **Response**:
     ```json
-  {
-    "content": [
-        {
-            "id": 1,
-            "name": "Limited Time Offer",
-            "discountPercentage": 30,
-            "products": [
-                {
-                    "id": 1,
-                    "name": "watermelon",
-                    "description": "watermelon",
-                    "price": 30.0,
-                    "inventory": 64,
-                    "active": true
-                }
-            ]
-        },
-        {
-            "id": 2,
-            "name": "Weekend Offer",
-            "discountPercentage": 15,
-            "products": [
-                {
-                    "id": 2,
-                    "name": "cherry",
-                    "description": "cherry",
-                    "price": 18.0,
-                    "inventory": 100,
-                    "active": true
-                }
-            ]
+    {
+        "content": [
+            {
+                "id": 1,
+                "name": "Weekend Offer",
+                "discountPercentage": 30,
+                "products": [
+                    {
+                        "id": 2,
+                        "name": "cherry",
+                        "description": "cherry",
+                        "price": 2.0,
+                        "inventory": 96,
+                        "active": true
+                    },
+                    {
+                        "id": 1,
+                        "name": "banana",
+                        "description": "banana",
+                        "price": 4.0,
+                        "inventory": 80,
+                        "active": true
+                    }
+                ]
+            },
+            {
+                "id": 2,
+                "name": "Limited Time Offer",
+                "discountPercentage": 12,
+                "products": [
+                    {
+                        "id": 4,
+                        "name": "apricot",
+                        "description": "apricot",
+                        "price": 5.0,
+                        "inventory": 100,
+                        "active": false
+                    }
+                ]
+            }
+        ],
+        "pageable": {
+            "pageNumber": 0,
+            "pageSize": 10,
+            "totalPages": 1,
+            "totalElements": 2
         }
-    ],
-    "pageable": {
-        "pageNumber": 0,
-        "pageSize": 10,
-        "totalPages": 1,
-        "totalElements": 2
-    }
     }
     ```
 
@@ -951,8 +1069,8 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Request**:
     ```json
    {
-    "name": "Weekend Special Discount",
-    "discountPercentage": 20
+    "name": "Weekend Offer",
+    "discountPercentage": 30
     }
 
     ```
@@ -960,8 +1078,8 @@ This service manages sales, including creating, updating, deleting, and retrievi
     ```json
   {
     "id": 16,
-    "name": "Weekend Special Discount",
-    "discountPercentage": 20,
+    "name": "Weekend Offer",
+    "discountPercentage": 30,
     "products": null
     }
     ```
@@ -981,7 +1099,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     ```json
     {
     "id": 16,
-    "name": "Weekend Special Discount",
+    "name": "Weekend Offer",
     "discountPercentage": 30,
     "products": null
     }
@@ -1009,24 +1127,24 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
    {
-    "id": 18,
-    "name": "Weekend Special Discount",
-    "discountPercentage": 15,
+    "id": 1,
+    "name": "Weekend Offer",
+    "discountPercentage": 30,
     "products": [
         {
             "id": 2,
-            "name": "banana",
-            "description": null,
-            "price": 12.0,
-            "inventory": 29,
+            "name": "cherry",
+            "description": "cherry",
+            "price": 2.0,
+            "inventory": 96,
             "active": true
         },
         {
             "id": 1,
-            "name": "cherry",
-            "description": null,
-            "price": 15.0,
-            "inventory": 17,
+            "name": "banana",
+            "description": "banana",
+            "price": 4.0,
+            "inventory": 80,
             "active": true
         }
     ]
@@ -1044,19 +1162,19 @@ This service manages sales, including creating, updating, deleting, and retrievi
 - **Response**:
     ```json
      {
-    "id": 18,
-    "name": "Weekend Special Discount",
-    "discountPercentage": 15,
-    "products": [
-        {
-            "id": 2,
-            "name": "banana",
-            "description": null,
-            "price": 12.0,
-            "inventory": 29,
-            "active": true
-        }
-    ]
+        "id": 1,
+        "name": "Weekend Offer",
+        "discountPercentage": 30,
+        "products": [
+            {
+                "id": 2,
+                "name": "cherry",
+                "description": "cherry",
+                "price": 2.0,
+                "inventory": 96,
+                "active": true
+            }
+        ]
     }
     ```
 
@@ -1068,8 +1186,8 @@ This service manages sales, including creating, updating, deleting, and retrievi
     ```json
    {
     "id": 18,
-    "name": "Weekend Special Discount",
-    "discountPercentage": 15,
+    "name": "Weekend Offer",
+    "discountPercentage": 30,
     "products": null
     }
     ```
@@ -1113,118 +1231,104 @@ This service manages sales, including creating, updating, deleting, and retrievi
 
 ```json
 {
-  "content": [
-    {
-      "id": 1,
-      "date": "2024-10-09T13:59:48.731203",
-      "paymentType": "CREDIT_CARD",
-      "totalPrice": 60.0,
-      "totalDiscountAmount": 0.0,
-      "totalDiscountedPrice": 60.0,
-      "cashierName": "Osman  Tahir  Ozdemir",
-      "soldProducts": [
+    "content": [
         {
-          "id": 1,
-          "product": {
             "id": 1,
-            "name": "watermelon",
-            "price": 30.0,
-            "inventory": 64
-          },
-          "discount": 0.0,
-          "discountAmount": 0.0,
-          "finalPriceAfterDiscount": 60.0,
-          "total": 60.0,
-          "quantity": 2,
-          "deleted": false
-        }
-      ]
-    },
-    {
-      "id": 2,
-      "date": "2024-10-09T14:16:17.862191",
-      "paymentType": "CREDIT_CARD",
-      "totalPrice": 240.0,
-      "totalDiscountAmount": 0.0,
-      "totalDiscountedPrice": 240.0,
-      "cashierName": "Osman  Tahir  Ozdemir",
-      "soldProducts": [
+            "date": "2024-10-15T07:49:52.556131",
+            "paymentType": "DEBIT_CARD",
+            "totalPrice": 104.0,
+            "totalDiscountAmount": 16.799999999999997,
+            "totalDiscountedPrice": 87.2,
+            "cashierName": "Osman  Tahir  Ozdemir",
+            "soldProducts": [
+                {
+                    "id": 1,
+                    "product": {
+                        "id": 1,
+                        "name": "banana",
+                        "price": 4.0,
+                        "inventory": 80,
+                        "active": true
+                    },
+                    "discount": 30.0,
+                    "discountAmount": 14.399999999999999,
+                    "finalPriceAfterDiscount": 33.6,
+                    "total": 48.0,
+                    "campaignName": "Weekend Offer",
+                    "quantity": 12,
+                    "deleted": false
+                },
+                {
+                    "id": 2,
+                    "product": {
+                        "id": 2,
+                        "name": "cherry",
+                        "price": 2.0,
+                        "inventory": 96,
+                        "active": true
+                    },
+                    "discount": 30.0,
+                    "discountAmount": 2.4,
+                    "finalPriceAfterDiscount": 5.6,
+                    "total": 8.0,
+                    "campaignName": "Weekend Offer",
+                    "quantity": 4,
+                    "deleted": false
+                },
+                {
+                    "id": 3,
+                    "product": {
+                        "id": 3,
+                        "name": "watermelon",
+                        "price": 6.0,
+                        "inventory": 92,
+                        "active": false
+                    },
+                    "discount": 0.0,
+                    "discountAmount": 0.0,
+                    "finalPriceAfterDiscount": 48.0,
+                    "total": 48.0,
+                    "campaignName": null,
+                    "quantity": 8,
+                    "deleted": false
+                }
+            ]
+        },
         {
-          "id": 2,
-          "product": {
-            "id": 1,
-            "name": "watermelon",
-            "price": 30.0,
-            "inventory": 64
-          },
-          "discount": 0.0,
-          "discountAmount": 0.0,
-          "finalPriceAfterDiscount": 240.0,
-          "total": 240.0,
-          "quantity": 8,
-          "deleted": false
+            "id": 2,
+            "date": "2024-10-15T07:51:21.620015",
+            "paymentType": "DEBIT_CARD",
+            "totalPrice": 32.0,
+            "totalDiscountAmount": 9.6,
+            "totalDiscountedPrice": 22.4,
+            "cashierName": "Osman  Tahir  Ozdemir",
+            "soldProducts": [
+                {
+                    "id": 7,
+                    "product": {
+                        "id": 1,
+                        "name": "banana",
+                        "price": 4.0,
+                        "inventory": 80,
+                        "active": true
+                    },
+                    "discount": 30.0,
+                    "discountAmount": 9.6,
+                    "finalPriceAfterDiscount": 22.4,
+                    "total": 32.0,
+                    "campaignName": "Weekend Offer",
+                    "quantity": 8,
+                    "deleted": false
+                }
+            ]
         }
-      ]
-    },
-    {
-      "id": 3,
-      "date": "2024-10-09T14:31:20.877169",
-      "paymentType": "CREDIT_CARD",
-      "totalPrice": 240.0,
-      "totalDiscountAmount": 0.0,
-      "totalDiscountedPrice": 240.0,
-      "cashierName": "Osman  Tahir  Ozdemir",
-      "soldProducts": [
-        {
-          "id": 3,
-          "product": {
-            "id": 1,
-            "name": "watermelon",
-            "price": 30.0,
-            "inventory": 64
-          },
-          "discount": 0.0,
-          "discountAmount": 0.0,
-          "finalPriceAfterDiscount": 240.0,
-          "total": 240.0,
-          "quantity": 8,
-          "deleted": false
-        }
-      ]
-    },
-    {
-      "id": 4,
-      "date": "2024-10-09T14:53:48.327226",
-      "paymentType": "CREDIT_CARD",
-      "totalPrice": 540.0,
-      "totalDiscountAmount": 81.0,
-      "totalDiscountedPrice": 459.0,
-      "cashierName": "Osman  Tahir  Ozdemir",
-      "soldProducts": [
-        {
-          "id": 4,
-          "product": {
-            "id": 1,
-            "name": "watermelon",
-            "price": 30.0,
-            "inventory": 64
-          },
-          "discount": 15.0,
-          "discountAmount": 81.0,
-          "finalPriceAfterDiscount": 459.0,
-          "total": 540.0,
-          "quantity": 18,
-          "deleted": false
-        }
-      ]
+    ],
+    "pageable": {
+        "pageNumber": 0,
+        "pageSize": 5,
+        "totalPages": 1,
+        "totalElements": 2
     }
-  ],
-  "pageable": {
-    "pageNumber": 0,
-    "pageSize": 5,
-    "totalPages": 1,
-    "totalElements": 4
-  }
 }
 ```
 

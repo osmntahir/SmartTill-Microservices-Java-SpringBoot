@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The **Cash Register ** is a backend system designed using a microservice architecture. This system handles
+The **Cash Register** is a backend system designed using a microservice architecture. This system handles
 various services like user management, product listing, sales, and reporting. The project integrates **API Gateway**
 with **Keycloak** to manage authentication, authorization, and routing requests between the services.
 

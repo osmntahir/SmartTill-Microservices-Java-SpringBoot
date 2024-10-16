@@ -1071,7 +1071,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
     ```json
    {
     "name": "Weekend Offer",
-    "discountPercentage": 30
+    "discountPercentage": 20
     }
 
     ```
@@ -1080,7 +1080,7 @@ This service manages sales, including creating, updating, deleting, and retrievi
   {
     "id": 1,
     "name": "Weekend Offer",
-    "discountPercentage": 30,
+    "discountPercentage": 20,
     "products": null
     }
     ```

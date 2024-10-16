@@ -83,7 +83,7 @@ To run the project locally, follow these steps:
 2. **Navigate to the project directory**:
 
     ```bash
-    cd Java-Toyota-32Bit-Backend
+    cd SmartTill-Microservices-Java-SpringBoot
     ```
 
 3. **Build the project and create JAR files** (skip the tests during build):

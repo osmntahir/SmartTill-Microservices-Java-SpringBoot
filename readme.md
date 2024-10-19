@@ -1,3 +1,7 @@
+
+![cash-register](https://github.com/user-attachments/assets/e6c19216-911a-4ec5-9b81-c9cab5a713fb)
+
+
 # Cash Register 
 
 ## Introduction
